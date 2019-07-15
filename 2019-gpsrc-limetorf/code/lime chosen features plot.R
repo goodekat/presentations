@@ -6,7 +6,7 @@ library(gretchenalbrecht)
 library(tidyverse)
 
 # Read in the test_explain data
-hamby224_test_explain <- readRDS("./data/hamby224_test_explain.rds")
+hamby224_test_explain <- readRDS("./2019-gpsrc-limetorf/data/hamby224_test_explain.rds")
 
 # Create the chosen features dataset
 chosen_features <- hamby224_test_explain %>%
@@ -74,7 +74,7 @@ lime_first_chosen <- chosen_features %>%
 lime_first_chosen
 
 # Save the plot
-ggsave("./figures/lime_first_chosen.png", 
+ggsave("./2019-gpsrc-limetorf/figures/lime_first_chosen.png", 
        plot = lime_first_chosen, 
        width = 15, 
        height = 9, 

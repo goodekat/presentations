@@ -37,4 +37,4 @@ sig_plot <- ggplot(wiggles, aes(x = t, y = yt)) +
 sig_plot
 
 # Save the plot
-ggsave("./figures/sig_plot.pdf", plot = sig_plot, width = 14, height = 5, units = c("in"))
+ggsave("./2019-gpsrc-limetorf/figures/sig_plot.pdf", plot = sig_plot, width = 14, height = 5, units = c("in"))

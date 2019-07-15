@@ -5,7 +5,7 @@ library(tidyverse)
 
 # Read in the test_explain data
 # Version copied from lime-to-bullets project on April 6, 2019
-hamby224_test_explain <- readRDS("./data/hamby224_test_explain.rds")
+hamby224_test_explain <- readRDS("./2019-gpsrc-limetorf/data/hamby224_test_explain.rds")
 
 # Subset to the case of interest
 caseofinterest <- hamby224_test_explain %>%
@@ -110,7 +110,7 @@ explainers <- plot_grid(plots, legend,
 explainers
 
 # Save the plot
-ggsave("./figures/explainers.pdf", 
+ggsave("./2019-gpsrc-limetorf/figures/explainers.pdf", 
        plot = explainers, 
        width = 12, 
        height = 8, 

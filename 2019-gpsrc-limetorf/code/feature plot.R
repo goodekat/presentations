@@ -1,7 +1,7 @@
 
 # Load in the training data
 # Version copied from lime-to-bullets project on April 6, 2019
-hamby173and252_train <- read.csv("./data/hamby173and252_train.csv")
+hamby173and252_train <- read.csv("./2019-gpsrc-limetorf/data/hamby173and252_train.csv")
 
 # Obtain features used when fitting the rtrees random forest
 rf_features <- rownames(bulletr::rtrees$importance)
@@ -31,7 +31,7 @@ features <- hamby173and252_train %>%
 features 
 
 # Save the plot
-ggsave("./figures/features.png", 
+ggsave("./2019-gpsrc-limetorf/figures/features.png", 
        plot = features, 
        width = 15, 
        height = 6, 

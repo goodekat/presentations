@@ -6,7 +6,7 @@ library(tidyverse)
 
 # Load in the testing data (Hamby Data 224 Sets 1 and 11)
 # Version copied from lime-to-bullets project on April 5, 2019
-hamby224_test <- read_csv("./data/hamby224_test.csv")
+hamby224_test <- read_csv("./2019-gpsrc-limetorf/data/hamby224_test.csv")
 
 # Heatmap of rfscore for each comparison in set 1
 heatmap <- hamby224_test %>%
@@ -37,5 +37,5 @@ heatmap <- hamby224_test %>%
 heatmap
 
 # Save the plot
-ggsave("./figures/heatmap.pdf", plot = heatmap, width = 7.5, height = 8, units = c("in"))
+ggsave("./2019-gpsrc-limetorf/figures/heatmap.pdf", plot = heatmap, width = 7.5, height = 8, units = c("in"))
 

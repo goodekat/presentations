@@ -1,6 +1,6 @@
 
 library(cowplot)
-hamby173and252_train <- read.csv("./data/hamby173and252_train.csv")
+hamby173and252_train <- read.csv("./2019-gpsrc-limetorf/data/hamby173and252_train.csv")
 
 full <- ggplot(hamby173and252_train, aes(x = non_cms, y = rfscore)) + 
   geom_point() + 
@@ -42,7 +42,7 @@ sub_bins <- hamby173and252_train %>%
 lime_example <- plot_grid(full, sub_linear, sub_bins, nrow = 1)
 
 # Save the plot
-ggsave("./figures/lime_example.png", 
+ggsave("./2019-gpsrc-limetorf/figures/lime_example.png", 
        plot = lime_example, 
        width = 25, 
        height = 6, 

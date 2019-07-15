@@ -4,7 +4,7 @@ library(tidyverse)
 
 # Read in the lime comparison data
 # Version copied from lime-to-bullets project on April 7, 2019
-hamby224_lime_comparisons <- readRDS("./data/hamby224_lime_comparisons.rds")
+hamby224_lime_comparisons <- readRDS("2019-gpsrc-limetorf/data/hamby224_lime_comparisons.rds")
 
 # Summarizing lime results
 hamby224_lime_results <- hamby224_lime_comparisons %>%
@@ -45,7 +45,7 @@ metrics <- hamby224_lime_results %>%
 metrics
 
 # Save the plot
-ggsave("./figures/metrics.pdf", 
+ggsave("./2019-gpsrc-limetorf/figures/metrics.pdf", 
        plot = metrics, 
        width = 15, 
        height = 7, 
