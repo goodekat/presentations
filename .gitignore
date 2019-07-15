@@ -3,8 +3,8 @@
 .Rhistory
 .Rproj.user
 .Ruserdata
-data
-figures
-libs
+*/data
+*/figures
+*/libs
+*/slides_files
 presentations.Rproj
-slides_files
