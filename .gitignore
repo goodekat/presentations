@@ -1,6 +1,7 @@
-.Rproj.user
-.Rhistory
 .RData
+.Rhistory
+.Rproj
+.Rproj.user
 .Ruserdata
 data
 figures
