@@ -1,0 +1,30 @@
+---
+title: "Notes from the Discussion"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Typed Version of Dr. Dixon's Notes
+
+**Susan and Deb (Boyken?)**: always use conditional residuals
+
+**Nora Bella**: uses studentized conditional residuals but will look at the marginal residuals to check for heteroscedasticity (e.g. by trt)
+
+**Larry Madden**: looks at studentized versions of both marginal and conditional residuals - he will also look at the marginal residuals by treatment to check for unequal variance and the conditional residuals by eblup to choose a transformation
+
+**Bruce Craig**: he mentioned that the conditional residuals tell you about $\textbf{R}$ (the error variance) whereas the marginal residuals can tell you about the random effects (this could also be assessed by looking at the BLUPs)
+
+**Rob Templeman**: he suggested color coding the residuals by treatment
+
+**Matt Kramer**: he suggested plotting the marginal versus the conditional residuals to get a feel for how much different the two sets of residuals are
+
+**Ed Gbur**: he likes to use the studentized residuals to assess outliers
+
+**Guilerme Rosa**: mentioned that when there are many random effects, the marginal residuals lump all of them together
+
+**Rob Templeman**: he suggested computing and using studentized BLUPs to assess the models
+
+**Susan Durham**: with ANOVA models, she likes to look at the boxplots of the residuals
