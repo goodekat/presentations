@@ -1,7 +1,8 @@
+.DS_Store
 .RData
 .Rhistory
 .Rproj.user
 .Ruserdata
 data
 figures
-Rproj
+presentations.Rproj
