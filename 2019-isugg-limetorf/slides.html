@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title> An Application of LIME to a Random Forest</title>
+    <meta charset="utf-8">
+    <meta name="author" content=" Katherine Goode" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# <a href="https://en.wikipedia.org/wiki/Tilia"><img src="figures/lindens.jpg" /></a> An Application of LIME to a Random Forest
+### <font size="5"> Katherine Goode </font>
+### <font size="5"> ISU Graphics Group - March 1, 2019 </font>
+
+---
+
+
+
+
+# Overview
+
+.pull-left[
+### The plan
+
+1. Explanation of LIME 
+2. Hamby bullet data
+3. Applying LIME to the random forest
+4. Issues and attempts at a solution
+6. Conclusions and future work
+]
+
+.pull-right[
+&lt;br&gt;
+&lt;br&gt;
+&lt;img src="./figures/lime_drawing.png" width = 400&gt;
+]
+
+---
+
+class: inverse, center, middle
+
+# What is &lt;span style="color:lime"&gt;LIME&lt;/span&gt;?
+
+---
+
+# Motivation for LIME
+
+&lt;br&gt;
+
+![](./figures/blackbox.png)
+
+### Black Box Prediction Models
+
+- Offer great predictive ability 
+- Loss of interpretability
+- Difficult to assess trustworthiness
+
+### Enter LIME...
+
+- **L**ocal **I**nterpretable **M**odel-Agnostic **E**xplanations
+- Developed by computer scientists ([Ribeiro, Singh, and Guestrin](https://arxiv.org/pdf/1602.04938.pdf))
+- Designed to assess if a black box predictive model is trustworthy
+- Produces "explanations" for individual predictions
+
+---
+
+# Meaning of LIME
+
+.pull-left[
+### &lt;span style="color:lime"&gt;L&lt;/span&gt;ocal
+
+- Focuses on behavior of a complex model at a local level
+
+### &lt;span style="color:lime"&gt;I&lt;/span&gt;nterpretable
+
+- Produces easily interpretable "explanations"
+
+### &lt;span style="color:lime"&gt;M&lt;/span&gt;odel-Agnostic
+
+- Works with any predictive model
+
+### &lt;span style="color:lime"&gt;E&lt;/span&gt;xplanations
+
+- Provides insight into individual predictions
+]
+
+.pull-right[
+&lt;br&gt;
+&lt;br&gt;
+.center[&lt;img src="./figures/local.png" width=300&gt;]
+.center[&lt;font size="4"&gt;Figure 3 in Ribeiro, Singh, and Guestrin (2016)&lt;/font&gt;]
+&lt;br&gt;
+&lt;br&gt;
+.center[&lt;img src="./figures/image_explanation.png" width=500&gt;]
+.center[&lt;font size="4"&gt;Figure 4 in Ribeiro, Singh, and Guestrin (2016)&lt;/font&gt;]
+]
+
+---
+
+# An Example &lt;font size="3"&gt;(from Ribeiro, Singh, and Guestrin (2016))&lt;/font&gt;
+
+.pull-left[
+### 1. Black Box Model 
+- Model predicts whether a patient has the flu
+- Apply the model to a new patient
+- Predicts that the patient has the flu
+- Can this prediction be trusted?
+]
+
+.pull-right[
+### 2. LIME
+- Apply LIME to *this* case
+- LIME returns the most important variables in *this* prediction
+- Colors indicate
+    + &lt;span style="color:green"&gt;green&lt;/span&gt;: evidence supporting the flu
+    + &lt;span style="color:red"&gt;red&lt;/span&gt;: evidence against the flu
+- Can this prediction be trusted?
+]
+
+.center[&lt;img src="./figures/example.png" width=700&gt;]
+.center[&lt;font size="4"&gt;Figure 1 in Ribeiro, Singh, and Guestrin (2016)&lt;/font&gt;]
+ 
+---
+
+# General LIME Procedure
+
+**Start with**: (1) training data, (2) complex model, (3) one prediction from the testing data
+1. Create perturbations from training data
+2. Input each perturbation into complex model to get predictions
+3. Compute similarity scores between test observation and each perturbation 
+4. Perform feature selection to choose `\(k\)` features
+5. Fit a simple and interpretable model weighted by the similarity scores to the perturbations
+  `$$\mbox{Example: } \mbox{prediction} \sim \mbox{feature 2} + \mbox{feature 3} \ \ \ \mbox{(with features standardized)}$$`
+6. Interpret the simple model to "explain" the predictions
+
+| | Feature 1 | &lt;span style="color:blue"&gt;Feature 2&lt;/span&gt; | &lt;span style="color:blue"&gt;Feature 3&lt;/span&gt; | Feature 4 | Similarity Score | &lt;span style="color:blue"&gt;Prediction&lt;/span&gt;|
+| --: | :--: | :--: | :--: | :--: | :--: | :--: |
+| test observation | 2 | 4 | 2 | 10 | exact | `\(\hat{y}_{\mbox{obs}}\)` |
+| perturbation 1 | 2 | 3 | 2 | 12 | very close | `\(\hat{y}_1\)` |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | 
+| perturbation 5000  | 10 | 0 | 13 | 22 | not close | `\(\hat{y}_{5000}\)` |
+
+---
+
+# Using LIME
+
+### Implementations of LIME
+
+- Developers created a Python package called [lime](https://github.com/marcotcr/lime)
+- Thomas Pedersen created an R package also called [lime](https://github.com/thomasp85/lime)
+
+![](./figures/lime.png)
+
+### Key Functions in the lime R package
+
+
+```r
+#install.packages("lime")
+library(lime)
+?lime
+?explain
+```
+
+---
+
+class: inverse, center, middle
+
+# Hamby Bullet Matching Data
+
+---
+
+# Hamby Bullet Study [&lt;font size="3"&gt;James E. Hamby et. al. (2009)&lt;/font&gt;](https://cdn2.hubspot.net/hub/71705/file-15668427-pdf/docs/aftespringvol41no2pages99-110.pdf)
+
+- Sets of bullets from both “known” and “unknown” gun barrels were sent to firearm examiners around the world
+- 240 total sets created
+    - 10 barrels used to create a set
+    - 35 bullets in a set 
+        - 20 knowns (2 from the same barrel)
+        - 15 unknowns (at least 1 and no more than 3 from each barrel)
+- Examiners asked to use the known bullets to identify which barrels the unknown bullets were fired from
+
+.center[&lt;img src="./figures/hamby.png" width=350&gt;]
+.center[&lt;font size="4"&gt;Results table from Hamby et. al. (2009)&lt;/font&gt;]
+
+---
+
+# Automated Bullet Matching Algorithm
+
+- CSAFE has access to some of the bullet sets
+- [Hare, Hofmann, and Carriquiry ](https://projecteuclid.org/euclid.aoas/1514430288)(2017) develop an automated algorithm to determine whether two bullets are a match
+- High definition scans of bullets used to obtain signatures associated with each land
+- Developed variables that measure how similar two signatures are
+- Fit a random forest model to predict whether two bullets were a match
+
+.center[&lt;img src="./figures/signatures.png" width=575&gt;]
+.center[&lt;font size="4"&gt;Figure from Hare, Hofmann, and Carriquiry (2017)&lt;/font&gt;]
+
+---
+
+# Training Data
+
+#### Sets 173 and 252
+
+
+```r
+hamby173and252_train &lt;- read.csv("./data/hamby173and252_train.csv") # first 5 rows
+```
+
+#### Variables Identifying the Bullets
+
+
+```r
+hamby173and252_train %&gt;% select(1:8) %&gt;% slice(1:5)
+```
+
+```
+##     study1 barrel1 bullet1 land1   study2 barrel2 bullet2 land2
+## 1 Hamby173      10       1     1 Hamby173      10       1     2
+## 2 Hamby173      10       1     1 Hamby173      10       1     3
+## 3 Hamby173      10       1     1 Hamby173      10       1     4
+## 4 Hamby173      10       1     1 Hamby173      10       1     5
+## 5 Hamby173      10       1     1 Hamby173      10       1     6
+```
+
+---
+
+# Training Data
+
+#### Signature Similarity Features
+
+
+```r
+hamby173and252_train %&gt;% select(9:17) %&gt;% slice(1:5) %&gt;% round(2)
+```
+
+```
+##    ccf rough_cor    D sd_D matches mismatches  cms non_cms sum_peaks
+## 1 0.19     -0.03 2.93 2.64    3.21       7.48 1.60    3.74      4.21
+## 2 0.26      0.18 1.43 1.88    3.37       9.54 1.68    2.80      3.63
+## 3 0.23      0.08 2.49 2.57    2.37      12.43 2.37    9.47      2.30
+## 4 0.35      0.17 2.29 2.68    2.66       9.56 1.59    5.31      3.92
+## 5 0.21      0.04 2.66 2.57    1.13      10.69 1.13    5.63      0.45
+```
+
+#### Response and RF Score
+
+
+```r
+hamby173and252_train %&gt;% select(18:19) %&gt;% slice(1:5)
+```
+
+```
+##   samesource   rfscore
+## 1      FALSE 0.1000000
+## 2      FALSE 0.2300000
+## 3      FALSE 0.3433333
+## 4      FALSE 0.3100000
+## 5      FALSE 0.3100000
+```
+
+---
+
+# Random Forest Model
+
+The random forest model fit to the training data in Hare, Hofmann, and Carriquiry can be found in the bulletr R package. It is called `rtrees`.
+
+.pull-left[
+
+```r
+# Load the bulletr library
+library(bulletr)
+```
+
+```r
+# Importance values from 
+# the random forest
+rtrees$importance
+```
+
+```
+##            MeanDecreaseGini
+## ccf               567.53791
+## rough_cor         666.62447
+## D                 164.76236
+## sd_D              101.73478
+## matches           305.13778
+## mismatches        261.84430
+## cms                94.96370
+## non_cms            96.75017
+## sum_peaks         120.49836
+```
+]
+
+.pull-right[
+
+```r
+# Number of trees
+rtrees$ntree
+```
+
+```
+## [1] 300
+```
+
+```r
+# Number of variables randomly 
+# sampled at each split
+rtrees$mtry
+```
+
+```
+## [1] 3
+```
+
+```r
+# Confusion matrix
+rtrees$confusion
+```
+
+```
+##       FALSE TRUE class.error
+## FALSE 81799   21 0.000256661
+## TRUE    363  845 0.300496689
+```
+]
+
+---
+
+# Testing Data
+
+
+```r
+hamby224_test &lt;- read.csv("./data/hamby224_test.csv") # first 5 rows
+glimpse(hamby224_test)
+```
+
+```
+## Observations: 432
+## Variables: 18
+## $ case       &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16…
+## $ study      &lt;fct&gt; Hamby 224, Hamby 224, Hamby 224, Hamby 224, Hamby 224…
+## $ set        &lt;fct&gt; Set 11, Set 11, Set 11, Set 11, Set 1, Set 1, Set 1, …
+## $ bullet1    &lt;fct&gt; Known 1, Known 1, Known 1, Known 1, Known 1, Known 1,…
+## $ bullet2    &lt;fct&gt; Known 1, Known 1, Known 2, Known 2, Known 2, Known 2,…
+## $ land1      &lt;fct&gt; Land 4, Land 3, Land 1, Land 4, Land 6, Land 3, Land …
+## $ land2      &lt;fct&gt; Land 3, Land 4, Land 6, Land 6, Land 4, Land 2, Land …
+## $ ccf        &lt;dbl&gt; 0.2704221, 0.2704221, 0.2788290, 0.3146965, 0.2251567…
+## $ rough_cor  &lt;dbl&gt; 0.2704221, 0.2704221, 0.2788290, 0.3146965, 0.2251567…
+## $ D          &lt;dbl&gt; 0.0013963668, 0.0013963668, 0.0015058188, 0.001533943…
+## $ sd_D       &lt;dbl&gt; 0.002090586, 0.002090586, 0.002059285, 0.002235877, 0…
+## $ matches    &lt;dbl&gt; 0.5901742, 0.5901742, 0.5320479, 0.5304097, 0.4600557…
+## $ mismatches &lt;dbl&gt; 7.616146, 7.616146, 7.895640, 8.213552, 7.123776, 5.9…
+## $ cms        &lt;dbl&gt; 0.5901742, 0.5901742, 0.5320479, 0.5304097, 0.4600557…
+## $ non_cms    &lt;dbl&gt; 3.808073, 3.808073, 4.462753, 4.449008, 5.936480, 3.9…
+## $ sum_peaks  &lt;dbl&gt; 1.4632093, 1.4632093, 1.2246315, 2.3406954, 0.6428395…
+## $ rfscore    &lt;dbl&gt; 0.00000000, 0.00000000, 0.00000000, 0.00000000, 0.020…
+## $ samesource &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALS…
+```
+
+---
+
+# Testing Data
+
+#### Results from Applying `rtrees` to Hamby 224 (Sets 1 and 11)
+
+&lt;br&gt;
+
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#uyjmftfjlc .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #000000;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  /* table.background.color */
+  width: auto;
+  /* table.width */
+  border-top-style: solid;
+  /* table.border.top.style */
+  border-top-width: 2px;
+  /* table.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table.border.top.color */
+}
+
+#uyjmftfjlc .gt_heading {
+  background-color: #FFFFFF;
+  /* heading.background.color */
+  border-bottom-color: #FFFFFF;
+}
+
+#uyjmftfjlc .gt_title {
+  color: #000000;
+  font-size: 125%;
+  /* heading.title.font.size */
+  padding-top: 4px;
+  /* heading.top.padding */
+  padding-bottom: 1px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#uyjmftfjlc .gt_subtitle {
+  color: #000000;
+  font-size: 85%;
+  /* heading.subtitle.font.size */
+  padding-top: 1px;
+  padding-bottom: 4px;
+  /* heading.bottom.padding */
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#uyjmftfjlc .gt_bottom_border {
+  border-bottom-style: solid;
+  /* heading.border.bottom.style */
+  border-bottom-width: 2px;
+  /* heading.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* heading.border.bottom.color */
+}
+
+#uyjmftfjlc .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#uyjmftfjlc .gt_col_heading {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* column_labels.background.color */
+  font-size: 16px;
+  /* column_labels.font.size */
+  font-weight: initial;
+  /* column_labels.font.weight */
+  vertical-align: middle;
+  padding: 10px;
+  margin: 10px;
+}
+
+#uyjmftfjlc .gt_sep_right {
+  border-right: 5px solid #FFFFFF;
+}
+
+#uyjmftfjlc .gt_group_heading {
+  padding: 8px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#uyjmftfjlc .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#uyjmftfjlc .gt_striped {
+  background-color: #f2f2f2;
+}
+
+#uyjmftfjlc .gt_row {
+  padding: 10px;
+  /* row.padding */
+  margin: 10px;
+  vertical-align: middle;
+}
+
+#uyjmftfjlc .gt_stub {
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #A8A8A8;
+  padding-left: 12px;
+}
+
+#uyjmftfjlc .gt_stub.gt_row {
+  background-color: #FFFFFF;
+}
+
+#uyjmftfjlc .gt_summary_row {
+  background-color: #FFFFFF;
+  /* summary_row.background.color */
+  padding: 6px;
+  /* summary_row.padding */
+  text-transform: inherit;
+  /* summary_row.text_transform */
+}
+
+#uyjmftfjlc .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+}
+
+#uyjmftfjlc .gt_table_body {
+  border-top-style: solid;
+  /* field.border.top.style */
+  border-top-width: 2px;
+  /* field.border.top.width */
+  border-top-color: #A8A8A8;
+  /* field.border.top.color */
+  border-bottom-style: solid;
+  /* field.border.bottom.style */
+  border-bottom-width: 2px;
+  /* field.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* field.border.bottom.color */
+}
+
+#uyjmftfjlc .gt_footnote {
+  font-size: 90%;
+  /* footnote.font.size */
+  padding: 4px;
+  /* footnote.padding */
+}
+
+#uyjmftfjlc .gt_sourcenote {
+  font-size: 90%;
+  /* sourcenote.font.size */
+  padding: 4px;
+  /* sourcenote.padding */
+}
+
+#uyjmftfjlc .gt_center {
+  text-align: center;
+}
+
+#uyjmftfjlc .gt_left {
+  text-align: left;
+}
+
+#uyjmftfjlc .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#uyjmftfjlc .gt_font_normal {
+  font-weight: normal;
+}
+
+#uyjmftfjlc .gt_font_bold {
+  font-weight: bold;
+}
+
+#uyjmftfjlc .gt_font_italic {
+  font-style: italic;
+}
+
+#uyjmftfjlc .gt_super {
+  font-size: 65%;
+}
+
+#uyjmftfjlc .gt_footnote_glyph {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="uyjmftfjlc" style="overflow-x:auto;"><!--gt table start-->
+<table class='gt_table'>
+<tr>
+<th class='gt_col_heading gt_center' rowspan='1' colspan='1'>Truth</th>
+<th class='gt_col_heading gt_center' rowspan='1' colspan='1'>RF_Prediction</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>Count</th>
+</tr>
+<tbody class='gt_table_body'>
+<tr>
+<td class='gt_row gt_center'>FALSE</td>
+<td class='gt_row gt_center'>FALSE</td>
+<td class='gt_row gt_right'>277</td>
+</tr>
+<tr>
+<td class='gt_row gt_center gt_striped'>FALSE</td>
+<td class='gt_row gt_center gt_striped'>TRUE</td>
+<td class='gt_row gt_right gt_striped'>43</td>
+</tr>
+<tr>
+<td class='gt_row gt_center'>TRUE</td>
+<td class='gt_row gt_center'>FALSE</td>
+<td class='gt_row gt_right'>3</td>
+</tr>
+<tr>
+<td class='gt_row gt_center gt_striped'>TRUE</td>
+<td class='gt_row gt_center gt_striped'>TRUE</td>
+<td class='gt_row gt_right gt_striped'>41</td>
+</tr>
+</tbody>
+</table>
+<!--gt table end-->
+</div>
+
+&lt;br&gt;
+
+- Want to determine the driving variables for individual predictions
+- Especially helpful when the model is wrong
+- Variable importance scores provide global interpretations
+- We want local interpretations
+
+---
+
+class: inverse, center, middle
+
+# Applying &lt;span style="color:lime"&gt;LIME&lt;/span&gt; to the Random Forest
+
+---
+
+# Step 0: Starting Objects
+
+**Training Data**: `hamby173and252_train`
+
+**Complex Model**: `rtrees`
+
+**Case of Interest**: case 1 from `hamby224_test`
+
+&lt;br&gt;
+
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#aasskfogmu .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #000000;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  /* table.background.color */
+  width: auto;
+  /* table.width */
+  border-top-style: solid;
+  /* table.border.top.style */
+  border-top-width: 2px;
+  /* table.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table.border.top.color */
+}
+
+#aasskfogmu .gt_heading {
+  background-color: #FFFFFF;
+  /* heading.background.color */
+  border-bottom-color: #FFFFFF;
+}
+
+#aasskfogmu .gt_title {
+  color: #000000;
+  font-size: 125%;
+  /* heading.title.font.size */
+  padding-top: 4px;
+  /* heading.top.padding */
+  padding-bottom: 1px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#aasskfogmu .gt_subtitle {
+  color: #000000;
+  font-size: 85%;
+  /* heading.subtitle.font.size */
+  padding-top: 1px;
+  padding-bottom: 4px;
+  /* heading.bottom.padding */
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#aasskfogmu .gt_bottom_border {
+  border-bottom-style: solid;
+  /* heading.border.bottom.style */
+  border-bottom-width: 2px;
+  /* heading.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* heading.border.bottom.color */
+}
+
+#aasskfogmu .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#aasskfogmu .gt_col_heading {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* column_labels.background.color */
+  font-size: 16px;
+  /* column_labels.font.size */
+  font-weight: initial;
+  /* column_labels.font.weight */
+  vertical-align: middle;
+  padding: 10px;
+  margin: 10px;
+}
+
+#aasskfogmu .gt_sep_right {
+  border-right: 5px solid #FFFFFF;
+}
+
+#aasskfogmu .gt_group_heading {
+  padding: 8px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#aasskfogmu .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#aasskfogmu .gt_striped {
+  background-color: #f2f2f2;
+}
+
+#aasskfogmu .gt_row {
+  padding: 10px;
+  /* row.padding */
+  margin: 10px;
+  vertical-align: middle;
+}
+
+#aasskfogmu .gt_stub {
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #A8A8A8;
+  padding-left: 12px;
+}
+
+#aasskfogmu .gt_stub.gt_row {
+  background-color: #FFFFFF;
+}
+
+#aasskfogmu .gt_summary_row {
+  background-color: #FFFFFF;
+  /* summary_row.background.color */
+  padding: 6px;
+  /* summary_row.padding */
+  text-transform: inherit;
+  /* summary_row.text_transform */
+}
+
+#aasskfogmu .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+}
+
+#aasskfogmu .gt_table_body {
+  border-top-style: solid;
+  /* field.border.top.style */
+  border-top-width: 2px;
+  /* field.border.top.width */
+  border-top-color: #A8A8A8;
+  /* field.border.top.color */
+  border-bottom-style: solid;
+  /* field.border.bottom.style */
+  border-bottom-width: 2px;
+  /* field.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* field.border.bottom.color */
+}
+
+#aasskfogmu .gt_footnote {
+  font-size: 90%;
+  /* footnote.font.size */
+  padding: 4px;
+  /* footnote.padding */
+}
+
+#aasskfogmu .gt_sourcenote {
+  font-size: 90%;
+  /* sourcenote.font.size */
+  padding: 4px;
+  /* sourcenote.padding */
+}
+
+#aasskfogmu .gt_center {
+  text-align: center;
+}
+
+#aasskfogmu .gt_left {
+  text-align: left;
+}
+
+#aasskfogmu .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#aasskfogmu .gt_font_normal {
+  font-weight: normal;
+}
+
+#aasskfogmu .gt_font_bold {
+  font-weight: bold;
+}
+
+#aasskfogmu .gt_font_italic {
+  font-style: italic;
+}
+
+#aasskfogmu .gt_super {
+  font-size: 65%;
+}
+
+#aasskfogmu .gt_footnote_glyph {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="aasskfogmu" style="overflow-x:auto;"><!--gt table start-->
+<table class='gt_table'>
+<tr>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>case</th>
+<th class='gt_col_heading gt_center' rowspan='1' colspan='1'>study</th>
+<th class='gt_col_heading gt_center' rowspan='1' colspan='1'>set</th>
+<th class='gt_col_heading gt_center' rowspan='1' colspan='1'>bullet1</th>
+<th class='gt_col_heading gt_center' rowspan='1' colspan='1'>bullet2</th>
+<th class='gt_col_heading gt_center' rowspan='1' colspan='1'>land1</th>
+<th class='gt_col_heading gt_center' rowspan='1' colspan='1'>land2</th>
+</tr>
+<tbody class='gt_table_body'>
+<tr>
+<td class='gt_row gt_right'>1</td>
+<td class='gt_row gt_center'>Hamby 224</td>
+<td class='gt_row gt_center'>Set 11</td>
+<td class='gt_row gt_center'>Known 1</td>
+<td class='gt_row gt_center'>Known 1</td>
+<td class='gt_row gt_center'>Land 4</td>
+<td class='gt_row gt_center'>Land 3</td>
+</tr>
+</tbody>
+</table>
+<!--gt table end-->
+</div>
+
+&lt;br&gt;
+
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#esjunoiazi .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #000000;
+  font-size: 16px;
+  background-color: #FFFFFF;
+  /* table.background.color */
+  width: auto;
+  /* table.width */
+  border-top-style: solid;
+  /* table.border.top.style */
+  border-top-width: 2px;
+  /* table.border.top.width */
+  border-top-color: #A8A8A8;
+  /* table.border.top.color */
+}
+
+#esjunoiazi .gt_heading {
+  background-color: #FFFFFF;
+  /* heading.background.color */
+  border-bottom-color: #FFFFFF;
+}
+
+#esjunoiazi .gt_title {
+  color: #000000;
+  font-size: 125%;
+  /* heading.title.font.size */
+  padding-top: 4px;
+  /* heading.top.padding */
+  padding-bottom: 1px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#esjunoiazi .gt_subtitle {
+  color: #000000;
+  font-size: 85%;
+  /* heading.subtitle.font.size */
+  padding-top: 1px;
+  padding-bottom: 4px;
+  /* heading.bottom.padding */
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#esjunoiazi .gt_bottom_border {
+  border-bottom-style: solid;
+  /* heading.border.bottom.style */
+  border-bottom-width: 2px;
+  /* heading.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* heading.border.bottom.color */
+}
+
+#esjunoiazi .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#esjunoiazi .gt_col_heading {
+  color: #000000;
+  background-color: #FFFFFF;
+  /* column_labels.background.color */
+  font-size: 16px;
+  /* column_labels.font.size */
+  font-weight: initial;
+  /* column_labels.font.weight */
+  vertical-align: middle;
+  padding: 10px;
+  margin: 10px;
+}
+
+#esjunoiazi .gt_sep_right {
+  border-right: 5px solid #FFFFFF;
+}
+
+#esjunoiazi .gt_group_heading {
+  padding: 8px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#esjunoiazi .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #000000;
+  background-color: #FFFFFF;
+  /* stub_group.background.color */
+  font-size: 16px;
+  /* stub_group.font.size */
+  font-weight: initial;
+  /* stub_group.font.weight */
+  border-top-style: solid;
+  /* stub_group.border.top.style */
+  border-top-width: 2px;
+  /* stub_group.border.top.width */
+  border-top-color: #A8A8A8;
+  /* stub_group.border.top.color */
+  border-bottom-style: solid;
+  /* stub_group.border.bottom.style */
+  border-bottom-width: 2px;
+  /* stub_group.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* stub_group.border.bottom.color */
+  vertical-align: middle;
+}
+
+#esjunoiazi .gt_striped {
+  background-color: #f2f2f2;
+}
+
+#esjunoiazi .gt_row {
+  padding: 10px;
+  /* row.padding */
+  margin: 10px;
+  vertical-align: middle;
+}
+
+#esjunoiazi .gt_stub {
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #A8A8A8;
+  padding-left: 12px;
+}
+
+#esjunoiazi .gt_stub.gt_row {
+  background-color: #FFFFFF;
+}
+
+#esjunoiazi .gt_summary_row {
+  background-color: #FFFFFF;
+  /* summary_row.background.color */
+  padding: 6px;
+  /* summary_row.padding */
+  text-transform: inherit;
+  /* summary_row.text_transform */
+}
+
+#esjunoiazi .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+}
+
+#esjunoiazi .gt_table_body {
+  border-top-style: solid;
+  /* field.border.top.style */
+  border-top-width: 2px;
+  /* field.border.top.width */
+  border-top-color: #A8A8A8;
+  /* field.border.top.color */
+  border-bottom-style: solid;
+  /* field.border.bottom.style */
+  border-bottom-width: 2px;
+  /* field.border.bottom.width */
+  border-bottom-color: #A8A8A8;
+  /* field.border.bottom.color */
+}
+
+#esjunoiazi .gt_footnote {
+  font-size: 90%;
+  /* footnote.font.size */
+  padding: 4px;
+  /* footnote.padding */
+}
+
+#esjunoiazi .gt_sourcenote {
+  font-size: 90%;
+  /* sourcenote.font.size */
+  padding: 4px;
+  /* sourcenote.padding */
+}
+
+#esjunoiazi .gt_center {
+  text-align: center;
+}
+
+#esjunoiazi .gt_left {
+  text-align: left;
+}
+
+#esjunoiazi .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#esjunoiazi .gt_font_normal {
+  font-weight: normal;
+}
+
+#esjunoiazi .gt_font_bold {
+  font-weight: bold;
+}
+
+#esjunoiazi .gt_font_italic {
+  font-style: italic;
+}
+
+#esjunoiazi .gt_super {
+  font-size: 65%;
+}
+
+#esjunoiazi .gt_footnote_glyph {
+  font-style: italic;
+  font-size: 65%;
+}
+</style>
+<div id="esjunoiazi" style="overflow-x:auto;"><!--gt table start-->
+<table class='gt_table'>
+<tr>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>ccf</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rough_cor</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>D</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>sd_D</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>matches</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>mismatches</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>cms</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>non_cms</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>sum_peaks</th>
+<th class='gt_col_heading gt_right' rowspan='1' colspan='1'>rfscore</th>
+</tr>
+<tbody class='gt_table_body'>
+<tr>
+<td class='gt_row gt_right'>0.27</td>
+<td class='gt_row gt_right'>0.27</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>0</td>
+<td class='gt_row gt_right'>0.59</td>
+<td class='gt_row gt_right'>7.62</td>
+<td class='gt_row gt_right'>0.59</td>
+<td class='gt_row gt_right'>3.81</td>
+<td class='gt_row gt_right'>1.46</td>
+<td class='gt_row gt_right'>0</td>
+</tr>
+</tbody>
+</table>
+<!--gt table end-->
+</div>
+
+---
+
+# Step 1: Create Perturbations
+
+#### Estimate the feature distributions
+
+.pull-left[
+- quantile bins (default with 4 bins)
+- equally spaced bins
+]
+.pull-right[
+- normal approximation 
+- kernel density estimation
+]
+.center[
+![](slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+]
+.center[&lt;font size="4"&gt;Histogram of CCF from training data with LIME quantile bins (blue line is ccf value of case 1)&lt;/font&gt;]
+
+---
+
+# Step 1: Create Perturbations
+
+#### Draw many samples from the estimated feature distributions
+
+- If a binning estimation method is used, numeric features are converted to indicator variables.
+    - 1 if in same bin as case 1
+    - 0 o.w.
+
+| | ccf same bin? | rough_cor same bin? | `\(\cdots\)` | sum_peaks same bin?|
+| --: | :--: | :--: | :--: | :--: | 
+| case 1 | 1 | 1 | `\(\cdots\)` | 1 |
+| perturbation 1 | 0 | 1 | `\(\cdots\)` | 1 |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+| perturbation 5000  | 0 | 0 | `\(\cdots\)` | 1|
+
+- Otherwise, features are left as is.
+
+---
+
+# Step 2: Obtain Predictions
+
+#### Use the complex model to obtain a prediction for each perturbation
+
+- Use the `rtrees` model to do this
+
+&lt;br&gt;
+
+| | ccf same bin? | rough_cor same bin? | `\(\cdots\)` | sum_peaks same bin?| prediction |
+| --: | :--: | :--: | :--: | :--: | :--: |
+| case 1 | 1 | 1 | `\(\cdots\)` | 1 | not a match |
+| perturbation 1 | 0 | 1 | `\(\cdots\)` | 1 | match |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+| perturbation 5000  | 0 | 0 | `\(\cdots\)` | 1 | not a match |
+
+---
+
+# Step 3: Similarity Score 
+
+#### Compute a similiarity score between the test observation and each perturbation.
+
+- Default method in R package is Gower distance
+    - between 0 and 1 
+    - 0 indicates exactly the same
+- Other distance metrics can be specified
+    
+| | ccf same bin? | rough_cor same bin? | `\(\cdots\)` | sum_peaks same bin?| distance | prediction |
+| --: | :--: | :--: | :--: | :--: | :--: |
+| case 1 | 1 | 1 | `\(\cdots\)` | 1 | 0 | not a match |
+| perturbation 1 | 0 | 1 | `\(\cdots\)` | 1 | 0.1 | match |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+| perturbation 5000  | 0 | 0 | `\(\cdots\)` | 1 | 0.8 | not a match |
+
+---
+
+# Step 4: Feature Selection
+
+#### Perform feature selection to choose `\(k\)` features.
+
+- Can specify the number of features to select
+    - We have been choosing 3 features
+- Options in lime
+     - auto: forward selection if `\(k\le6\)`, highest weight otherwise (default)
+     - forward selection with ridge regression
+     - highest weight with ridge regression
+     - LASSO
+     - tree models
+- We have been using the default method
+
+&lt;br&gt;
+
+`$$\hat{\mbox{rf score}}=\hat{\beta_0} + \hat{\beta_1} I[\mbox{ccf in same bin}] + \hat{\beta_2} I[\mbox{rough_cor in same bin}] +\cdots + \hat{\beta_9} I[\mbox{sum_peaks in same bin}]$$`
+
+---
+
+# Step 5: Simple Model
+
+#### Fit a linear regression (weighted by the similarity scores) to the perturbations with the 3 chosen features.
+
+- Features are standardized
+- Currently, lime uses ridge regression as the "simple" model
+- If the response is categorical, the user can select how many categories they want to explain
+    - We have only been explaining "TRUE"
+- Example model: 
+
+&lt;br&gt;
+
+`$$\hat{\mbox{rf score}}=\hat{\beta_0} + \hat{\beta_1} I[\mbox{ccf in same bin}] + \hat{\beta_2} I[\mbox{cms in same bin}] + \hat{\beta_3} I[\mbox{matches in same bin}]$$`
+
+---
+
+# Step 6: Interpret 
+
+#### Use the coefficients from the regression to "explain" the predictions.
+
+- Since features are standardized, we can compare the coefficients
+- Largest `\(\hat{\beta}_i\)` is considered the most important
+
+---
+
+# R Code
+
+## lime Function
+
+The `lime` function estimates the feature distributions (first part of step 1).
+
+
+```r
+set.seed(20190229)
+out_lime &lt;- lime::lime(x = hamby173and252_train %&gt;% select(ccf:sum_peaks), 
+                      model = lime::as_classifier(rtrees))
+out_lime$bin_cuts$ccf
+```
+
+```
+##         0%        25%        50%        75%       100% 
+## 0.01406705 0.21271265 0.27499511 0.34783793 0.98110386
+```
+
+```r
+out_lime$feature_distribution$ccf
+```
+
+```
+## 
+##    1    2    3    4 
+## 0.25 0.25 0.25 0.25
+```
+
+---
+
+# R Code
+
+## explain Function
+
+The `explain` function performs the rest of the steps.
+
+
+```r
+out_explain &lt;- lime::explain(x = hamby224_test %&gt;% filter(case == 1) %&gt;%
+                               select(ccf:sum_peaks),
+                             explainer = out_lime,
+                             labels = TRUE,
+                             n_features = 3)
+out_explain[,1:6]
+```
+
+```
+##       model_type case label label_prob   model_r2 model_intercept
+## 1 classification    1  TRUE          0 0.03399898       0.6913718
+## 2 classification    1  TRUE          0 0.03399898       0.6913718
+## 3 classification    1  TRUE          0 0.03399898       0.6913718
+```
+
+```r
+out_explain[,7:10]
+```
+
+```
+##   model_prediction   feature feature_value feature_weight
+## 1        0.6864841         D   0.001396367  -0.0006426591
+## 2        0.6864841 rough_cor   0.270422149  -0.0437905046
+## 3        0.6864841       ccf   0.270422149   0.0395454440
+```
+
+---
+
+# R Code
+
+## R Package Plot of Explanations 
+
+The function `plot_features` let you visualize the explanations.
+
+
+```r
+lime::plot_features(out_explain)
+```
+
+![](slides_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+---
+
+# Shiny App
+
+&lt;br&gt;
+
+.center[&lt;img src="./figures/app.png" width=1100&gt;]
+
+---
+class: inverse, center, middle
+
+# Issues with &lt;span style="color:lime"&gt;LIME&lt;/span&gt; and Attempts at a Solution
+
+---
+
+# Initial Concerns
+
+We first applied lime using all default settings.
+- Explanations did not make sense
+- `\(R^2\)` values were very low
+- Predictions from the simple model were poor
+    
+.center[&lt;img src="./figures/explain1.png" width=450&gt;]
+.center[&lt;font size="4"&gt;Example where the random forest prediction is wrong. The explanations are from 4 quantile bins.&lt;/font&gt;]
+
+---
+
+# More Issues
+
+Then we tried more of the feature distribution estimation methods
+- Explanations still not great
+- `\(R^2\)` values still very low
+- Predictions from the simple model still poor
+- Explanations dependent on the input
+
+.center[&lt;img src="./figures/explain2.png" width=450&gt;]
+.center[&lt;font size="4"&gt;This is the same case with explanations from 3 equally spaced bins.&lt;/font&gt;]
+
+---
+
+# New Binning Method
+
+Next we created our own way to select bins using trees
+
+
+
+.pull-left[
+
+```r
+# Example using treebink
+treebink(
+  y = hamby173and252_train$samesource, 
+  x = hamby173and252_train$ccf, 
+  k = 5
+)
+```
+
+```
+## [1] 0.493562 0.582999 0.688211 0.778397
+```
+]
+.pull-right[
+.center[&lt;img src="./figures/tree.png" height = 500&gt;]
+]
+---
+
+# Comparing Methods
+
+#### Feature distribution estimaton methods:
+
+- 2 to 5 quantile bins
+- 2 to 5 equally spaced bins
+- 2 to 5 tree based bins with `samesoure` as the response
+- 2 to 5 tree based bins with `rfscore` as the response
+- normal approximation
+- kernel density estimation
+
+#### Comparison metrics:
+
+- MSEs (rf prediction vs simple model predictions)
+- `\(R^2\)`
+- Consistency across number of bins
+- Consistency across 10 reps
+
+---
+
+# Comparing MSEs
+
+.center[&lt;img src="./figures/mse.png" width = 900&gt;]
+
+---
+
+# Comparing `\(R^2\)` Values
+
+.center[&lt;img src="./figures/r2.png" width = 900&gt;]
+
+---
+
+# Comparing Consistency Across Bins
+
+.center[&lt;img src="./figures/firstfeature.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Bins
+
+.center[&lt;img src="./figures/secondfeature.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Bins
+
+.center[&lt;img src="./figures/thirdfeature.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Reps
+
+.center[&lt;img src="./figures/reps1.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Reps
+
+.center[&lt;img src="./figures/reps2.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Reps
+
+.center[&lt;img src="./figures/reps3.png" width = 1100&gt;]
+
+---
+
+class: middle, center, inverse
+
+# Conclusions and Future Work
+
+---
+
+# Conclusions
+
+- Equally spaced bins are dependent on the number of bins
+- Tree based bins usually have the lowest MSEs
+- `rfscore` tree based bins usually have the highest `\(R^2\)` for the binning options
+- All options results in low `\(R^2\)` values
+    - We think that the linear regression is not similar enough to a random forest to produce good explanations
+- Explanations are relatively consistent across reps for first and second features
+- Non-binning methods produce very different results compared to the binning methods
+
+---
+
+# Future Work
+
+- Apply LIME to a logistic regression model
+    - We know how to interpret a logistic regression
+    - Can compare to LIME explanations
+- Run some sort of simulation to assess LIME explanations
+- Adjust and compare weighting methods and the feature selection methods
+- Allow the number of bins to vary across features
+- Use a tree as the simple model
+- Find other ways to interpret random forest models
+
+---
+
+# Image Credits
+
+- slide 1: https://www.flickr.com/photos/lincolnian/300262799
+- slide 2: https://ayoqq.org/explore/lime-drawing/
+- slide 3: https://en.wikipedia.org/wiki/Black_box 
+- slide 8: https://github.com/thomasp85/lime
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
