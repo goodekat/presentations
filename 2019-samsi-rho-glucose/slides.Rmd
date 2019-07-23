@@ -1,0 +1,48 @@
+---
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+
+# Load packages
+library(dplyr)
+library(forcats)
+library(gganimate)
+library(ggplot2)
+```
+
+```{r data}
+# Load in data
+ds_cgm_complete <- readRDS("../2019-samsi-rho-glucose/data/ds_cgm_complete.RDS")
+
+# Get and order patient 2 data
+pt2_data <- ds_cgm_complete %>%
+  select(pt_id, 
+         visit,
+         visitnum, 
+         device_visit_period_day, 
+         device_tm,
+         device_tm_bin, 
+         glucose_value) %>%
+  filter(pt_id == 2) %>%
+  arrange(visitnum, device_visit_period_day, device_tm_bin) %>%
+  group_by(visit) %>%
+  mutate(time_order = 1:n())
+```
+
+## Glucose Measurements from One Participant Over 8 Days
+
+```{r figure, fig.height = 4.5}
+pt2_data %>%
+  filter(visitnum == 1) %>%
+  ggplot(aes(x = device_tm, 
+             y = glucose_value, 
+             color = as.factor(device_visit_period_day),
+             group = as.factor(device_visit_period_day))) + 
+  geom_point(aes(group = seq_along(device_tm)), size = 0.5) +
+  scale_color_brewer(palette = "Paired") +
+  labs(x = "Time of Day", y = "Glucose Value (mg/dL)") +
+  theme_bw() +
+  theme(legend.position = "none") +
+  transition_reveal(time_order) 
+```
