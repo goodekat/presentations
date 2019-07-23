@@ -32,7 +32,7 @@ pt2_data <- ds_cgm_complete %>%
 
 ## Glucose Measurements from One Participant Over 8 Days
 
-```{r figure, fig.height = 4.5}
+```{r figure, fig.height = 5}
 pt2_data %>%
   filter(visitnum == 1) %>%
   ggplot(aes(x = device_tm, 
