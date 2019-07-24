@@ -2,7 +2,7 @@
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE, warning = FALSE)
 
 # Load packages
 library(dplyr)
@@ -15,7 +15,13 @@ library(ggplot2)
 # Load in data
 ds_cgm_complete <- readRDS("../2019-samsi-rho-glucose/data/ds_cgm_complete.RDS")
 
-# Get and order patient 2 data
+# Create a complete grid of patients and times
+full_times <- data.frame(
+  pt_id = factor(rep(c(2, 3, 5, 7, 8, 9, 10, 11, 14, 15), 
+                     each = 288)),
+  device_tm_bin = 1:288)
+
+# Get data for 10 patients on one day and order appropriately
 pt2_data <- ds_cgm_complete %>%
   select(pt_id, 
          visit,
@@ -24,20 +30,23 @@ pt2_data <- ds_cgm_complete %>%
          device_tm,
          device_tm_bin, 
          glucose_value) %>%
-  filter(pt_id == 2) %>%
-  arrange(visitnum, device_visit_period_day, device_tm_bin) %>%
-  group_by(visit) %>%
+  filter(pt_id %in% c(2, 3, 5, 7, 8, 9, 10, 11, 14, 15),
+         visitnum == 1,
+         device_visit_period_day == 1) %>%
+  right_join(full_times) %>%
+  arrange(pt_id, device_tm_bin) %>%
+  group_by(pt_id) %>%
   mutate(time_order = 1:n())
 ```
 
-## Glucose Measurements from One Participant Over 8 Days
+## Glucose Measurements from Ten Individuals Over One Days
 
 ```{r figure, fig.height = 5}
 pt2_data %>%
   filter(visitnum == 1) %>%
   ggplot(aes(x = device_tm, 
              y = glucose_value, 
-             color = as.factor(device_visit_period_day),
+             color = as.factor(pt_id),
              group = as.factor(device_visit_period_day))) + 
   geom_point(aes(group = seq_along(device_tm)), size = 0.5) +
   scale_color_brewer(palette = "Paired") +
