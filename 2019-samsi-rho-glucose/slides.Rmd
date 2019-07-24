@@ -2,7 +2,10 @@
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = FALSE, cache = TRUE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, 
+                      cache = TRUE, 
+                      warning = FALSE,
+                      message = FALSE)
 
 # Load packages
 library(dplyr)
@@ -39,7 +42,7 @@ pt2_data <- ds_cgm_complete %>%
   mutate(time_order = 1:n())
 ```
 
-## Glucose Measurements from Ten Individuals Over One Days
+## Glucose Measurements from Ten Individuals for One Day
 
 ```{r figure, fig.height = 5}
 pt2_data %>%
