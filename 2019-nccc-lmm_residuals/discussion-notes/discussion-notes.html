@@ -391,6 +391,10 @@ $(document).ready(function () {
 <p><strong>Rob Templeman</strong>: he suggested computing and using studentized BLUPs to assess the models</p>
 <p><strong>Susan Durham</strong>: with ANOVA models, she likes to look at the boxplots of the residuals</p>
 </div>
+<div id="email-from-dr.dixon-on-error-recovery-residuals" class="section level3">
+<h3>Email from Dr. Dixon on Error Recovery Residuals</h3>
+<p>I took a look at error recovery residuals. There are two types but the one I’m most comfortable with is the sequential type. The most natural way to think about them is with temporally autocorrelated data, where some folks call them one-step ahead residuals. Fit the model to k-1 observations, predict the k’th and standardize. Those should be independent, zero mean and unit variance. They can also be applied to spatial data, but there the sequence is not so clear. Also not clear with a compound symmetric structure (e.g. your drop example). - Philip Dixon</p>
+</div>
 
 
 
