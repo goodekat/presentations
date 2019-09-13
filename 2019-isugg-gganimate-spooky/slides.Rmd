@@ -1,0 +1,141 @@
+---
+title: "![](./figures/bat-cartoon.png) gganimate (with a spooky twist)"
+subtitle: "<html><div style='float:left'></div><hr color='#FFFFFF' size=1px width=796px></html> <html><div style='float:left'></div><hr color='#FFFFFF' size=1px width=796px></html>"
+author: <font size="5"> Katherine Goode </font>
+date: <font size="5"> ISU Graphics Group - October 31, 2019 </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+}
+
+.title-slide > h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide > h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide > h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+library(tidyverse)
+library(gganimate)
+```
+
+# Resources
+
+- https://gganimate.com/articles/extra/talks.html 
+- https://resources.rstudio.com/rstudio-conf-2019/gganimate-live-cookbook
+- http://svmiller.com/blog/2018/02/r-markdown-xaringan-theme/
+
+---
+
+class: inverse
+
+# Test Slide
+
+---
+
+```{r}
+bats_raw <- read.csv("./halloween data/tentotheminus9-movement-coordination-in-trawling-bats/Movement coordination in trawling bats (data from Giuggioli et al. 2015).csv")
+```
+
+---
+
+```{r}
+bats_raw %>%
+  filter(tag.local.identifier == 1) %>%
+  mutate(time = as.numeric(timestamp)) %>%
+  ggplot(aes(x = location.long, y = location.lat)) +
+  geom_point()
+```
+
+---
+
+```{r}
+bats_raw %>%
+  filter(tag.local.identifier == 1) %>%
+  mutate(time = as.numeric(timestamp)) %>%
+  ggplot(aes(x = location.long, y = location.lat, color = time)) +
+  geom_point() + 
+  theme(legend.position = "bottom")
+```
+
+---
+
+```{r}
+bats_raw %>%
+  filter(tag.local.identifier == 1) %>%
+  mutate(time = as.numeric(timestamp)) %>%
+  ggplot(aes(x = location.long, y = location.lat)) +
+  geom_point() + 
+  transition_time(time)
+```
+
+---
+
+```{r}
+bats_raw %>%
+  filter(tag.local.identifier == 1) %>%
+  mutate(time = as.numeric(timestamp)) %>%
+  ggplot(aes(x = location.long, y = location.lat)) +
+  geom_point() + 
+  transition_reveal(time, keep_last = TRUE)
+```
+
+
