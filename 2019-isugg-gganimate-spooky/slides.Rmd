@@ -31,7 +31,7 @@ output:
 
 .inverse {
   background-color: #696767;
-  border-top: 80px solid #F9C389;
+  border-top: 80px solid #696767;
   text-shadow: none;
 }
 
@@ -72,70 +72,154 @@ output:
 </style>
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE, 
+                      cache = TRUE, 
+                      fig.width = 10,
+                      fig.height = 5,
+                      fig.align = "center")
 library(tidyverse)
 library(gganimate)
 ```
 
-# Resources
+# Overview
 
-- https://gganimate.com/articles/extra/talks.html 
-- https://resources.rstudio.com/rstudio-conf-2019/gganimate-live-cookbook
-- http://svmiller.com/blog/2018/02/r-markdown-xaringan-theme/
+1. What is gganimate?
+
+2. Transition functions 
+
+3. View functions
+
+4. Shadow functions
+
+5. Other
 
 ---
 
-class: inverse
+class: inverse, middle, center
 
-# Test Slide
+# Introduction
+
+---
+
+# What is gganimate?
+
+- Originally written by David Robinson
+- Updated by Thomas Pederson in 2018/2019 
+- Code from a year ago will probably not work anymore
+- Pederson describes it as "... a theoretical backbone of how to describe animation, and it's also an implementation of set theoretical backbones."
+- An extension to ggplot2 for creating animated graphics in R
+
+---
+
+# Features of gganimate
+
+- should interpolate the data, so the animation is smooth
+- maybe can adjust the number of frames to make it mosre smooth
+- can add a label that changes over time
+- can add shadows to trail the old data (tail or mark)
+
+- transition_time versus transition_reveal
+- could use the stat() function
+- enter grow function
+
+---
+
+# Three Types of Functions
+
+- transistions: changing the data in the graphic
+- views: changing the viewpoint (i.e. x and y axes) of the graphic
+- shadows: memory of the transition
+
+---
+
+class: inverse, middle, center
+
+# Transitions
+
+---
+
+# Transition Functions 
+
+<br>
+
+| Function | Use | 
+| :-------- | :---------------- |
+| transition_components | Transition individual components through their own lifecycle |
+| transition_events | Transition individual events in and out |
+| transition_filter | Transition between different filters | 
+| transition_layers | Build up a plot, layer by layer |
+| transition_manual | Create an animation by specifying the frame membership directly |
+| transition_null | Keep all data constant across the animation |
+| transition_reveal | Reveal data along a given dimension |
+| transition_states | Transition between several distinct stages of the data |
+| transition_time | Transition through distinct states in time | 
 
 ---
 
 ```{r}
 bats_raw <- read.csv("./halloween data/tentotheminus9-movement-coordination-in-trawling-bats/Movement coordination in trawling bats (data from Giuggioli et al. 2015).csv")
+
+bat1 <- bats_raw %>%
+  filter(tag.local.identifier == 1)
+bat1
 ```
 
 ---
 
 ```{r}
-bats_raw %>%
-  filter(tag.local.identifier == 1) %>%
-  mutate(time = as.numeric(timestamp)) %>%
-  ggplot(aes(x = location.long, y = location.lat)) +
-  geom_point()
-```
-
----
-
-```{r}
-bats_raw %>%
+batplot1 <- bats_raw %>%
   filter(tag.local.identifier == 1) %>%
   mutate(time = as.numeric(timestamp)) %>%
   ggplot(aes(x = location.long, y = location.lat, color = time)) +
   geom_point() + 
   theme(legend.position = "bottom")
+batplot1
 ```
 
 ---
 
 ```{r}
-bats_raw %>%
-  filter(tag.local.identifier == 1) %>%
-  mutate(time = as.numeric(timestamp)) %>%
-  ggplot(aes(x = location.long, y = location.lat)) +
-  geom_point() + 
+batplot1 + 
   transition_time(time)
 ```
 
 ---
 
 ```{r}
-bats_raw %>%
-  filter(tag.local.identifier == 1) %>%
-  mutate(time = as.numeric(timestamp)) %>%
-  ggplot(aes(x = location.long, y = location.lat)) +
-  geom_point() + 
+batplot1 + 
   transition_reveal(time, keep_last = TRUE)
 ```
 
+---
+
+```{r}
+batplot1 + 
+  transition_states(time)
+```
+
+---
+
+class: inverse, middle, center
+
+# Views
+
+---
+
+class: inverse, middle, center
+
+# Shadows
+
+---
+
+class: inverse, middle, center
+
+# Other
+
+---
+
+# Resources
+
+- https://gganimate.com/articles/extra/talks.html 
+- https://resources.rstudio.com/rstudio-conf-2019/gganimate-live-cookbook
+- http://svmiller.com/blog/2018/02/r-markdown-xaringan-theme/
 

@@ -44,7 +44,7 @@ class: center, middle, inverse, title-slide
 
 .inverse {
   background-color: #696767;
-  border-top: 80px solid #F9C389;
+  border-top: 80px solid #696767;
   text-shadow: none;
 }
 
@@ -86,79 +86,1123 @@ class: center, middle, inverse, title-slide
 
 
 
-# Resources
+# Overview
 
-- https://gganimate.com/articles/extra/talks.html 
-- https://resources.rstudio.com/rstudio-conf-2019/gganimate-live-cookbook
-- http://svmiller.com/blog/2018/02/r-markdown-xaringan-theme/
+1. What is gganimate?
+
+2. Transition functions 
+
+3. View functions
+
+4. Shadow functions
+
+5. Other
 
 ---
 
-class: inverse
+class: inverse, middle, center
 
-# Test Slide
+# Introduction
+
+---
+
+# What is gganimate?
+
+- Originally written by David Robinson
+- Updated by Thomas Pederson in 2018/2019 
+- Code from a year ago will probably not work anymore
+- Pederson describes it as "... a theoretical backbone of how to describe animation, and it's also an implementation of set theoretical backbones."
+- An extension to ggplot2 for creating animated graphics in R
+
+---
+
+# Features of gganimate
+
+- should interpolate the data, so the animation is smooth
+- maybe can adjust the number of frames to make it mosre smooth
+- can add a label that changes over time
+- can add shadows to trail the old data (tail or mark)
+
+- transition_time versus transition_reveal
+- could use the stat() function
+- enter grow function
+
+---
+
+# Three Types of Functions
+
+- transistions: changing the data in the graphic
+- views: changing the viewpoint (i.e. x and y axes) of the graphic
+- shadows: memory of the transition
+
+---
+
+class: inverse, middle, center
+
+# Transitions
+
+---
+
+# Transition Functions 
+
+&lt;br&gt;
+
+| Function | Use | 
+| :-------- | :---------------- |
+| transition_components | Transition individual components through their own lifecycle |
+| transition_events | Transition individual events in and out |
+| transition_filter | Transition between different filters | 
+| transition_layers | Build up a plot, layer by layer |
+| transition_manual | Create an animation by specifying the frame membership directly |
+| transition_null | Keep all data constant across the animation |
+| transition_reveal | Reveal data along a given dimension |
+| transition_states | Transition between several distinct stages of the data |
+| transition_time | Transition through distinct states in time | 
 
 ---
 
 
 ```r
 bats_raw &lt;- read.csv("./halloween data/tentotheminus9-movement-coordination-in-trawling-bats/Movement coordination in trawling bats (data from Giuggioli et al. 2015).csv")
+
+bat1 &lt;- bats_raw %&gt;%
+  filter(tag.local.identifier == 1)
+bat1
+```
+
+```
+##      event.id visible               timestamp location.long location.lat
+## 1   500933619    true 2009-01-01 12:00:00.000     -2.662988     51.40701
+## 2   500933620    true 2009-01-01 12:00:00.020     -2.662988     51.40701
+## 3   500933621    true 2009-01-01 12:00:00.040     -2.662988     51.40701
+## 4   500933622    true 2009-01-01 12:00:00.060     -2.662988     51.40701
+## 5   500933623    true 2009-01-01 12:00:00.080     -2.662988     51.40701
+## 6   500933624    true 2009-01-01 12:00:00.100     -2.662989     51.40701
+## 7   500933625    true 2009-01-01 12:00:00.120     -2.662991     51.40701
+## 8   500933626    true 2009-01-01 12:00:00.140     -2.662992     51.40701
+## 9   500933627    true 2009-01-01 12:00:00.160     -2.662992     51.40701
+## 10  500933628    true 2009-01-01 12:00:00.180     -2.662993     51.40701
+## 11  500933629    true 2009-01-01 12:00:00.200     -2.662994     51.40701
+## 12  500933630    true 2009-01-01 12:00:00.220     -2.662996     51.40701
+## 13  500933631    true 2009-01-01 12:00:00.240     -2.662999     51.40701
+## 14  500933632    true 2009-01-01 12:00:00.260     -2.663001     51.40701
+## 15  500933633    true 2009-01-01 12:00:00.280     -2.663004     51.40701
+## 16  500933634    true 2009-01-01 12:00:00.300     -2.663008     51.40701
+## 17  500933635    true 2009-01-01 12:00:00.320     -2.663011     51.40701
+## 18  500933636    true 2009-01-01 12:00:00.340     -2.663015     51.40701
+## 19  500933637    true 2009-01-01 12:00:00.360     -2.663018     51.40701
+## 20  500933638    true 2009-01-01 12:00:00.380     -2.663022     51.40701
+## 21  500933639    true 2009-01-01 12:00:00.400     -2.663026     51.40701
+## 22  500933640    true 2009-01-01 12:00:00.420     -2.663029     51.40701
+## 23  500933641    true 2009-01-01 12:00:00.440     -2.663033     51.40701
+## 24  500933642    true 2009-01-01 12:00:00.460     -2.663036     51.40701
+## 25  500933643    true 2009-01-01 12:00:00.480     -2.663038     51.40701
+## 26  500933644    true 2009-01-01 12:00:00.500     -2.663041     51.40701
+## 27  500933645    true 2009-01-01 12:00:00.520     -2.663043     51.40701
+## 28  500933646    true 2009-01-01 12:00:00.540     -2.663047     51.40701
+## 29  500933647    true 2009-01-01 12:00:00.560     -2.663050     51.40700
+## 30  500933648    true 2009-01-01 12:00:00.580     -2.663053     51.40700
+## 31  500933649    true 2009-01-01 12:00:00.600     -2.663057     51.40700
+## 32  500933650    true 2009-01-01 12:00:00.620     -2.663060     51.40700
+## 33  500933651    true 2009-01-01 12:00:00.640     -2.663063     51.40700
+## 34  500933652    true 2009-01-01 12:00:00.660     -2.663065     51.40700
+## 35  500933653    true 2009-01-01 12:00:00.680     -2.663067     51.40700
+## 36  500933654    true 2009-01-01 12:00:00.700     -2.663070     51.40700
+## 37  500933655    true 2009-01-01 12:00:00.720     -2.663073     51.40700
+## 38  500933656    true 2009-01-01 12:00:00.740     -2.663075     51.40700
+## 39  500933657    true 2009-01-01 12:00:00.760     -2.663077     51.40700
+## 40  500933658    true 2009-01-01 12:00:00.780     -2.663079     51.40700
+## 41  500933659    true 2009-01-01 12:00:00.800     -2.663080     51.40700
+## 42  500933660    true 2009-01-01 12:00:00.820     -2.663082     51.40699
+## 43  500933661    true 2009-01-01 12:00:00.840     -2.663084     51.40699
+## 44  500933662    true 2009-01-01 12:00:00.860     -2.663085     51.40699
+## 45  500933663    true 2009-01-01 12:00:00.880     -2.663087     51.40699
+## 46  500933664    true 2009-01-01 12:00:00.900     -2.663087     51.40699
+## 47  500933665    true 2009-01-01 12:00:00.920     -2.663088     51.40699
+## 48  500933666    true 2009-01-01 12:00:00.940     -2.663089     51.40699
+## 49  500933667    true 2009-01-01 12:00:00.960     -2.663090     51.40699
+## 50  500933668    true 2009-01-01 12:00:00.980     -2.663090     51.40699
+## 51  500933669    true 2009-01-01 12:00:01.000     -2.663091     51.40699
+## 52  500933670    true 2009-01-01 12:00:01.020     -2.663091     51.40699
+## 53  500933671    true 2009-01-01 12:00:01.040     -2.663092     51.40699
+## 54  500933672    true 2009-01-01 12:00:01.060     -2.663092     51.40699
+## 55  500933673    true 2009-01-01 12:00:01.080     -2.663093     51.40699
+## 56  500933674    true 2009-01-01 12:00:01.100     -2.663094     51.40699
+## 57  500933675    true 2009-01-01 12:00:01.120     -2.663095     51.40699
+## 58  500933676    true 2009-01-01 12:00:01.140     -2.663096     51.40699
+## 59  500933677    true 2009-01-01 12:00:01.160     -2.663097     51.40699
+## 60  500933678    true 2009-01-01 12:00:01.180     -2.663097     51.40699
+## 61  500933679    true 2009-01-01 12:00:01.200     -2.663098     51.40699
+## 62  500933680    true 2009-01-01 12:00:01.220     -2.663099     51.40698
+## 63  500933681    true 2009-01-01 12:00:01.240     -2.663101     51.40698
+## 64  500933682    true 2009-01-01 12:00:01.260     -2.663102     51.40698
+## 65  500933683    true 2009-01-01 12:00:01.280     -2.663104     51.40698
+## 66  500933684    true 2009-01-01 12:00:01.300     -2.663105     51.40698
+## 67  500933685    true 2009-01-01 12:00:01.320     -2.663107     51.40698
+## 68  500933686    true 2009-01-01 12:00:01.340     -2.663109     51.40698
+## 69  500933687    true 2009-01-01 12:00:01.360     -2.663112     51.40698
+## 70  500933688    true 2009-01-01 12:00:01.380     -2.663114     51.40698
+## 71  500933689    true 2009-01-01 12:00:01.400     -2.663116     51.40698
+## 72  500933690    true 2009-01-01 12:00:01.420     -2.663118     51.40698
+## 73  500933691    true 2009-01-01 12:00:01.440     -2.663120     51.40698
+## 74  500933692    true 2009-01-01 12:00:01.460     -2.663122     51.40698
+## 75  500933693    true 2009-01-01 12:00:01.480     -2.663124     51.40698
+## 76  500933694    true 2009-01-01 12:00:01.500     -2.663126     51.40698
+## 77  500933695    true 2009-01-01 12:00:01.520     -2.663128     51.40698
+## 78  500933696    true 2009-01-01 12:00:01.540     -2.663130     51.40697
+## 79  500933697    true 2009-01-01 12:00:01.560     -2.663132     51.40697
+## 80  500933698    true 2009-01-01 12:00:01.580     -2.663133     51.40697
+## 81  500933699    true 2009-01-01 12:00:01.600     -2.663134     51.40697
+## 82  500933700    true 2009-01-01 12:00:01.620     -2.663135     51.40697
+## 83  500933701    true 2009-01-01 12:00:01.640     -2.663137     51.40697
+## 84  500933702    true 2009-01-01 12:00:01.660     -2.663137     51.40697
+## 85  500933703    true 2009-01-01 12:00:01.680     -2.663138     51.40697
+## 86  500933704    true 2009-01-01 12:00:01.700     -2.663139     51.40697
+## 87  500933705    true 2009-01-01 12:00:01.720     -2.663140     51.40697
+## 88  500933706    true 2009-01-01 12:00:01.740     -2.663140     51.40697
+## 89  500933707    true 2009-01-01 12:00:01.760     -2.663140     51.40697
+## 90  500933708    true 2009-01-01 12:00:01.780     -2.663141     51.40696
+## 91  500933709    true 2009-01-01 12:00:01.800     -2.663141     51.40696
+## 92  500933710    true 2009-01-01 12:00:01.820     -2.663140     51.40696
+## 93  500933711    true 2009-01-01 12:00:01.840     -2.663140     51.40696
+## 94  500933712    true 2009-01-01 12:00:01.860     -2.663139     51.40696
+## 95  500933713    true 2009-01-01 12:00:01.880     -2.663138     51.40696
+## 96  500933714    true 2009-01-01 12:00:01.900     -2.663137     51.40696
+## 97  500933715    true 2009-01-01 12:00:01.920     -2.663135     51.40696
+## 98  500933716    true 2009-01-01 12:00:01.940     -2.663134     51.40696
+## 99  500933717    true 2009-01-01 12:00:01.960     -2.663131     51.40696
+## 100 500933718    true 2009-01-01 12:00:01.980     -2.663129     51.40696
+## 101 500933719    true 2009-01-01 12:00:02.000     -2.663127     51.40696
+## 102 500933720    true 2009-01-01 12:00:02.020     -2.663124     51.40696
+## 103 500933721    true 2009-01-01 12:00:02.040     -2.663121     51.40696
+## 104 500933722    true 2009-01-01 12:00:02.060     -2.663119     51.40696
+## 105 500933723    true 2009-01-01 12:00:02.080     -2.663116     51.40696
+## 106 500933724    true 2009-01-01 12:00:02.100     -2.663113     51.40696
+## 107 500933725    true 2009-01-01 12:00:02.120     -2.663110     51.40696
+## 108 500933726    true 2009-01-01 12:00:02.140     -2.663107     51.40696
+## 109 500933727    true 2009-01-01 12:00:02.160     -2.663104     51.40696
+## 110 500933728    true 2009-01-01 12:00:02.180     -2.663102     51.40696
+## 111 500933729    true 2009-01-01 12:00:02.200     -2.663099     51.40696
+## 112 500933730    true 2009-01-01 12:00:02.220     -2.663097     51.40696
+## 113 500933731    true 2009-01-01 12:00:02.240     -2.663095     51.40696
+## 114 500933732    true 2009-01-01 12:00:02.260     -2.663093     51.40696
+## 115 500933733    true 2009-01-01 12:00:02.280     -2.663092     51.40696
+## 116 500933734    true 2009-01-01 12:00:02.300     -2.663090     51.40696
+## 117 500933735    true 2009-01-01 12:00:02.320     -2.663089     51.40696
+## 118 500933736    true 2009-01-01 12:00:02.340     -2.663089     51.40696
+## 119 500933737    true 2009-01-01 12:00:02.360     -2.663089     51.40696
+## 120 500933738    true 2009-01-01 12:00:02.380     -2.663088     51.40696
+## 121 500933739    true 2009-01-01 12:00:02.400     -2.663088     51.40696
+## 122 500933740    true 2009-01-01 12:00:02.420     -2.663088     51.40696
+## 123 500933741    true 2009-01-01 12:00:02.440     -2.663089     51.40696
+## 124 500933742    true 2009-01-01 12:00:02.460     -2.663090     51.40696
+## 125 500933743    true 2009-01-01 12:00:02.480     -2.663091     51.40696
+## 126 500933744    true 2009-01-01 12:00:02.500     -2.663093     51.40696
+## 127 500933745    true 2009-01-01 12:00:02.520     -2.663094     51.40696
+## 128 500933746    true 2009-01-01 12:00:02.540     -2.663095     51.40696
+## 129 500933747    true 2009-01-01 12:00:02.560     -2.663097     51.40696
+## 130 500933748    true 2009-01-01 12:00:02.580     -2.663098     51.40696
+## 131 500933749    true 2009-01-01 12:00:02.600     -2.663100     51.40696
+## 132 500933750    true 2009-01-01 12:00:02.620     -2.663102     51.40696
+## 133 500933751    true 2009-01-01 12:00:02.640     -2.663103     51.40696
+## 134 500933752    true 2009-01-01 12:00:02.660     -2.663105     51.40696
+## 135 500933753    true 2009-01-01 12:00:02.680     -2.663107     51.40696
+## 136 500933754    true 2009-01-01 12:00:02.700     -2.663108     51.40696
+## 137 500933755    true 2009-01-01 12:00:02.720     -2.663110     51.40696
+## 138 500933756    true 2009-01-01 12:00:02.740     -2.663111     51.40696
+## 139 500933757    true 2009-01-01 12:00:02.760     -2.663113     51.40696
+## 140 500933758    true 2009-01-01 12:00:02.780     -2.663114     51.40696
+## 141 500933759    true 2009-01-01 12:00:02.800     -2.663116     51.40696
+## 142 500933760    true 2009-01-01 12:00:02.820     -2.663118     51.40696
+## 143 500933761    true 2009-01-01 12:00:02.840     -2.663119     51.40696
+## 144 500933762    true 2009-01-01 12:00:02.860     -2.663120     51.40696
+## 145 500933763    true 2009-01-01 12:00:02.880     -2.663122     51.40696
+## 146 500933764    true 2009-01-01 12:00:02.900     -2.663123     51.40696
+## 147 500933765    true 2009-01-01 12:00:02.920     -2.663125     51.40696
+## 148 500933766    true 2009-01-01 12:00:02.940     -2.663126     51.40696
+## 149 500933767    true 2009-01-01 12:00:02.960     -2.663127     51.40696
+## 150 500933768    true 2009-01-01 12:00:02.980     -2.663128     51.40696
+## 151 500933769    true 2009-01-01 12:00:03.000     -2.663130     51.40696
+## 152 500933770    true 2009-01-01 12:00:03.020     -2.663131     51.40696
+## 153 500933771    true 2009-01-01 12:00:03.040     -2.663132     51.40696
+## 154 500933772    true 2009-01-01 12:00:03.060     -2.663133     51.40696
+## 155 500933773    true 2009-01-01 12:00:03.080     -2.663134     51.40696
+## 156 500933774    true 2009-01-01 12:00:03.100     -2.663135     51.40696
+## 157 500933775    true 2009-01-01 12:00:03.120     -2.663136     51.40696
+## 158 500933776    true 2009-01-01 12:00:03.140     -2.663137     51.40696
+## 159 500933777    true 2009-01-01 12:00:03.160     -2.663137     51.40696
+## 160 500933778    true 2009-01-01 12:00:03.180     -2.663137     51.40696
+## 161 500933779    true 2009-01-01 12:00:03.200     -2.663138     51.40696
+## 162 500933780    true 2009-01-01 12:00:03.220     -2.663138     51.40696
+## 163 500933781    true 2009-01-01 12:00:03.240     -2.663138     51.40696
+## 164 500933782    true 2009-01-01 12:00:03.260     -2.663139     51.40696
+## 165 500933783    true 2009-01-01 12:00:03.280     -2.663138     51.40696
+## 166 500933784    true 2009-01-01 12:00:03.300     -2.663138     51.40697
+## 167 500933785    true 2009-01-01 12:00:03.320     -2.663138     51.40697
+## 168 500933786    true 2009-01-01 12:00:03.340     -2.663138     51.40697
+## 169 500933787    true 2009-01-01 12:00:03.360     -2.663138     51.40697
+## 170 500933788    true 2009-01-01 12:00:03.380     -2.663138     51.40697
+## 171 500933789    true 2009-01-01 12:00:03.400     -2.663138     51.40697
+## 172 500933790    true 2009-01-01 12:00:03.420     -2.663137     51.40697
+## 173 500933791    true 2009-01-01 12:00:03.440     -2.663136     51.40697
+## 174 500933792    true 2009-01-01 12:00:03.460     -2.663135     51.40697
+## 175 500933793    true 2009-01-01 12:00:03.480     -2.663135     51.40697
+## 176 500933794    true 2009-01-01 12:00:03.500     -2.663134     51.40697
+## 177 500933795    true 2009-01-01 12:00:03.520     -2.663133     51.40697
+## 178 500933796    true 2009-01-01 12:00:03.540     -2.663132     51.40697
+## 179 500933797    true 2009-01-01 12:00:03.560     -2.663131     51.40697
+## 180 500933798    true 2009-01-01 12:00:03.580     -2.663130     51.40697
+## 181 500933799    true 2009-01-01 12:00:03.600     -2.663129     51.40697
+## 182 500933800    true 2009-01-01 12:00:03.620     -2.663128     51.40697
+## 183 500933801    true 2009-01-01 12:00:03.640     -2.663127     51.40697
+## 184 500933802    true 2009-01-01 12:00:03.660     -2.663125     51.40697
+## 185 500933803    true 2009-01-01 12:00:03.680     -2.663124     51.40697
+## 186 500933804    true 2009-01-01 12:00:03.700     -2.663123     51.40697
+## 187 500933805    true 2009-01-01 12:00:03.720     -2.663122     51.40697
+## 188 500933806    true 2009-01-01 12:00:03.740     -2.663121     51.40697
+## 189 500933807    true 2009-01-01 12:00:03.760     -2.663119     51.40697
+## 190 500933808    true 2009-01-01 12:00:03.780     -2.663118     51.40697
+## 191 500933809    true 2009-01-01 12:00:03.800     -2.663117     51.40697
+## 192 500933810    true 2009-01-01 12:00:03.820     -2.663116     51.40698
+## 193 500933811    true 2009-01-01 12:00:03.840     -2.663114     51.40698
+## 194 500933812    true 2009-01-01 12:00:03.860     -2.663113     51.40698
+## 195 500933813    true 2009-01-01 12:00:03.880     -2.663111     51.40698
+## 196 500933814    true 2009-01-01 12:00:03.900     -2.663110     51.40698
+## 197 500933815    true 2009-01-01 12:00:03.920     -2.663109     51.40698
+## 198 500933816    true 2009-01-01 12:00:03.940     -2.663108     51.40698
+## 199 500933817    true 2009-01-01 12:00:03.960     -2.663106     51.40698
+## 200 500933818    true 2009-01-01 12:00:03.980     -2.663105     51.40698
+## 201 500933819    true 2009-01-01 12:00:04.000     -2.663104     51.40698
+## 202 500933820    true 2009-01-01 12:00:04.020     -2.663103     51.40698
+## 203 500933821    true 2009-01-01 12:00:04.040     -2.663101     51.40698
+## 204 500933822    true 2009-01-01 12:00:04.060     -2.663100     51.40698
+## 205 500933823    true 2009-01-01 12:00:04.080     -2.663099     51.40698
+## 206 500933824    true 2009-01-01 12:00:04.100     -2.663097     51.40698
+## 207 500933825    true 2009-01-01 12:00:04.120     -2.663096     51.40698
+## 208 500933826    true 2009-01-01 12:00:04.140     -2.663095     51.40699
+## 209 500933827    true 2009-01-01 12:00:04.160     -2.663093     51.40699
+## 210 500933828    true 2009-01-01 12:00:04.180     -2.663092     51.40699
+## 211 500933829    true 2009-01-01 12:00:04.200     -2.663091     51.40699
+## 212 500933830    true 2009-01-01 12:00:04.220     -2.663090     51.40699
+## 213 500933831    true 2009-01-01 12:00:04.240     -2.663089     51.40699
+## 214 500933832    true 2009-01-01 12:00:04.260     -2.663088     51.40699
+## 215 500933833    true 2009-01-01 12:00:04.280     -2.663087     51.40699
+## 216 500933834    true 2009-01-01 12:00:04.300     -2.663086     51.40699
+## 217 500933835    true 2009-01-01 12:00:04.320     -2.663085     51.40699
+## 218 500933836    true 2009-01-01 12:00:04.340     -2.663083     51.40699
+## 219 500933837    true 2009-01-01 12:00:04.360     -2.663082     51.40699
+## 220 500933838    true 2009-01-01 12:00:04.380     -2.663081     51.40699
+## 221 500933839    true 2009-01-01 12:00:04.400     -2.663080     51.40699
+## 222 500933840    true 2009-01-01 12:00:04.420     -2.663079     51.40700
+## 223 500933841    true 2009-01-01 12:00:04.440     -2.663077     51.40700
+## 224 500933842    true 2009-01-01 12:00:04.460     -2.663076     51.40700
+## 225 500933843    true 2009-01-01 12:00:04.480     -2.663075     51.40700
+## 226 500933844    true 2009-01-01 12:00:04.500     -2.663074     51.40700
+## 227 500933845    true 2009-01-01 12:00:04.520     -2.663072     51.40700
+## 228 500933846    true 2009-01-01 12:00:04.540     -2.663071     51.40700
+## 229 500933847    true 2009-01-01 12:00:04.560     -2.663069     51.40700
+## 230 500933848    true 2009-01-01 12:00:04.580     -2.663068     51.40700
+## 231 500933849    true 2009-01-01 12:00:04.600     -2.663067     51.40700
+## 232 500933850    true 2009-01-01 12:00:04.620     -2.663066     51.40700
+## 233 500933851    true 2009-01-01 12:00:04.640     -2.663064     51.40701
+## 234 500933852    true 2009-01-01 12:00:04.660     -2.663063     51.40701
+## 235 500933853    true 2009-01-01 12:00:04.680     -2.663062     51.40701
+## 236 500933854    true 2009-01-01 12:00:04.700     -2.663062     51.40701
+## 237 500933855    true 2009-01-01 12:00:04.720     -2.663062     51.40701
+## 238 500933856    true 2009-01-01 12:00:04.740     -2.663060     51.40701
+## 239 500933857    true 2009-01-01 12:00:04.760     -2.663059     51.40701
+##                   comments sensor.type individual.taxon.canonical.name
+## 1   2D videogrammetry data         gps               Myotis daubentoni
+## 2   2D videogrammetry data         gps               Myotis daubentoni
+## 3   2D videogrammetry data         gps               Myotis daubentoni
+## 4   2D videogrammetry data         gps               Myotis daubentoni
+## 5   2D videogrammetry data         gps               Myotis daubentoni
+## 6   2D videogrammetry data         gps               Myotis daubentoni
+## 7   2D videogrammetry data         gps               Myotis daubentoni
+## 8   2D videogrammetry data         gps               Myotis daubentoni
+## 9   2D videogrammetry data         gps               Myotis daubentoni
+## 10  2D videogrammetry data         gps               Myotis daubentoni
+## 11  2D videogrammetry data         gps               Myotis daubentoni
+## 12  2D videogrammetry data         gps               Myotis daubentoni
+## 13  2D videogrammetry data         gps               Myotis daubentoni
+## 14  2D videogrammetry data         gps               Myotis daubentoni
+## 15  2D videogrammetry data         gps               Myotis daubentoni
+## 16  2D videogrammetry data         gps               Myotis daubentoni
+## 17  2D videogrammetry data         gps               Myotis daubentoni
+## 18  2D videogrammetry data         gps               Myotis daubentoni
+## 19  2D videogrammetry data         gps               Myotis daubentoni
+## 20  2D videogrammetry data         gps               Myotis daubentoni
+## 21  2D videogrammetry data         gps               Myotis daubentoni
+## 22  2D videogrammetry data         gps               Myotis daubentoni
+## 23  2D videogrammetry data         gps               Myotis daubentoni
+## 24  2D videogrammetry data         gps               Myotis daubentoni
+## 25  2D videogrammetry data         gps               Myotis daubentoni
+## 26  2D videogrammetry data         gps               Myotis daubentoni
+## 27  2D videogrammetry data         gps               Myotis daubentoni
+## 28  2D videogrammetry data         gps               Myotis daubentoni
+## 29  2D videogrammetry data         gps               Myotis daubentoni
+## 30  2D videogrammetry data         gps               Myotis daubentoni
+## 31  2D videogrammetry data         gps               Myotis daubentoni
+## 32  2D videogrammetry data         gps               Myotis daubentoni
+## 33  2D videogrammetry data         gps               Myotis daubentoni
+## 34  2D videogrammetry data         gps               Myotis daubentoni
+## 35  2D videogrammetry data         gps               Myotis daubentoni
+## 36  2D videogrammetry data         gps               Myotis daubentoni
+## 37  2D videogrammetry data         gps               Myotis daubentoni
+## 38  2D videogrammetry data         gps               Myotis daubentoni
+## 39  2D videogrammetry data         gps               Myotis daubentoni
+## 40  2D videogrammetry data         gps               Myotis daubentoni
+## 41  2D videogrammetry data         gps               Myotis daubentoni
+## 42  2D videogrammetry data         gps               Myotis daubentoni
+## 43  2D videogrammetry data         gps               Myotis daubentoni
+## 44  2D videogrammetry data         gps               Myotis daubentoni
+## 45  2D videogrammetry data         gps               Myotis daubentoni
+## 46  2D videogrammetry data         gps               Myotis daubentoni
+## 47  2D videogrammetry data         gps               Myotis daubentoni
+## 48  2D videogrammetry data         gps               Myotis daubentoni
+## 49  2D videogrammetry data         gps               Myotis daubentoni
+## 50  2D videogrammetry data         gps               Myotis daubentoni
+## 51  2D videogrammetry data         gps               Myotis daubentoni
+## 52  2D videogrammetry data         gps               Myotis daubentoni
+## 53  2D videogrammetry data         gps               Myotis daubentoni
+## 54  2D videogrammetry data         gps               Myotis daubentoni
+## 55  2D videogrammetry data         gps               Myotis daubentoni
+## 56  2D videogrammetry data         gps               Myotis daubentoni
+## 57  2D videogrammetry data         gps               Myotis daubentoni
+## 58  2D videogrammetry data         gps               Myotis daubentoni
+## 59  2D videogrammetry data         gps               Myotis daubentoni
+## 60  2D videogrammetry data         gps               Myotis daubentoni
+## 61  2D videogrammetry data         gps               Myotis daubentoni
+## 62  2D videogrammetry data         gps               Myotis daubentoni
+## 63  2D videogrammetry data         gps               Myotis daubentoni
+## 64  2D videogrammetry data         gps               Myotis daubentoni
+## 65  2D videogrammetry data         gps               Myotis daubentoni
+## 66  2D videogrammetry data         gps               Myotis daubentoni
+## 67  2D videogrammetry data         gps               Myotis daubentoni
+## 68  2D videogrammetry data         gps               Myotis daubentoni
+## 69  2D videogrammetry data         gps               Myotis daubentoni
+## 70  2D videogrammetry data         gps               Myotis daubentoni
+## 71  2D videogrammetry data         gps               Myotis daubentoni
+## 72  2D videogrammetry data         gps               Myotis daubentoni
+## 73  2D videogrammetry data         gps               Myotis daubentoni
+## 74  2D videogrammetry data         gps               Myotis daubentoni
+## 75  2D videogrammetry data         gps               Myotis daubentoni
+## 76  2D videogrammetry data         gps               Myotis daubentoni
+## 77  2D videogrammetry data         gps               Myotis daubentoni
+## 78  2D videogrammetry data         gps               Myotis daubentoni
+## 79  2D videogrammetry data         gps               Myotis daubentoni
+## 80  2D videogrammetry data         gps               Myotis daubentoni
+## 81  2D videogrammetry data         gps               Myotis daubentoni
+## 82  2D videogrammetry data         gps               Myotis daubentoni
+## 83  2D videogrammetry data         gps               Myotis daubentoni
+## 84  2D videogrammetry data         gps               Myotis daubentoni
+## 85  2D videogrammetry data         gps               Myotis daubentoni
+## 86  2D videogrammetry data         gps               Myotis daubentoni
+## 87  2D videogrammetry data         gps               Myotis daubentoni
+## 88  2D videogrammetry data         gps               Myotis daubentoni
+## 89  2D videogrammetry data         gps               Myotis daubentoni
+## 90  2D videogrammetry data         gps               Myotis daubentoni
+## 91  2D videogrammetry data         gps               Myotis daubentoni
+## 92  2D videogrammetry data         gps               Myotis daubentoni
+## 93  2D videogrammetry data         gps               Myotis daubentoni
+## 94  2D videogrammetry data         gps               Myotis daubentoni
+## 95  2D videogrammetry data         gps               Myotis daubentoni
+## 96  2D videogrammetry data         gps               Myotis daubentoni
+## 97  2D videogrammetry data         gps               Myotis daubentoni
+## 98  2D videogrammetry data         gps               Myotis daubentoni
+## 99  2D videogrammetry data         gps               Myotis daubentoni
+## 100 2D videogrammetry data         gps               Myotis daubentoni
+## 101 2D videogrammetry data         gps               Myotis daubentoni
+## 102 2D videogrammetry data         gps               Myotis daubentoni
+## 103 2D videogrammetry data         gps               Myotis daubentoni
+## 104 2D videogrammetry data         gps               Myotis daubentoni
+## 105 2D videogrammetry data         gps               Myotis daubentoni
+## 106 2D videogrammetry data         gps               Myotis daubentoni
+## 107 2D videogrammetry data         gps               Myotis daubentoni
+## 108 2D videogrammetry data         gps               Myotis daubentoni
+## 109 2D videogrammetry data         gps               Myotis daubentoni
+## 110 2D videogrammetry data         gps               Myotis daubentoni
+## 111 2D videogrammetry data         gps               Myotis daubentoni
+## 112 2D videogrammetry data         gps               Myotis daubentoni
+## 113 2D videogrammetry data         gps               Myotis daubentoni
+## 114 2D videogrammetry data         gps               Myotis daubentoni
+## 115 2D videogrammetry data         gps               Myotis daubentoni
+## 116 2D videogrammetry data         gps               Myotis daubentoni
+## 117 2D videogrammetry data         gps               Myotis daubentoni
+## 118 2D videogrammetry data         gps               Myotis daubentoni
+## 119 2D videogrammetry data         gps               Myotis daubentoni
+## 120 2D videogrammetry data         gps               Myotis daubentoni
+## 121 2D videogrammetry data         gps               Myotis daubentoni
+## 122 2D videogrammetry data         gps               Myotis daubentoni
+## 123 2D videogrammetry data         gps               Myotis daubentoni
+## 124 2D videogrammetry data         gps               Myotis daubentoni
+## 125 2D videogrammetry data         gps               Myotis daubentoni
+## 126 2D videogrammetry data         gps               Myotis daubentoni
+## 127 2D videogrammetry data         gps               Myotis daubentoni
+## 128 2D videogrammetry data         gps               Myotis daubentoni
+## 129 2D videogrammetry data         gps               Myotis daubentoni
+## 130 2D videogrammetry data         gps               Myotis daubentoni
+## 131 2D videogrammetry data         gps               Myotis daubentoni
+## 132 2D videogrammetry data         gps               Myotis daubentoni
+## 133 2D videogrammetry data         gps               Myotis daubentoni
+## 134 2D videogrammetry data         gps               Myotis daubentoni
+## 135 2D videogrammetry data         gps               Myotis daubentoni
+## 136 2D videogrammetry data         gps               Myotis daubentoni
+## 137 2D videogrammetry data         gps               Myotis daubentoni
+## 138 2D videogrammetry data         gps               Myotis daubentoni
+## 139 2D videogrammetry data         gps               Myotis daubentoni
+## 140 2D videogrammetry data         gps               Myotis daubentoni
+## 141 2D videogrammetry data         gps               Myotis daubentoni
+## 142 2D videogrammetry data         gps               Myotis daubentoni
+## 143 2D videogrammetry data         gps               Myotis daubentoni
+## 144 2D videogrammetry data         gps               Myotis daubentoni
+## 145 2D videogrammetry data         gps               Myotis daubentoni
+## 146 2D videogrammetry data         gps               Myotis daubentoni
+## 147 2D videogrammetry data         gps               Myotis daubentoni
+## 148 2D videogrammetry data         gps               Myotis daubentoni
+## 149 2D videogrammetry data         gps               Myotis daubentoni
+## 150 2D videogrammetry data         gps               Myotis daubentoni
+## 151 2D videogrammetry data         gps               Myotis daubentoni
+## 152 2D videogrammetry data         gps               Myotis daubentoni
+## 153 2D videogrammetry data         gps               Myotis daubentoni
+## 154 2D videogrammetry data         gps               Myotis daubentoni
+## 155 2D videogrammetry data         gps               Myotis daubentoni
+## 156 2D videogrammetry data         gps               Myotis daubentoni
+## 157 2D videogrammetry data         gps               Myotis daubentoni
+## 158 2D videogrammetry data         gps               Myotis daubentoni
+## 159 2D videogrammetry data         gps               Myotis daubentoni
+## 160 2D videogrammetry data         gps               Myotis daubentoni
+## 161 2D videogrammetry data         gps               Myotis daubentoni
+## 162 2D videogrammetry data         gps               Myotis daubentoni
+## 163 2D videogrammetry data         gps               Myotis daubentoni
+## 164 2D videogrammetry data         gps               Myotis daubentoni
+## 165 2D videogrammetry data         gps               Myotis daubentoni
+## 166 2D videogrammetry data         gps               Myotis daubentoni
+## 167 2D videogrammetry data         gps               Myotis daubentoni
+## 168 2D videogrammetry data         gps               Myotis daubentoni
+## 169 2D videogrammetry data         gps               Myotis daubentoni
+## 170 2D videogrammetry data         gps               Myotis daubentoni
+## 171 2D videogrammetry data         gps               Myotis daubentoni
+## 172 2D videogrammetry data         gps               Myotis daubentoni
+## 173 2D videogrammetry data         gps               Myotis daubentoni
+## 174 2D videogrammetry data         gps               Myotis daubentoni
+## 175 2D videogrammetry data         gps               Myotis daubentoni
+## 176 2D videogrammetry data         gps               Myotis daubentoni
+## 177 2D videogrammetry data         gps               Myotis daubentoni
+## 178 2D videogrammetry data         gps               Myotis daubentoni
+## 179 2D videogrammetry data         gps               Myotis daubentoni
+## 180 2D videogrammetry data         gps               Myotis daubentoni
+## 181 2D videogrammetry data         gps               Myotis daubentoni
+## 182 2D videogrammetry data         gps               Myotis daubentoni
+## 183 2D videogrammetry data         gps               Myotis daubentoni
+## 184 2D videogrammetry data         gps               Myotis daubentoni
+## 185 2D videogrammetry data         gps               Myotis daubentoni
+## 186 2D videogrammetry data         gps               Myotis daubentoni
+## 187 2D videogrammetry data         gps               Myotis daubentoni
+## 188 2D videogrammetry data         gps               Myotis daubentoni
+## 189 2D videogrammetry data         gps               Myotis daubentoni
+## 190 2D videogrammetry data         gps               Myotis daubentoni
+## 191 2D videogrammetry data         gps               Myotis daubentoni
+## 192 2D videogrammetry data         gps               Myotis daubentoni
+## 193 2D videogrammetry data         gps               Myotis daubentoni
+## 194 2D videogrammetry data         gps               Myotis daubentoni
+## 195 2D videogrammetry data         gps               Myotis daubentoni
+## 196 2D videogrammetry data         gps               Myotis daubentoni
+## 197 2D videogrammetry data         gps               Myotis daubentoni
+## 198 2D videogrammetry data         gps               Myotis daubentoni
+## 199 2D videogrammetry data         gps               Myotis daubentoni
+## 200 2D videogrammetry data         gps               Myotis daubentoni
+## 201 2D videogrammetry data         gps               Myotis daubentoni
+## 202 2D videogrammetry data         gps               Myotis daubentoni
+## 203 2D videogrammetry data         gps               Myotis daubentoni
+## 204 2D videogrammetry data         gps               Myotis daubentoni
+## 205 2D videogrammetry data         gps               Myotis daubentoni
+## 206 2D videogrammetry data         gps               Myotis daubentoni
+## 207 2D videogrammetry data         gps               Myotis daubentoni
+## 208 2D videogrammetry data         gps               Myotis daubentoni
+## 209 2D videogrammetry data         gps               Myotis daubentoni
+## 210 2D videogrammetry data         gps               Myotis daubentoni
+## 211 2D videogrammetry data         gps               Myotis daubentoni
+## 212 2D videogrammetry data         gps               Myotis daubentoni
+## 213 2D videogrammetry data         gps               Myotis daubentoni
+## 214 2D videogrammetry data         gps               Myotis daubentoni
+## 215 2D videogrammetry data         gps               Myotis daubentoni
+## 216 2D videogrammetry data         gps               Myotis daubentoni
+## 217 2D videogrammetry data         gps               Myotis daubentoni
+## 218 2D videogrammetry data         gps               Myotis daubentoni
+## 219 2D videogrammetry data         gps               Myotis daubentoni
+## 220 2D videogrammetry data         gps               Myotis daubentoni
+## 221 2D videogrammetry data         gps               Myotis daubentoni
+## 222 2D videogrammetry data         gps               Myotis daubentoni
+## 223 2D videogrammetry data         gps               Myotis daubentoni
+## 224 2D videogrammetry data         gps               Myotis daubentoni
+## 225 2D videogrammetry data         gps               Myotis daubentoni
+## 226 2D videogrammetry data         gps               Myotis daubentoni
+## 227 2D videogrammetry data         gps               Myotis daubentoni
+## 228 2D videogrammetry data         gps               Myotis daubentoni
+## 229 2D videogrammetry data         gps               Myotis daubentoni
+## 230 2D videogrammetry data         gps               Myotis daubentoni
+## 231 2D videogrammetry data         gps               Myotis daubentoni
+## 232 2D videogrammetry data         gps               Myotis daubentoni
+## 233 2D videogrammetry data         gps               Myotis daubentoni
+## 234 2D videogrammetry data         gps               Myotis daubentoni
+## 235 2D videogrammetry data         gps               Myotis daubentoni
+## 236 2D videogrammetry data         gps               Myotis daubentoni
+## 237 2D videogrammetry data         gps               Myotis daubentoni
+## 238 2D videogrammetry data         gps               Myotis daubentoni
+## 239 2D videogrammetry data         gps               Myotis daubentoni
+##     tag.local.identifier individual.local.identifier
+## 1                      1                           1
+## 2                      1                           1
+## 3                      1                           1
+## 4                      1                           1
+## 5                      1                           1
+## 6                      1                           1
+## 7                      1                           1
+## 8                      1                           1
+## 9                      1                           1
+## 10                     1                           1
+## 11                     1                           1
+## 12                     1                           1
+## 13                     1                           1
+## 14                     1                           1
+## 15                     1                           1
+## 16                     1                           1
+## 17                     1                           1
+## 18                     1                           1
+## 19                     1                           1
+## 20                     1                           1
+## 21                     1                           1
+## 22                     1                           1
+## 23                     1                           1
+## 24                     1                           1
+## 25                     1                           1
+## 26                     1                           1
+## 27                     1                           1
+## 28                     1                           1
+## 29                     1                           1
+## 30                     1                           1
+## 31                     1                           1
+## 32                     1                           1
+## 33                     1                           1
+## 34                     1                           1
+## 35                     1                           1
+## 36                     1                           1
+## 37                     1                           1
+## 38                     1                           1
+## 39                     1                           1
+## 40                     1                           1
+## 41                     1                           1
+## 42                     1                           1
+## 43                     1                           1
+## 44                     1                           1
+## 45                     1                           1
+## 46                     1                           1
+## 47                     1                           1
+## 48                     1                           1
+## 49                     1                           1
+## 50                     1                           1
+## 51                     1                           1
+## 52                     1                           1
+## 53                     1                           1
+## 54                     1                           1
+## 55                     1                           1
+## 56                     1                           1
+## 57                     1                           1
+## 58                     1                           1
+## 59                     1                           1
+## 60                     1                           1
+## 61                     1                           1
+## 62                     1                           1
+## 63                     1                           1
+## 64                     1                           1
+## 65                     1                           1
+## 66                     1                           1
+## 67                     1                           1
+## 68                     1                           1
+## 69                     1                           1
+## 70                     1                           1
+## 71                     1                           1
+## 72                     1                           1
+## 73                     1                           1
+## 74                     1                           1
+## 75                     1                           1
+## 76                     1                           1
+## 77                     1                           1
+## 78                     1                           1
+## 79                     1                           1
+## 80                     1                           1
+## 81                     1                           1
+## 82                     1                           1
+## 83                     1                           1
+## 84                     1                           1
+## 85                     1                           1
+## 86                     1                           1
+## 87                     1                           1
+## 88                     1                           1
+## 89                     1                           1
+## 90                     1                           1
+## 91                     1                           1
+## 92                     1                           1
+## 93                     1                           1
+## 94                     1                           1
+## 95                     1                           1
+## 96                     1                           1
+## 97                     1                           1
+## 98                     1                           1
+## 99                     1                           1
+## 100                    1                           1
+## 101                    1                           1
+## 102                    1                           1
+## 103                    1                           1
+## 104                    1                           1
+## 105                    1                           1
+## 106                    1                           1
+## 107                    1                           1
+## 108                    1                           1
+## 109                    1                           1
+## 110                    1                           1
+## 111                    1                           1
+## 112                    1                           1
+## 113                    1                           1
+## 114                    1                           1
+## 115                    1                           1
+## 116                    1                           1
+## 117                    1                           1
+## 118                    1                           1
+## 119                    1                           1
+## 120                    1                           1
+## 121                    1                           1
+## 122                    1                           1
+## 123                    1                           1
+## 124                    1                           1
+## 125                    1                           1
+## 126                    1                           1
+## 127                    1                           1
+## 128                    1                           1
+## 129                    1                           1
+## 130                    1                           1
+## 131                    1                           1
+## 132                    1                           1
+## 133                    1                           1
+## 134                    1                           1
+## 135                    1                           1
+## 136                    1                           1
+## 137                    1                           1
+## 138                    1                           1
+## 139                    1                           1
+## 140                    1                           1
+## 141                    1                           1
+## 142                    1                           1
+## 143                    1                           1
+## 144                    1                           1
+## 145                    1                           1
+## 146                    1                           1
+## 147                    1                           1
+## 148                    1                           1
+## 149                    1                           1
+## 150                    1                           1
+## 151                    1                           1
+## 152                    1                           1
+## 153                    1                           1
+## 154                    1                           1
+## 155                    1                           1
+## 156                    1                           1
+## 157                    1                           1
+## 158                    1                           1
+## 159                    1                           1
+## 160                    1                           1
+## 161                    1                           1
+## 162                    1                           1
+## 163                    1                           1
+## 164                    1                           1
+## 165                    1                           1
+## 166                    1                           1
+## 167                    1                           1
+## 168                    1                           1
+## 169                    1                           1
+## 170                    1                           1
+## 171                    1                           1
+## 172                    1                           1
+## 173                    1                           1
+## 174                    1                           1
+## 175                    1                           1
+## 176                    1                           1
+## 177                    1                           1
+## 178                    1                           1
+## 179                    1                           1
+## 180                    1                           1
+## 181                    1                           1
+## 182                    1                           1
+## 183                    1                           1
+## 184                    1                           1
+## 185                    1                           1
+## 186                    1                           1
+## 187                    1                           1
+## 188                    1                           1
+## 189                    1                           1
+## 190                    1                           1
+## 191                    1                           1
+## 192                    1                           1
+## 193                    1                           1
+## 194                    1                           1
+## 195                    1                           1
+## 196                    1                           1
+## 197                    1                           1
+## 198                    1                           1
+## 199                    1                           1
+## 200                    1                           1
+## 201                    1                           1
+## 202                    1                           1
+## 203                    1                           1
+## 204                    1                           1
+## 205                    1                           1
+## 206                    1                           1
+## 207                    1                           1
+## 208                    1                           1
+## 209                    1                           1
+## 210                    1                           1
+## 211                    1                           1
+## 212                    1                           1
+## 213                    1                           1
+## 214                    1                           1
+## 215                    1                           1
+## 216                    1                           1
+## 217                    1                           1
+## 218                    1                           1
+## 219                    1                           1
+## 220                    1                           1
+## 221                    1                           1
+## 222                    1                           1
+## 223                    1                           1
+## 224                    1                           1
+## 225                    1                           1
+## 226                    1                           1
+## 227                    1                           1
+## 228                    1                           1
+## 229                    1                           1
+## 230                    1                           1
+## 231                    1                           1
+## 232                    1                           1
+## 233                    1                           1
+## 234                    1                           1
+## 235                    1                           1
+## 236                    1                           1
+## 237                    1                           1
+## 238                    1                           1
+## 239                    1                           1
+##                                                                   study.name
+## 1   Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 2   Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 3   Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 4   Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 5   Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 6   Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 7   Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 8   Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 9   Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 10  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 11  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 12  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 13  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 14  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 15  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 16  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 17  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 18  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 19  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 20  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 21  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 22  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 23  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 24  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 25  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 26  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 27  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 28  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 29  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 30  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 31  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 32  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 33  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 34  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 35  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 36  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 37  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 38  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 39  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 40  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 41  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 42  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 43  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 44  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 45  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 46  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 47  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 48  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 49  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 50  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 51  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 52  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 53  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 54  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 55  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 56  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 57  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 58  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 59  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 60  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 61  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 62  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 63  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 64  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 65  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 66  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 67  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 68  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 69  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 70  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 71  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 72  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 73  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 74  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 75  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 76  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 77  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 78  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 79  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 80  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 81  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 82  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 83  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 84  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 85  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 86  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 87  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 88  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 89  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 90  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 91  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 92  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 93  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 94  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 95  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 96  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 97  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 98  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 99  Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 100 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 101 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 102 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 103 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 104 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 105 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 106 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 107 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 108 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 109 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 110 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 111 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 112 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 113 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 114 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 115 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 116 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 117 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 118 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 119 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 120 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 121 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 122 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 123 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 124 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 125 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 126 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 127 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 128 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 129 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 130 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 131 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 132 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 133 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 134 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 135 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 136 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 137 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 138 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 139 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 140 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 141 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 142 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 143 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 144 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 145 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 146 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 147 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 148 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 149 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 150 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 151 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 152 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 153 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 154 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 155 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 156 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 157 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 158 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 159 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 160 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 161 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 162 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 163 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 164 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 165 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 166 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 167 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 168 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 169 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 170 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 171 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 172 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 173 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 174 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 175 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 176 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 177 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 178 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 179 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 180 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 181 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 182 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 183 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 184 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 185 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 186 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 187 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 188 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 189 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 190 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 191 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 192 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 193 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 194 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 195 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 196 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 197 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 198 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 199 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 200 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 201 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 202 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 203 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 204 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 205 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 206 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 207 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 208 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 209 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 210 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 211 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 212 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 213 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 214 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 215 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 216 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 217 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 218 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 219 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 220 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 221 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 222 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 223 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 224 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 225 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 226 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 227 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 228 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 229 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 230 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 231 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 232 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 233 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 234 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 235 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 236 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 237 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 238 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
+## 239 Movement coordination in trawling bats (data from Giuggioli et al. 2015)
 ```
 
 ---
 
 
 ```r
-bats_raw %&gt;%
-  filter(tag.local.identifier == 1) %&gt;%
-  mutate(time = as.numeric(timestamp)) %&gt;%
-  ggplot(aes(x = location.long, y = location.lat)) +
-  geom_point()
-```
-
-![](slides_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
-
----
-
-
-```r
-bats_raw %&gt;%
+batplot1 &lt;- bats_raw %&gt;%
   filter(tag.local.identifier == 1) %&gt;%
   mutate(time = as.numeric(timestamp)) %&gt;%
   ggplot(aes(x = location.long, y = location.lat, color = time)) +
   geom_point() + 
   theme(legend.position = "bottom")
+batplot1
 ```
 
-![](slides_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
 
 ```r
-bats_raw %&gt;%
-  filter(tag.local.identifier == 1) %&gt;%
-  mutate(time = as.numeric(timestamp)) %&gt;%
-  ggplot(aes(x = location.long, y = location.lat)) +
-  geom_point() + 
+batplot1 + 
   transition_time(time)
 ```
 
-![](slides_files/figure-html/unnamed-chunk-4-1.gif)&lt;!-- --&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-3-1.gif" style="display: block; margin: auto;" /&gt;
 
 ---
 
 
 ```r
-bats_raw %&gt;%
-  filter(tag.local.identifier == 1) %&gt;%
-  mutate(time = as.numeric(timestamp)) %&gt;%
-  ggplot(aes(x = location.long, y = location.lat)) +
-  geom_point() + 
+batplot1 + 
   transition_reveal(time, keep_last = TRUE)
 ```
 
-![](slides_files/figure-html/unnamed-chunk-5-1.gif)&lt;!-- --&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-4-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+```r
+batplot1 + 
+  transition_states(time)
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-5-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: inverse, middle, center
+
+# Views
+
+---
+
+class: inverse, middle, center
+
+# Shadows
+
+---
+
+class: inverse, middle, center
+
+# Other
+
+---
+
+# Resources
+
+- https://gganimate.com/articles/extra/talks.html 
+- https://resources.rstudio.com/rstudio-conf-2019/gganimate-live-cookbook
+- http://svmiller.com/blog/2018/02/r-markdown-xaringan-theme/
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
