@@ -1,0 +1,425 @@
+---
+title: ".right[![](./figures/logo.png)] ggResidpanel"
+subtitle: "Easy Creation of Panels of Diagnostics Plots <html><div style='float:left'></div><hr color='#0D06C0' size=1px width=796px></html>"
+author: "Katherine Goode"
+date: "October 4, 2019"
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div 
+          class = "progress-bar" 
+          style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #404040;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #404040;
+  text-shadow: none;
+}
+
+.title-slide {
+  background-color: #FFFFFF;
+  border-top: 80px solid #FFFFFF;
+}
+
+.remark-slide-number {
+  position: inherit;
+}
+
+.remark-slide-number .progress-bar-container {
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  display: block;
+  left: 0;
+  right: 0;
+}
+
+.remark-slide-number .progress-bar {
+  height: 100%;
+  background-color: #0D06C0;
+}
+
+</style>
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = TRUE,  
+                      fig.align = 'center', 
+                      message = FALSE, 
+                      fig.width = 8,
+                      fig.height = 6)
+
+# Load packages
+library(ggplot2)
+library(qqplotr)
+library(ggResidpanel)
+library(tidyverse)
+```
+
+# Overview
+
+1. Introduction: background and motivation
+
+2. ggResidpanel Functionality
+
+3. Current Development
+
+4. Resources
+
+---
+
+# Example Data: Trees
+
+`trees` data available in base R
+
+"This data set provides measurements of the diameter, height and volume of timber in 31 felled black cherry trees." - R documentation
+
+```{r}
+str(trees)
+```
+
+*Linear Model*
+
+```{r}
+# Example linear model
+tree_model <- lm(Volume ~ Height + Girth, data = trees)
+```
+
+---
+
+# Example Data: Penguins
+
+`penguins` data available in ggResidpanel
+
+Data from a study on how the heart rate of the emperor penguins relates to the depth and duration during a dive. Multiple observations taken from 9 penguins.
+
+```{r}
+str(ggResidpanel::penguins)
+```
+
+*Mixed effects model*
+
+```{r}
+penguin_model <- lme4::lmer(heartrate ~ depth + duration + (1|bird), 
+                            data = penguins)
+```
+
+---
+
+class: inverse, center, middle
+
+# Introduction
+
+---
+
+# Example of Model Assumptions
+
+### Linear Model
+
+For $i=1,...,n$:
+
+  $$y_i=\beta_0+\beta_1x_{1,i}+\cdots+\beta_px_{p,i}+\epsilon_i$$ 
+
+where 
+
+  $$\epsilon_i\overset{iid}{\sim}N(0,\sigma^2)$$
+
+### Assumptions (in words)
+
+- independence of residuals
+- linearity
+- constant variance of residuals
+- normality of residuals
+
+---
+
+# Diagnostic Plots
+
+.center[
+```{r echo = FALSE, fig.width = 10, fig.height = 7}
+set.seed(10)
+ex <- data.frame(resid = rnorm(100, 0, 3),
+                 pred = rnorm(100, 20, 4))
+ggplot(ex, aes(x = pred, y = resid)) + 
+  geom_point() + 
+  geom_hline(yintercept = 0) + 
+  labs(x = "Predicted Values", 
+       y = "Residuals",
+       title = "Residual Plot") + 
+  theme_grey(base_size = 22)
+```
+]
+
+---
+
+# Diagnostic Plots
+
+.center[
+```{r echo = FALSE, fig.width = 7.5, fig.height = 7}
+ggplot(ex, aes(sample = resid)) + 
+  stat_qq_line() + 
+  stat_qq_point() + 
+  labs(x = "Theoretical Quantiles", 
+       y = "Sample Quantiles",
+       title = "Normal Quantile Plot") + 
+  theme_grey(base_size = 22)
+```
+]
+
+---
+
+# What is ggResidpanel?
+
+R package for the easy creation of panels of diagnostics plots using ggplot2 (joint work with Katie Rey)
+
+```{r echo = TRUE, fig.width = 7, fig.height = 5, fig.align = 'center'}
+resid_panel(tree_model)
+```
+
+---
+
+# Motivation
+
+- Katie Rey and I worked as stats consultants
+
+- Encourage checking of model assumptions
+
+- Annoyed by the base R plotting option
+
+    `> plot(model)`  
+    `Hit <Return> to see next plot:`  
+    `Hit <Return> to see next plot:`  
+    .  
+    .  
+    .
+    
+- Wanted to develop a tool for easy creation of residual plots using ggplot
+
+---
+
+# Other Tools: plot.lm
+
+```{r fig.height = 6.5}
+par(mfrow = c(2, 2)) # specifies the layout
+plot(tree_model) # plots 'lm' default diagnostic plots
+```
+
+---
+
+# Other Tools: plot.merMod
+
+```{r fig.height = 6}
+plot(penguin_model)
+```
+
+---
+
+# Other Tools: ggfortify
+
+```{r fig.height = 6}
+library(ggfortify)
+autoplot(tree_model)
+```
+
+---
+
+# Other Tools: ggfortify
+
+```{r error = TRUE}
+autoplot(penguin_model)
+```
+
+---
+
+# Other Tools: broom + ggplot2
+
+```{r}
+library(broom)
+
+# extracts model info in a dataframe
+tree_model_values <- augment(tree_model) 
+head(tree_model_values)
+```
+
+---
+
+# Other Tools: broom + ggplot2
+
+```{r fig.height = 6}
+ggplot(tree_model_values, aes(x = .fitted, y = .resid)) + 
+  geom_point()
+```
+
+---
+
+# Other Tools: SAS residual panels
+
+### Residual Panels from SAS Procedures
+
+<img src="./figures/sas1.png" width="400"> 
+<img src="./figures/sas2.png" width="400">
+
+---
+
+# Goals for ggResidpanel
+
+- simple creation of panels of diagnostic plots
+
+- ggplot2 framework
+
+- functionality for linear and mixed models
+
+- more plot options and choice of plots
+
+- additional features: 
+
+    - interactive
+    - comparison of models
+    - more residual choices
+
+---
+
+class: inverse, center, middle
+
+# ggResidpanel Functionality
+
+---
+
+# Functions Available
+
+**Models of type “lm”, “glm”, “lme”, “lmer”, “glmer”, and “lmerTest”**
+
+- `resid_panel`: panel of diagnostic plots 
+- `resid_interact`: interactive panel of diagnostic plots
+- `resid_xpanel`: panel of diagnostic plots of the predictor variables
+- `resid_compare`: panel of diagnostic plots from multiple models
+
+**Any model type**
+
+- `resid_auxpanel`: Mimics `resid_panel` for any model type
+
+---
+
+# resid_panel: default
+
+```{r}
+resid_panel(penguin_model)
+```
+
+---
+
+# resid_panel: plot options
+
+**Available Plots**
+
+- "boxplot": boxplot of residuals
+- "cookd": Cook's D values versus observation numbers
+- "hist": histogram of residuals
+- "index": residuals versus observation numbers
+- "ls": location scale plot of the residuals
+- "qq": normal quantile plot of residuals
+- "lev": standardized residuals versus leverage values
+- "resid": residuals versus predicted values
+- "yvp": observed response values versus predicted values
+
+*"cookd", "ls", and "lev" are only available for "lm" and "glm" models* 
+
+---
+
+# resid_panel: individual plot
+
+```{r}
+resid_panel(penguin_model, plots = "yvp")
+```
+
+---
+
+# resid_panel: vector of plots
+
+```{r}
+resid_panel(penguin_model, plots = c("resid", "qq", "yvp"), nrow = 1)
+```
+
+---
+
+# resid_panel: prespecified panels
+
+```{r}
+resid_panel(penguin_model, plots = "SAS")
+```
+
+---
+
+# resid_panel: prespecified panels
+
+```{r}
+resid_panel(penguin_model, plots = "all")
+```
+
+---
+
+# resid_panel: prespecified panels
+
+```{r}
+resid_panel(tree_model, plots = "all")
+```
+
+---
+
+# resid_panel: prespecified panels
+
+```{r}
+resid_panel(tree_model, plots = "R")
+```
+
+---
+
+# resid_interact: default
+
+```{r}
+resid_interact(penguin_model)
+```
+
+---
+
+# resid_interact: plot options
+
+Same plot options as `resid_panel`
+
+```{r}
+resid_panel(penguin_model, plots = "all")
+```
+
+---
+
+class: inverse, center, middle
+
+# Current Development
+
+---
+
+class: inverse, center, middle
+
+# Resources
+
+---
