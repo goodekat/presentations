@@ -65,9 +65,7 @@ output:
 options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(echo = TRUE,  
                       fig.align = 'center', 
-                      message = FALSE, 
-                      fig.width = 8,
-                      fig.height = 6)
+                      message = FALSE)
 
 # Load packages
 library(ggplot2)
@@ -307,7 +305,7 @@ class: inverse, center, middle
 
 # Functions Available
 
-**Models of type “lm”, “glm”, “lme”, “lmer”, “glmer”, and “lmerTest”**
+**Models of type**: “lm”, “glm”, “lme”, “lmer”, “glmer”, and “lmerTest”
 
 - `resid_panel`: panel of diagnostic plots 
 - `resid_interact`: interactive panel of diagnostic plots
@@ -322,7 +320,7 @@ class: inverse, center, middle
 
 # resid_panel: default
 
-```{r}
+```{r fig.height = 6, fig.width = 8}
 resid_panel(penguin_model)
 ```
 
@@ -348,7 +346,7 @@ resid_panel(penguin_model)
 
 # resid_panel: individual plot
 
-```{r}
+```{r fig.height = 6, fig.width = 8}
 resid_panel(penguin_model, plots = "yvp")
 ```
 
@@ -356,7 +354,7 @@ resid_panel(penguin_model, plots = "yvp")
 
 # resid_panel: vector of plots
 
-```{r}
+```{r fig.width = 12, fig.height = 5}
 resid_panel(penguin_model, plots = c("resid", "qq", "yvp"), nrow = 1)
 ```
 
@@ -364,7 +362,7 @@ resid_panel(penguin_model, plots = c("resid", "qq", "yvp"), nrow = 1)
 
 # resid_panel: prespecified panels
 
-```{r}
+```{r fig.height = 6, fig.width = 8}
 resid_panel(penguin_model, plots = "SAS")
 ```
 
@@ -372,7 +370,7 @@ resid_panel(penguin_model, plots = "SAS")
 
 # resid_panel: prespecified panels
 
-```{r}
+```{r fig.height = 6, fig.width = 8}
 resid_panel(penguin_model, plots = "all")
 ```
 
@@ -380,7 +378,7 @@ resid_panel(penguin_model, plots = "all")
 
 # resid_panel: prespecified panels
 
-```{r}
+```{r fig.height = 6, fig.width = 8}
 resid_panel(tree_model, plots = "all")
 ```
 
@@ -388,17 +386,116 @@ resid_panel(tree_model, plots = "all")
 
 # resid_panel: prespecified panels
 
-```{r}
-resid_panel(tree_model, plots = "R")
+```{r fig.height = 6, fig.width = 8}
+resid_panel(tree_model, plots = "R") # for lm and glm models only
 ```
+
+---
+
+# resid_panel: residual types
+
+.pull-left[
+**“lm” model:**
+
+- pearson
+- response*
+- standardized
+
+**“glm” model:**
+
+- pearson
+- deviance*
+- response
+- stand.deviance
+- stand.pearson
+
+]
+
+.pull-right[
+**“lmer”, “lmerTest”, and “lme” models:**
+
+- pearson*
+- response
+
+**“glmer” model:**
+
+- pearson
+- deviance*
+- response
+
+*Note: plots of ls and lev only accept standardized residuals*
+]
+
+*** Denotes default residual type 
+
+---
+
+# resid_panel: residual types
+
+```{r fig.height = 6, fig.width = 8}
+resid_panel(tree_model, type = "standardized")
+```
+
+---
+
+# resid_panel: residual types
+
+```{r fig.height = 6, fig.width = 8}
+resid_panel(penguin_model, type = "response")
+```
+
+---
+
+# resid_panel: panel formatting
+
+**Format Options**
+
+- axis.text.size = adjust axis text size
+
+- title.text.size = adjust title text size
+
+- nrow = number of rows in the panel
+
+- scale = adjusts the size of the graphics
+
+- theme = “bw”, “classic”, and “grey” (or “gray”)
+
+- title.opt = whether to include a title
+
+---
+
+# resid_panel: formatting options
+
+.pull-left[
+```{r}
+formatted <- resid_panel(
+  penguin_model,
+  plots = c("yvp", "index"),
+  axis.text.size = 24,
+  title.text.size = 30,
+  nrow = 2, 
+  scale = 0.9,
+  theme = "grey"
+)
+```
+]
+
+.pull-right[
+```{r fig.height = 8}
+formatted
+```
+
+]
 
 ---
 
 # resid_interact: default
 
-```{r}
-resid_interact(penguin_model)
+.center[
+```{r fig.width = 10}
+resid_interact(penguin_model, plots = c("resid", "qq"))
 ```
+]
 
 ---
 

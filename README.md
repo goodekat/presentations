@@ -20,6 +20,8 @@
 
 - [**jsm-lime_diagnostics**](https://goodekat.github.io/presentations/2019-jsm-lime_diagnostics/slides.pdf): speed presentation (and [poster](https://goodekat.github.io/presentations/2019-jsm-lime_diagnostics/poster.pdf)) for JSM on diagnostic tools for LIME
 
+- [**lunchinatoRs-ggResidpanel**](https://goodekat.github.io/presentations/2019-lunchinatoRs-ggResidpanel/slides.html): presentation on ggResidpanel for lunchinatoRs at ISU
+
 - [**mmlc-assesslime**](https://goodekat.github.io/presentations/2019-mmlc-assesslime/poster.pdf): same poster presented at the ISU Graduate and Professional Student Research Conference on applying LIME to a random forest model fit to bullet matching data
 
 - [**nccc-lmm_residuals**](https://goodekat.github.io/presentations/2019-nccc-lmm_residuals/slides.html#1): presentation and discussion for the NCCC-170 meeting on residuals for mixed models
