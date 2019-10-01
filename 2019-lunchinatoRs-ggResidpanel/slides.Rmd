@@ -36,6 +36,12 @@ output:
   text-shadow: none;
 }
 
+.inverse2 {
+  background-color: #f0f0f0;
+  border-top: 80px solid #404040;
+  font-color: #404040;
+}
+
 .title-slide {
   background-color: #FFFFFF;
   border-top: 80px solid #FFFFFF;
@@ -72,6 +78,7 @@ library(ggplot2)
 library(qqplotr)
 library(ggResidpanel)
 library(tidyverse)
+library(widgetframe)
 ```
 
 # Overview
@@ -83,6 +90,18 @@ library(tidyverse)
 3. Current Development
 
 4. Resources
+
+<br> 
+
+For following along...
+
+```{r eval = FALSE}
+# Installs package
+install.packages("ggResidpanel")
+
+# Loads package
+library(ggResidpanel)
+```
 
 ---
 
@@ -314,7 +333,7 @@ class: inverse, center, middle
 
 **Any model type**
 
-- `resid_auxpanel`: Mimics `resid_panel` for any model type
+- `resid_auxpanel`: mimics (to a certain extent) `resid_panel` for any model type
 
 ---
 
@@ -328,7 +347,7 @@ resid_panel(penguin_model)
 
 # resid_panel: plot options
 
-**Available Plots**
+**Available Plots** (*"cookd", "ls", "lev" only available for "lm" and "glm" models*)
 
 - "boxplot": boxplot of residuals
 - "cookd": Cook's D values versus observation numbers
@@ -340,7 +359,11 @@ resid_panel(penguin_model)
 - "resid": residuals versus predicted values
 - "yvp": observed response values versus predicted values
 
-*"cookd", "ls", and "lev" are only available for "lm" and "glm" models* 
+**Additional Options**
+
+- `qqbands` = include 95% confidence bands on qq plot?
+- `qqline` = include a 1-1 line on qq plot?
+- `smoother` = include a smoother on index, ls, lev, and resid plots?
 
 ---
 
@@ -379,7 +402,8 @@ resid_panel(penguin_model, plots = "all")
 # resid_panel: prespecified panels
 
 ```{r fig.height = 6, fig.width = 8}
-resid_panel(tree_model, plots = "all")
+resid_panel(tree_model, plots = "all", 
+            smoother = TRUE, qqbands = TRUE)
 ```
 
 ---
@@ -450,17 +474,17 @@ resid_panel(penguin_model, type = "response")
 
 **Format Options**
 
-- axis.text.size = adjust axis text size
+- `axis.text.size` = adjust axis text size
 
-- title.text.size = adjust title text size
+- `title.text.size` = adjust title text size
 
-- nrow = number of rows in the panel
+- `nrow` = number of rows in the panel
 
-- scale = adjusts the size of the graphics
+- `scale` = adjusts the size of the graphics
 
-- theme = “bw”, “classic”, and “grey” (or “gray”)
+- `theme` = “bw”, “classic”, and “grey” (or “gray”)
 
-- title.opt = whether to include a title
+- `title.opt` = whether to include a title
 
 ---
 
@@ -484,27 +508,108 @@ formatted <- resid_panel(
 ```{r fig.height = 8}
 formatted
 ```
-
 ]
 
 ---
 
 # resid_interact: default
 
-.center[
-```{r fig.width = 10}
-resid_interact(penguin_model, plots = c("resid", "qq"))
+```{r eval = FALSE}
+resid_interact(penguin_model)
+```
+
+```{r fig.align = 'center', echo = FALSE}
+# Code for printing the plot
+interact_default <- resid_interact(penguin_model)
+frameWidget(interact_default, height = '110%')
+```
+
+---
+
+# resid_interact: options
+
+**plot options, residual types, and format options**: same as `resid_panel`
+
+```{r eval = FALSE}
+resid_interact(penguin_model, plots = c("resid", "yvp"), 
+               theme = "classic", smoother = TRUE)
+```
+
+```{r echo = FALSE}
+interact_format <- resid_interact(penguin_model, 
+                                  plots = c("resid", "yvp"), 
+                                  theme = "classic", 
+                                  smoother = TRUE)
+frameWidget(interact_format)
+```
+
+---
+
+# resid_xpanel: default 
+
+```{r, fig.height = 6.5}
+resid_xpanel(penguin_model)
+```
+
+---
+
+# resid_xpanel: options
+
+- `yvar`: "residual" (default) or "response"
+- `smoother`: indicates whether to add a smoother or not
+- `type`: residual types (same as `resid_panel`)
+- format options: same as `resid_panel`
+
+```{r fig.height = 4, fig.width = 12}
+resid_xpanel(penguin_model, yvar = "response", 
+             smoother = TRUE, nrow = 1)
+```
+
+---
+
+# resid_compare: default
+
+.pull-left[
+```{r}
+# Fit a new model to the 
+# penguin data
+penguin_model_log2 <- 
+  lme4::lmer(
+    log(heartrate) ~ 
+      depth + 
+      duration +
+      I(duration^2) + 
+      (1|bird), 
+    data = penguins)
+
+# Compare the residuals from 
+# the two penguin models
+penguin_models <- 
+  resid_compare(
+    list(penguin_model, 
+         penguin_model_log2))
+```
+]
+
+.pull-right[
+```{r fig.height = 8}
+penguin_models 
 ```
 ]
 
 ---
 
-# resid_interact: plot options
+# resid_compare: options
 
-Same plot options as `resid_panel`
+- `plots`: same as `resid_panel`
+- `type`: residual types (same as `resid_panel`)
+- `smoother`: indicates whether to add a smoother
+- `qqband`: adds a confidence band to the qqplot
+- format options: same as `resid_panel` (expect no `nrow`)
 
-```{r}
-resid_panel(penguin_model, plots = "all")
+```{r fig.height = 3.5}
+resid_compare(list(penguin_model, penguin_model_log2), 
+              plots = c("resid"), smoother = TRUE, theme = "gray")
 ```
 
 ---
@@ -515,8 +620,29 @@ class: inverse, center, middle
 
 ---
 
+# Additional Residual Types
+
+---
+
+# Interactions in resid_xpanel
+
+---
+
+# Option to Color by a Variable
+
+---
+
 class: inverse, center, middle
 
 # Resources
 
 ---
+
+# Helpful Links
+
+- [Website](https://goodekat.github.io/ggResidpanel/)
+- [Introduction Vignette](https://goodekat.github.io/ggResidpanel/articles/introduction.html)
+- [Tutorial and User Manual](https://goodekat.github.io/ggResidpanel-tutorial/tutorial.html)
+- [GitHub](https://github.com/goodekat/ggResidpanel)
+
+.center[<img src="./figures/hedgehog.jpeg" height="400">]
