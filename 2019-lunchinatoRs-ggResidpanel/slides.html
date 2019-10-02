@@ -46,12 +46,6 @@ class: center, middle, inverse, title-slide
   text-shadow: none;
 }
 
-.inverse2 {
-  background-color: #f0f0f0;
-  border-top: 80px solid #404040;
-  font-color: #404040;
-}
-
 .title-slide {
   background-color: #FFFFFF;
   border-top: 80px solid #FFFFFF;
@@ -188,7 +182,7 @@ where
 
 ---
 
-# Diagnostic Plots
+# Examples of Diagnostic Plots
 
 .center[
 &lt;img src="slides_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
@@ -196,7 +190,7 @@ where
 
 ---
 
-# Diagnostic Plots
+# Examples of Diagnostic Plots
 
 .center[
 &lt;img src="slides_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
@@ -370,7 +364,7 @@ class: inverse, center, middle
 
 ---
 
-# resid_panel: default
+# resid_panel
 
 
 ```r
@@ -383,22 +377,29 @@ resid_panel(penguin_model)
 
 # resid_panel: plot options
 
-**Available Plots** (*"cookd", "ls", "lev" only available for "lm" and "glm" models*)
+| Plot | Description |
+| :--------- | :-------------------- |
+| boxplot | boxplot of residuals |
+| cookd | Cook's D values versus observation numbers | 
+| hist | histogram of residuals |
+| index | residuals versus observation numbers |
+| ls | location scale plot of the residuals |
+| qq | normal quantile plot of residuals |
+| lev | standardized residuals versus leverage values |
+| resid | residuals versus predicted values |
+| yvp | observed response values versus predicted values | 
 
-- "boxplot": boxplot of residuals
-- "cookd": Cook's D values versus observation numbers
-- "hist": histogram of residuals
-- "index": residuals versus observation numbers
-- "ls": location scale plot of the residuals
-- "qq": normal quantile plot of residuals
-- "lev": standardized residuals versus leverage values
-- "resid": residuals versus predicted values
-- "yvp": observed response values versus predicted values
+*Note: cookd, ls, lev only available for "lm" and "glm" models*
+
+---
+
+# resid_panel: plot options
 
 **Additional Options**
 
-- `qqbands` = include 95% confidence bands on qq plot?
-- `qqline` = include a 1-1 line on qq plot?
+- `bins` = number of bins for the histogram
+- `qqbands` = include 95% confidence bands line on qq plot?
+- `qqline` = include 1-1 line on qq plot?
 - `smoother` = include a smoother on index, ls, lev, and resid plots?
 
 ---
@@ -576,21 +577,21 @@ formatted
 
 ---
 
-# resid_interact: default
+# resid_interact
 
 
 ```r
 resid_interact(penguin_model)
 ```
 
-<div id="htmlwidget-a37a8e2fe9685807ff70" style="width:100%;height:110%;" class="widgetframe html-widget"></div>
+<div id="htmlwidget-a37a8e2fe9685807ff70" style="width:100%;height:105%;" class="widgetframe html-widget"></div>
 <script type="application/json" data-for="htmlwidget-a37a8e2fe9685807ff70">{"x":{"url":"slides_files/figure-html//widgets/widget_unnamed-chunk-27.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 # resid_interact: options
 
-**plot options, residual types, and format options**: same as `resid_panel`
+Same options as `resid_panel` &lt;small&gt; (except `qqbands` is not available) &lt;/small&gt;
 
 
 ```r
@@ -603,7 +604,7 @@ resid_interact(penguin_model, plots = c("resid", "yvp"),
 
 ---
 
-# resid_xpanel: default 
+# resid_xpanel
 
 
 ```r
@@ -631,7 +632,7 @@ resid_xpanel(penguin_model, yvar = "response",
 
 ---
 
-# resid_compare: default
+# resid_compare
 
 .pull-left[
 
@@ -649,7 +650,7 @@ penguin_model_log2 &lt;-
 
 # Compare the residuals from 
 # the two penguin models
-penguin_models &lt;- 
+compare_panel &lt;- 
   resid_compare(
     list(penguin_model, 
          penguin_model_log2))
@@ -659,7 +660,7 @@ penguin_models &lt;-
 .pull-right[
 
 ```r
-penguin_models 
+compare_panel
 ```
 
 &lt;img src="slides_files/figure-html/unnamed-chunk-33-1.png" style="display: block; margin: auto;" /&gt;
@@ -669,19 +670,70 @@ penguin_models
 
 # resid_compare: options
 
-- `plots`: same as `resid_panel`
-- `type`: residual types (same as `resid_panel`)
-- `smoother`: indicates whether to add a smoother
-- `qqband`: adds a confidence band to the qqplot
-- format options: same as `resid_panel` (expect no `nrow`)
+Same options as resid_panel &lt;small&gt; (expect no `nrow`) &lt;/small&gt;
 
 
 ```r
-resid_compare(list(penguin_model, penguin_model_log2), 
-              plots = c("resid"), smoother = TRUE, theme = "gray")
+resid_compare(models = list(penguin_model, penguin_model_log2), 
+              plots = c("resid", "yvp"), smoother = TRUE, 
+              theme = "gray")
 ```
 
 &lt;img src="slides_files/figure-html/unnamed-chunk-34-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# resid_auxpanel
+
+.pull-left[
+
+```r
+# Fit a regression tree
+penguin_tree &lt;- rpart::rpart(
+  heartrate ~ depth + duration, 
+  data = penguins)
+
+# Obtain the predicted values
+tree_pred &lt;- 
+  predict(penguin_tree)
+
+# Obtain the residuals
+tree_resid &lt;- 
+  penguins$heartrate - 
+  tree_pred
+
+# Create default panel
+tree_panel &lt;- resid_auxpanel(
+  residuals = tree_resid,
+  predicted = tree_pred)
+```
+]
+
+.pull-right[
+
+```r
+tree_panel
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-36-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# resid_auxpanel: options
+
+Same as `resid_panel` (except for available plots)
+
+**Plots Options**: boxplot, hist, index, qq, resid  
+**Prespecified Panels**: all, default, SAS
+
+
+```r
+resid_auxpanel(residuals = tree_resid, predicted = tree_pred,
+               plots = c("resid", "index"), smoother = TRUE)
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-37-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -691,15 +743,14 @@ class: inverse, center, middle
 
 ---
 
-# Additional Residual Types
+# In progress...
 
----
+- Additional residual types 
+    - such as standardized residuals for mixed models  
+    
+- Interactions in resid_xpanel  
 
-# Interactions in resid_xpanel
-
----
-
-# Option to Color by a Variable
+- Option to color by a variable
 
 ---
 
@@ -714,7 +765,7 @@ class: inverse, center, middle
 - [Website](https://goodekat.github.io/ggResidpanel/)
 - [Introduction Vignette](https://goodekat.github.io/ggResidpanel/articles/introduction.html)
 - [Tutorial and User Manual](https://goodekat.github.io/ggResidpanel-tutorial/tutorial.html)
-- [GitHub](https://github.com/goodekat/ggResidpanel)
+- [GitHub Repository](https://github.com/goodekat/ggResidpanel)
 
 .center[&lt;img src="./figures/hedgehog.jpeg" height="400"&gt;]
     </textarea>
