@@ -687,7 +687,7 @@ class: inverse, center, middle
 # Helpful Links
 
 - [Website](https://goodekat.github.io/ggResidpanel/)
-- [Introduction Vignette](https://goodekat.github.io/ggResidpanel/articles/introduction.html)
+- [Introduction Vignette](https://cran.r-project.org/web/packages/ggResidpanel/vignettes/introduction.html)
 - [Tutorial and User Manual](https://goodekat.github.io/ggResidpanel-tutorial/tutorial.html)
 - [GitHub Repository](https://github.com/goodekat/ggResidpanel)
 
