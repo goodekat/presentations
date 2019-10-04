@@ -412,7 +412,7 @@ resid_panel(tree_model, plots = "all",
 # resid_panel: prespecified panels
 
 ```{r fig.height = 6, fig.width = 8}
-resid_panel(tree_model, plots = "R") # for lm and glm models only
+resid_panel(tree_model, plots = "R", smoother = TRUE) # for lm and glm models only
 ```
 
 ---
