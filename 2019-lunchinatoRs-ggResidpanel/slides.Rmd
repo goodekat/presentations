@@ -674,6 +674,8 @@ class: inverse, center, middle
 
 - Option to color by a variable
 
+.center[<img src="./figures/withcolor.png" width="1000"> ]
+
 ---
 
 class: inverse, center, middle
