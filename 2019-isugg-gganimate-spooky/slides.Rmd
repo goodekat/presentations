@@ -22,6 +22,8 @@ output:
 
 .remark-slide-content {
   background-color: #FFFFFF;
+  background-image: ./figures/spider.png;
+	background-position: right top 170px;
   border-top: 80px solid #F9C389;
   font-size: 20px;
   font-weight: 300;
@@ -126,7 +128,7 @@ class: inverse, middle, center
 
 # Three Types of Functions
 
-- transistions: changing the data in the graphic
+- transitions: changing the data in the graphic
 - views: changing the viewpoint (i.e. x and y axes) of the graphic
 - shadows: memory of the transition
 
@@ -194,7 +196,7 @@ batplot1 +
 
 ```{r}
 batplot1 + 
-  transition_states(time)
+  transition_time(time)
 ```
 
 ---
