@@ -20,11 +20,12 @@ output:
 
 <style>
 
-.remark-slide-content {
+.remark-slide-content:not(.inverse) {
   background-color: #FFFFFF;
-  background-image: ./figures/spider.png;
-	background-position: right top 170px;
   border-top: 80px solid #F9C389;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 95%;
+  background-size: 75px;
   font-size: 20px;
   font-weight: 300;
   line-height: 1.5;
@@ -159,7 +160,7 @@ class: inverse, middle, center
 ---
 
 ```{r}
-bats_raw <- read.csv("./halloween data/tentotheminus9-movement-coordination-in-trawling-bats/Movement coordination in trawling bats (data from Giuggioli et al. 2015).csv")
+bats_raw <- read.csv("./data/tentotheminus9-movement-coordination-in-trawling-bats/Movement coordination in trawling bats (data from Giuggioli et al. 2015).csv")
 
 bat1 <- bats_raw %>%
   filter(tag.local.identifier == 1)
