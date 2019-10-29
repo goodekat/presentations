@@ -20,12 +20,9 @@ output:
 
 <style>
 
-.remark-slide-content:not(.inverse) {
+.remark-slide-content {
   background-color: #FFFFFF;
   border-top: 80px solid #F9C389;
-  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
-	background-position: 95% 95%;
-  background-size: 75px;
   font-size: 20px;
   font-weight: 300;
   line-height: 1.5;
@@ -36,11 +33,15 @@ output:
   background-color: #696767;
   border-top: 80px solid #696767;
   text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
 }
 
 .title-slide {
   background-color: #F9C389;
   border-top: 80px solid #F9C389;
+  background-image: none;
 }
 
 .title-slide > h1  {
@@ -74,14 +75,19 @@ output:
 
 </style>
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
+
+# R markdown options
 knitr::opts_chunk$set(echo = TRUE, 
                       cache = TRUE, 
                       fig.width = 10,
                       fig.height = 5,
                       fig.align = "center")
-library(tidyverse)
+
+# Load packages
 library(gganimate)
+library(tidyverse)
+
 ```
 
 # Overview
@@ -160,7 +166,7 @@ class: inverse, middle, center
 ---
 
 ```{r}
-bats_raw <- read.csv("./data/tentotheminus9-movement-coordination-in-trawling-bats/Movement coordination in trawling bats (data from Giuggioli et al. 2015).csv")
+bats_raw <- read.csv("./data/bats-raw/Movement coordination in trawling bats (data from Giuggioli et al. 2015).csv")
 
 bat1 <- bats_raw %>%
   filter(tag.local.identifier == 1)
@@ -169,13 +175,12 @@ bat1
 
 ---
 
-```{r}
+```{r fig.height = 5, fig.width = 6}
 batplot1 <- bats_raw %>%
   filter(tag.local.identifier == 1) %>%
   mutate(time = as.numeric(timestamp)) %>%
   ggplot(aes(x = location.long, y = location.lat, color = time)) +
-  geom_point() + 
-  theme(legend.position = "bottom")
+  geom_point()
 batplot1
 ```
 
@@ -224,5 +229,7 @@ class: inverse, middle, center
 
 - https://gganimate.com/articles/extra/talks.html 
 - https://resources.rstudio.com/rstudio-conf-2019/gganimate-live-cookbook
-- http://svmiller.com/blog/2018/02/r-markdown-xaringan-theme/
+- https://github.com/numbats/gganimate-workshop
+- https://twitter.com/mitchoharawild/status/1108913366100119553
+
 
