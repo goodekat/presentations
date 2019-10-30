@@ -112,11 +112,21 @@ class: inverse, middle, center
 
 # What is gganimate?
 
-- Originally written by David Robinson
-- Updated by Thomas Pederson in 2018/2019 
-- Code from a year ago will probably not work anymore
-- Pederson describes it as "... a theoretical backbone of how to describe animation, and it's also an implementation of set theoretical backbones."
 - An extension to ggplot2 for creating animated graphics in R
+
+- Originally written by David Robinson
+
+- Updated by Thomas Lin Pedersen in 2018/2019 
+
+- Code from a year ago will probably not work anymore
+
+- Pederson describes it as... 
+
+> "a theoretical backbone of how to describe animation, and it's also an implementation of set theoretical backbones."
+
+```{r, fig.align="right", out.width = "200px", echo = FALSE}
+knitr::include_graphics("figures/logo.png")
+```
 
 ---
 
@@ -166,20 +176,16 @@ class: inverse, middle, center
 ---
 
 ```{r}
-bats_raw <- read.csv("./data/bats-raw/Movement coordination in trawling bats (data from Giuggioli et al. 2015).csv")
-
-bat1 <- bats_raw %>%
-  filter(tag.local.identifier == 1)
-bat1
+bats <- read.csv("https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/bats_indv.csv")
 ```
 
 ---
 
 ```{r fig.height = 5, fig.width = 6}
-batplot1 <- bats_raw %>%
-  filter(tag.local.identifier == 1) %>%
-  mutate(time = as.numeric(timestamp)) %>%
-  ggplot(aes(x = location.long, y = location.lat, color = time)) +
+batplot1 <- bats %>%
+  filter(id == 1) %>%
+  mutate(time = as.numeric(date_time)) %>%
+  ggplot(aes(x = longitude, y = latitude, color = time)) +
   geom_point()
 batplot1
 ```
@@ -227,9 +233,16 @@ class: inverse, middle, center
 
 # Resources
 
-- https://gganimate.com/articles/extra/talks.html 
-- https://resources.rstudio.com/rstudio-conf-2019/gganimate-live-cookbook
-- https://github.com/numbats/gganimate-workshop
-- https://twitter.com/mitchoharawild/status/1108913366100119553
+Official Website: https://gganimate.com/index.html
+
+GitHub: https://github.com/thomasp85/gganimate
+
+Presentations on gganimate: https://gganimate.com/articles/extra/talks.html
+
+Workshop by Mitchell O'Hara-Wild: https://github.com/numbats/gganimate-workshop
+
+```{r, out.width = "625px", echo = FALSE}
+knitr::include_graphics("figures/halloween-dogs.png")
+```
 
 
