@@ -92,7 +92,7 @@ class: center, middle, inverse, title-slide
 
 # Overview
 
-1. What is gganimate?
+1. Introduction
 
 2. Transition functions 
 
@@ -120,7 +120,7 @@ class: inverse, middle, center
 
 - Code from a year ago will probably not work anymore
 
-- Pederson describes it as... 
+- Pedersen describes it as... 
 
 &gt; "a theoretical backbone of how to describe animation, and it's also an implementation of set theoretical backbones."
 
@@ -128,24 +128,207 @@ class: inverse, middle, center
 
 ---
 
-# Features of gganimate
+# gapminder Example
 
-- should interpolate the data, so the animation is smooth
-- maybe can adjust the number of frames to make it mosre smooth
-- can add a label that changes over time
-- can add shadows to trail the old data (tail or mark)
-
-- transition_time versus transition_reveal
-- could use the stat() function
-- enter grow function
+&lt;img src="slides_files/figure-html/unnamed-chunk-2-1.gif" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Three Types of Functions
+# How does it work?
 
-- transitions: changing the data in the graphic
-- views: changing the viewpoint (i.e. x and y axes) of the graphic
-- shadows: memory of the transition
+From the documentation...
+
+&gt; gganimate provides "a range of new grammar classes that can be added to the plot object in order to customise how it should change with time."   
+
+New Grammar Classes
+
+| Classes | | 
+| ----- | :------------ | 
+| transitions | defines how the data changes in the graphic across time |
+| views | defines changes in the viewpoint of the graphic (i.e. x and y axes) | 
+| shadows | defines how to display "memories" in the animation |
+| enter/exit | defines how the data transitions from one time point to the next |
+| ease_aes | defines how the aesthetics associated with the ease during transitions |
+
+---
+
+# Set up
+
+Packages to load if you are following along
+
+
+```r
+# Installs gganimate
+install.packages("gganimate")
+
+# Loads the library
+library(gganimate)
+
+# Other libraries that will be used
+library(ggplot2)
+library(tidyverse)
+```
+
+---
+
+# Bat Data
+
+Study recorded the flying trajectories of bats (individual and paired)
+
+- **Paper**: Giuggioli L, McKetterick TJ, Holderied M (2015) Delayed response and biosonar perception explain movement coordination in trawling bats. PLOS Computational Biology. [doi:10.1371/journal.pcbi.1004089.t001](https://journals.plos.org/ploscompbiol/article/figure?id=10.1371/journal.pcbi.1004089.t001)
+
+- **Original Data**: Holderied M, Giuggioli L, McKetterick TJ (2015) Data from: Delayed response and biosonar perception explain movement coordination in trawling bats. Movebank Data Repository. [doi:10.5441/001/1.62h1f7k9](https://www.datarepository.movebank.org/handle/10255/move.421)
+
+- **My Subset of the Data**:
+    - extracted the first 5 individual bat trajectories
+    - selected 4 variables
+        - `id`: bat id
+        - `time`: time of observed location (in milliseconds)
+        - `latitude`: latitude at the time of observation
+        - `longitude`: longitude at the time of observation
+
+---
+
+# Bat Data
+
+How to access my subset of the data:
+
+
+```r
+# Link where the data are stored
+link &lt;- "https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/bats_indv.csv"
+```
+
+
+```r
+# Access the data and convert id to a factor
+bats &lt;- read.csv(link) %&gt;% 
+  mutate(id = factor(id))
+```
+
+
+```r
+# Data structure
+str(bats)
+```
+
+```
+## 'data.frame':	1743 obs. of  4 variables:
+##  $ id       : Factor w/ 5 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ time     : num  0 0.019 0.039 0.059 0.079 0.099 0.119 0.139 0.16 0.18 ...
+##  $ latitude : num  51.4 51.4 51.4 51.4 51.4 ...
+##  $ longitude: num  -2.66 -2.66 -2.66 -2.66 -2.66 ...
+```
+
+---
+
+# Bat Data
+
+Plot of the 5 bat trajectories
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Basics for creating a gganimation
+
+**Step 1**: Start with a ggplot data and mapping
+
+.pull-left[
+
+```r
+*ggplot(data = bats %&gt;%
+*        filter(id == 1),
+*      mapping = aes(x = longitude,
+*                    y = latitude,
+*                    color = time))
+```
+]
+.pull-right[
+&lt;img src="slides_files/figure-html/output1-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Basics for creating a gganimation
+
+**Step 2**: Add layers using geoms to create static
+
+.pull-left[
+
+```r
+ggplot(data = bats 
+       %&gt;% filter(id == 1), 
+       mapping = aes(x = longitude, 
+                     y = latitude, 
+                     color = time)) + 
+* geom_point()
+```
+]
+.pull-right[
+&lt;img src="slides_files/figure-html/output2-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Basics for creating a gganimation
+
+**Step 3**: Add formatting options
+
+.pull-left[
+
+```r
+ggplot(data = bats %&gt;% 
+         filter(id == 1), 
+       mapping = aes(x = longitude, 
+                     y = latitude, 
+                     color = time)) + 
+  geom_point() +
+* scale_color_gradient2(
+*   midpoint = 6,
+*   low = "orange",
+*   mid = "purple",
+*   high = "black")
+```
+]
+.pull-right[
+&lt;img src="slides_files/figure-html/output3-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Basics for creating a gganimation
+
+**Step 4**: Add gganimate options
+
+.pull-left[
+
+```r
+ggplot(data = bats %&gt;% 
+         filter(id == 1), 
+       mapping = aes(x = longitude, 
+                     y = latitude, 
+                     color = time)) + 
+  geom_point() +
+  scale_color_gradient2(
+    midpoint = 6,
+    low = "orange",
+    mid = "purple",
+    high = "black") +
+* transition_reveal(time)
+```
+]
+.pull-right[
+&lt;img src="slides_files/figure-html/output4-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Rendering process
+
+&lt;video width="800" height="550" controls&gt;
+  &lt;source src="./figures/rendering.mp4" type="video/mp4"&gt;
+&lt;/video&gt;
 
 ---
 
@@ -173,564 +356,66 @@ class: inverse, middle, center
 
 ---
 
-
-```r
-bats &lt;- read.csv("https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/bats_indv.csv")
-```
-
----
+# Transition: Time
 
 
 ```r
-batplot1 &lt;- bats %&gt;%
+bats %&gt;%
   filter(id == 1) %&gt;%
-  mutate(time = as.numeric(date_time)) %&gt;%
-  ggplot(aes(x = longitude, y = latitude, color = time)) +
-  geom_point()
-batplot1
+  ggplot(aes(x = longitude, y = latitude)) +
+  geom_point() +
+* transition_time(time)
 ```
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-8-1.gif" style="display: block; margin: auto;" /&gt;
 
 ---
 
+# Transition: Reveal
+
 
 ```r
-batplot1 + 
-  transition_time(time)
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, y = latitude)) +
+  geom_point() +
+* transition_reveal(time)
 ```
 
-```
-## 
-Rendering [&gt;--------------------------------------] at 8.6 fps ~ eta: 11s
-Rendering [&gt;--------------------------------------] at 8.8 fps ~ eta: 11s
-Rendering [=&gt;---------------------------------------] at 9 fps ~ eta: 11s
-Rendering [=&gt;---------------------------------------] at 9 fps ~ eta: 10s
-Rendering [==&gt;------------------------------------] at 9.2 fps ~ eta: 10s
-Rendering [==&gt;------------------------------------] at 9.3 fps ~ eta: 10s
-Rendering [===&gt;-----------------------------------] at 9.3 fps ~ eta: 10s
-Rendering [====&gt;----------------------------------] at 9.3 fps ~ eta:  9s
-Rendering [=====&gt;---------------------------------] at 9.3 fps ~ eta:  9s
-Rendering [======&gt;--------------------------------] at 9.3 fps ~ eta:  9s
-Rendering [=======&gt;-------------------------------] at 9.3 fps ~ eta:  9s
-Rendering [=======&gt;-------------------------------] at 9.3 fps ~ eta:  8s
-Rendering [========&gt;------------------------------] at 9.3 fps ~ eta:  8s
-Rendering [=========&gt;-----------------------------] at 9.3 fps ~ eta:  8s
-Rendering [==========&gt;----------------------------] at 9.3 fps ~ eta:  8s
-Rendering [===========&gt;---------------------------] at 9.3 fps ~ eta:  8s
-Rendering [===========&gt;---------------------------] at 9.3 fps ~ eta:  7s
-Rendering [============&gt;--------------------------] at 9.3 fps ~ eta:  7s
-Rendering [=============&gt;-------------------------] at 9.3 fps ~ eta:  7s
-Rendering [==============&gt;------------------------] at 9.3 fps ~ eta:  7s
-Rendering [===============&gt;-----------------------] at 9.3 fps ~ eta:  6s
-Rendering [================&gt;----------------------] at 9.3 fps ~ eta:  6s
-Rendering [=================&gt;---------------------] at 9.3 fps ~ eta:  6s
-Rendering [=================&gt;---------------------] at 9.2 fps ~ eta:  6s
-Rendering [==================&gt;--------------------] at 9.2 fps ~ eta:  6s
-Rendering [===================&gt;-------------------] at 9.2 fps ~ eta:  5s
-Rendering [====================&gt;------------------] at 9.2 fps ~ eta:  5s
-Rendering [=====================&gt;-----------------] at 9.2 fps ~ eta:  5s
-Rendering [======================&gt;----------------] at 9.2 fps ~ eta:  5s
-Rendering [======================&gt;----------------] at 9.2 fps ~ eta:  4s
-Rendering [=======================&gt;---------------] at 9.2 fps ~ eta:  4s
-Rendering [========================&gt;--------------] at 9.2 fps ~ eta:  4s
-Rendering [=========================&gt;-------------] at 9.2 fps ~ eta:  4s
-Rendering [==========================&gt;------------] at 9.2 fps ~ eta:  3s
-Rendering [==========================&gt;------------] at 8.9 fps ~ eta:  3s
-Rendering [===========================&gt;-----------] at 8.9 fps ~ eta:  3s
-Rendering [============================&gt;----------] at 8.9 fps ~ eta:  3s
-Rendering [=============================&gt;---------] at 8.9 fps ~ eta:  3s
-Rendering [=============================&gt;---------] at 8.9 fps ~ eta:  2s
-Rendering [==============================&gt;--------] at 8.9 fps ~ eta:  2s
-Rendering [===============================&gt;-------] at 8.9 fps ~ eta:  2s
-Rendering [=================================&gt;-------] at 9 fps ~ eta:  2s
-Rendering [==================================&gt;------] at 9 fps ~ eta:  2s
-Rendering [===================================&gt;-----] at 9 fps ~ eta:  1s
-Rendering [====================================&gt;----] at 9 fps ~ eta:  1s
-Rendering [=====================================&gt;---] at 9 fps ~ eta:  1s
-Rendering [======================================&gt;--] at 9 fps ~ eta:  1s
-Rendering [======================================&gt;--] at 9 fps ~ eta:  0s
-Rendering [=======================================&gt;-] at 9 fps ~ eta:  0s
-Rendering [========================================&gt;] at 9 fps ~ eta:  0s
-Rendering [=========================================] at 9 fps ~ eta:  0s
-                                                                         
-```
-
-```
-## 
-Frame 1 (1%)
-Frame 2 (2%)
-Frame 3 (3%)
-Frame 4 (4%)
-Frame 5 (5%)
-Frame 6 (6%)
-Frame 7 (7%)
-Frame 8 (8%)
-Frame 9 (9%)
-Frame 10 (10%)
-Frame 11 (11%)
-Frame 12 (12%)
-Frame 13 (13%)
-Frame 14 (14%)
-Frame 15 (15%)
-Frame 16 (16%)
-Frame 17 (17%)
-Frame 18 (18%)
-Frame 19 (19%)
-Frame 20 (20%)
-Frame 21 (21%)
-Frame 22 (22%)
-Frame 23 (23%)
-Frame 24 (24%)
-Frame 25 (25%)
-Frame 26 (26%)
-Frame 27 (27%)
-Frame 28 (28%)
-Frame 29 (29%)
-Frame 30 (30%)
-Frame 31 (31%)
-Frame 32 (32%)
-Frame 33 (33%)
-Frame 34 (34%)
-Frame 35 (35%)
-Frame 36 (36%)
-Frame 37 (37%)
-Frame 38 (38%)
-Frame 39 (39%)
-Frame 40 (40%)
-Frame 41 (41%)
-Frame 42 (42%)
-Frame 43 (43%)
-Frame 44 (44%)
-Frame 45 (45%)
-Frame 46 (46%)
-Frame 47 (47%)
-Frame 48 (48%)
-Frame 49 (49%)
-Frame 50 (50%)
-Frame 51 (51%)
-Frame 52 (52%)
-Frame 53 (53%)
-Frame 54 (54%)
-Frame 55 (55%)
-Frame 56 (56%)
-Frame 57 (57%)
-Frame 58 (58%)
-Frame 59 (59%)
-Frame 60 (60%)
-Frame 61 (61%)
-Frame 62 (62%)
-Frame 63 (63%)
-Frame 64 (64%)
-Frame 65 (65%)
-Frame 66 (66%)
-Frame 67 (67%)
-Frame 68 (68%)
-Frame 69 (69%)
-Frame 70 (70%)
-Frame 71 (71%)
-Frame 72 (72%)
-Frame 73 (73%)
-Frame 74 (74%)
-Frame 75 (75%)
-Frame 76 (76%)
-Frame 77 (77%)
-Frame 78 (78%)
-Frame 79 (79%)
-Frame 80 (80%)
-Frame 81 (81%)
-Frame 82 (82%)
-Frame 83 (83%)
-Frame 84 (84%)
-Frame 85 (85%)
-Frame 86 (86%)
-Frame 87 (87%)
-Frame 88 (88%)
-Frame 89 (89%)
-Frame 90 (90%)
-Frame 91 (91%)
-Frame 92 (92%)
-Frame 93 (93%)
-Frame 94 (94%)
-Frame 95 (95%)
-Frame 96 (96%)
-Frame 97 (97%)
-Frame 98 (98%)
-Frame 99 (99%)
-Frame 100 (100%)
-## Finalizing encoding... done!
-```
-
-&lt;img src="slides_files/figure-html/unnamed-chunk-4-1.gif" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-9-1.gif" style="display: block; margin: auto;" /&gt;
 
 ---
 
+# Transition: Reveal
+
+Allows data to gradually appear
+
 
 ```r
-batplot1 + 
-  transition_reveal(time, keep_last = TRUE)
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, y = latitude)) +
+* geom_path() +
+  transition_reveal(time) 
 ```
 
-```
-## 
-Rendering [&gt;--------------------------------------] at 7.2 fps ~ eta: 14s
-Rendering [&gt;--------------------------------------] at 7.4 fps ~ eta: 13s
-Rendering [=&gt;-------------------------------------] at 7.5 fps ~ eta: 13s
-Rendering [=&gt;-------------------------------------] at 7.6 fps ~ eta: 13s
-Rendering [=&gt;-------------------------------------] at 7.7 fps ~ eta: 12s
-Rendering [==&gt;------------------------------------] at 7.8 fps ~ eta: 12s
-Rendering [==&gt;------------------------------------] at 7.9 fps ~ eta: 12s
-Rendering [===&gt;-------------------------------------] at 8 fps ~ eta: 11s
-Rendering [===&gt;-----------------------------------] at 8.1 fps ~ eta: 11s
-Rendering [===&gt;-----------------------------------] at 8.2 fps ~ eta: 11s
-Rendering [====&gt;----------------------------------] at 8.2 fps ~ eta: 11s
-Rendering [====&gt;----------------------------------] at 8.3 fps ~ eta: 10s
-Rendering [====&gt;----------------------------------] at 8.4 fps ~ eta: 10s
-Rendering [=====&gt;---------------------------------] at 8.5 fps ~ eta: 10s
-Rendering [======&gt;--------------------------------] at 8.5 fps ~ eta: 10s
-Rendering [======&gt;--------------------------------] at 8.6 fps ~ eta:  9s
-Rendering [=======&gt;-------------------------------] at 8.6 fps ~ eta:  9s
-Rendering [========&gt;------------------------------] at 8.6 fps ~ eta:  9s
-Rendering [========&gt;------------------------------] at 8.7 fps ~ eta:  9s
-Rendering [=========&gt;-----------------------------] at 8.7 fps ~ eta:  9s
-Rendering [==========&gt;----------------------------] at 8.7 fps ~ eta:  8s
-Rendering [===========&gt;---------------------------] at 8.7 fps ~ eta:  8s
-Rendering [============&gt;--------------------------] at 8.7 fps ~ eta:  8s
-Rendering [=============&gt;-------------------------] at 8.7 fps ~ eta:  7s
-Rendering [=============&gt;-------------------------] at 8.8 fps ~ eta:  7s
-Rendering [==============&gt;------------------------] at 8.8 fps ~ eta:  7s
-Rendering [===============&gt;-----------------------] at 8.8 fps ~ eta:  7s
-Rendering [===============&gt;-----------------------] at 8.7 fps ~ eta:  7s
-Rendering [================&gt;----------------------] at 8.7 fps ~ eta:  7s
-Rendering [================&gt;----------------------] at 8.7 fps ~ eta:  6s
-Rendering [=================&gt;---------------------] at 8.7 fps ~ eta:  6s
-Rendering [=================&gt;---------------------] at 8.8 fps ~ eta:  6s
-Rendering [==================&gt;--------------------] at 8.8 fps ~ eta:  6s
-Rendering [===================&gt;-------------------] at 8.8 fps ~ eta:  6s
-Rendering [===================&gt;-------------------] at 8.8 fps ~ eta:  5s
-Rendering [====================&gt;------------------] at 8.8 fps ~ eta:  5s
-Rendering [====================&gt;------------------] at 8.9 fps ~ eta:  5s
-Rendering [=====================&gt;-----------------] at 8.9 fps ~ eta:  5s
-Rendering [======================&gt;----------------] at 8.9 fps ~ eta:  5s
-Rendering [======================&gt;----------------] at 8.9 fps ~ eta:  4s
-Rendering [=======================&gt;---------------] at 8.9 fps ~ eta:  4s
-Rendering [========================&gt;--------------] at 8.9 fps ~ eta:  4s
-Rendering [=========================&gt;---------------] at 9 fps ~ eta:  4s
-Rendering [========================&gt;--------------] at 8.9 fps ~ eta:  4s
-Rendering [=========================&gt;-------------] at 8.9 fps ~ eta:  4s
-Rendering [===========================&gt;-------------] at 9 fps ~ eta:  4s
-Rendering [===========================&gt;-------------] at 9 fps ~ eta:  3s
-Rendering [============================&gt;------------] at 9 fps ~ eta:  3s
-Rendering [=============================&gt;-----------] at 9 fps ~ eta:  3s
-Rendering [==============================&gt;----------] at 9 fps ~ eta:  3s
-Rendering [===============================&gt;---------] at 9 fps ~ eta:  3s
-Rendering [===============================&gt;---------] at 9 fps ~ eta:  2s
-Rendering [================================&gt;--------] at 9 fps ~ eta:  2s
-Rendering [=================================&gt;-------] at 9 fps ~ eta:  2s
-Rendering [===============================&gt;-------] at 9.1 fps ~ eta:  2s
-Rendering [================================&gt;------] at 9.1 fps ~ eta:  2s
-Rendering [=================================&gt;-----] at 9.1 fps ~ eta:  2s
-Rendering [=================================&gt;-----] at 9.1 fps ~ eta:  1s
-Rendering [==================================&gt;----] at 9.1 fps ~ eta:  1s
-Rendering [===================================&gt;---] at 9.1 fps ~ eta:  1s
-Rendering [====================================&gt;--] at 9.1 fps ~ eta:  1s
-Rendering [====================================&gt;--] at 9.1 fps ~ eta:  0s
-Rendering [=====================================&gt;-] at 9.1 fps ~ eta:  0s
-Rendering [======================================&gt;] at 9.1 fps ~ eta:  0s
-Rendering [=======================================] at 9.1 fps ~ eta:  0s
-                                                                         
-```
-
-```
-## 
-Frame 1 (1%)
-Frame 2 (2%)
-Frame 3 (3%)
-Frame 4 (4%)
-Frame 5 (5%)
-Frame 6 (6%)
-Frame 7 (7%)
-Frame 8 (8%)
-Frame 9 (9%)
-Frame 10 (10%)
-Frame 11 (11%)
-Frame 12 (12%)
-Frame 13 (13%)
-Frame 14 (14%)
-Frame 15 (15%)
-Frame 16 (16%)
-Frame 17 (17%)
-Frame 18 (18%)
-Frame 19 (19%)
-Frame 20 (20%)
-Frame 21 (21%)
-Frame 22 (22%)
-Frame 23 (23%)
-Frame 24 (24%)
-Frame 25 (25%)
-Frame 26 (26%)
-Frame 27 (27%)
-Frame 28 (28%)
-Frame 29 (29%)
-Frame 30 (30%)
-Frame 31 (31%)
-Frame 32 (32%)
-Frame 33 (33%)
-Frame 34 (34%)
-Frame 35 (35%)
-Frame 36 (36%)
-Frame 37 (37%)
-Frame 38 (38%)
-Frame 39 (39%)
-Frame 40 (40%)
-Frame 41 (41%)
-Frame 42 (42%)
-Frame 43 (43%)
-Frame 44 (44%)
-Frame 45 (45%)
-Frame 46 (46%)
-Frame 47 (47%)
-Frame 48 (48%)
-Frame 49 (49%)
-Frame 50 (50%)
-Frame 51 (51%)
-Frame 52 (52%)
-Frame 53 (53%)
-Frame 54 (54%)
-Frame 55 (55%)
-Frame 56 (56%)
-Frame 57 (57%)
-Frame 58 (58%)
-Frame 59 (59%)
-Frame 60 (60%)
-Frame 61 (61%)
-Frame 62 (62%)
-Frame 63 (63%)
-Frame 64 (64%)
-Frame 65 (65%)
-Frame 66 (66%)
-Frame 67 (67%)
-Frame 68 (68%)
-Frame 69 (69%)
-Frame 70 (70%)
-Frame 71 (71%)
-Frame 72 (72%)
-Frame 73 (73%)
-Frame 74 (74%)
-Frame 75 (75%)
-Frame 76 (76%)
-Frame 77 (77%)
-Frame 78 (78%)
-Frame 79 (79%)
-Frame 80 (80%)
-Frame 81 (81%)
-Frame 82 (82%)
-Frame 83 (83%)
-Frame 84 (84%)
-Frame 85 (85%)
-Frame 86 (86%)
-Frame 87 (87%)
-Frame 88 (88%)
-Frame 89 (89%)
-Frame 90 (90%)
-Frame 91 (91%)
-Frame 92 (92%)
-Frame 93 (93%)
-Frame 94 (94%)
-Frame 95 (95%)
-Frame 96 (96%)
-Frame 97 (97%)
-Frame 98 (98%)
-Frame 99 (99%)
-Frame 100 (100%)
-## Finalizing encoding... done!
-```
-
-&lt;img src="slides_files/figure-html/unnamed-chunk-5-1.gif" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-10-1.gif" style="display: block; margin: auto;" /&gt;
 
 ---
 
+# Transition: Reveal
+
 
 ```r
-batplot1 + 
-  transition_time(time)
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, y = latitude)) +
+* geom_path() +
+* geom_point() +
+  transition_reveal(time)
 ```
 
-```
-## 
-Rendering [&gt;--------------------------------------] at 8.5 fps ~ eta: 12s
-Rendering [&gt;--------------------------------------] at 8.8 fps ~ eta: 11s
-Rendering [=&gt;-------------------------------------] at 8.9 fps ~ eta: 11s
-Rendering [=&gt;-------------------------------------] at 8.7 fps ~ eta: 11s
-Rendering [=&gt;-------------------------------------] at 8.3 fps ~ eta: 11s
-Rendering [==&gt;------------------------------------] at 8.2 fps ~ eta: 11s
-Rendering [===&gt;-----------------------------------] at 8.2 fps ~ eta: 11s
-Rendering [===&gt;-----------------------------------] at 8.3 fps ~ eta: 11s
-Rendering [====&gt;----------------------------------] at 8.4 fps ~ eta: 11s
-Rendering [====&gt;----------------------------------] at 8.4 fps ~ eta: 10s
-Rendering [====&gt;----------------------------------] at 8.5 fps ~ eta: 10s
-Rendering [=====&gt;---------------------------------] at 8.5 fps ~ eta: 10s
-Rendering [=====&gt;---------------------------------] at 8.6 fps ~ eta: 10s
-Rendering [======&gt;--------------------------------] at 8.6 fps ~ eta: 10s
-Rendering [======&gt;--------------------------------] at 8.7 fps ~ eta:  9s
-Rendering [=======&gt;-------------------------------] at 8.7 fps ~ eta:  9s
-Rendering [========&gt;------------------------------] at 8.7 fps ~ eta:  9s
-Rendering [========&gt;------------------------------] at 8.8 fps ~ eta:  9s
-Rendering [=========&gt;-----------------------------] at 8.8 fps ~ eta:  9s
-Rendering [=========&gt;-----------------------------] at 8.8 fps ~ eta:  8s
-Rendering [==========&gt;----------------------------] at 8.8 fps ~ eta:  8s
-Rendering [==========&gt;----------------------------] at 8.9 fps ~ eta:  8s
-Rendering [==========&gt;----------------------------] at 8.8 fps ~ eta:  8s
-Rendering [===========&gt;---------------------------] at 8.9 fps ~ eta:  8s
-Rendering [============&gt;--------------------------] at 8.9 fps ~ eta:  8s
-Rendering [============&gt;--------------------------] at 8.9 fps ~ eta:  7s
-Rendering [=============&gt;-------------------------] at 8.9 fps ~ eta:  7s
-Rendering [==============&gt;------------------------] at 8.9 fps ~ eta:  7s
-Rendering [===============&gt;-----------------------] at 8.9 fps ~ eta:  7s
-Rendering [================&gt;------------------------] at 9 fps ~ eta:  7s
-Rendering [================&gt;------------------------] at 9 fps ~ eta:  6s
-Rendering [=================&gt;-----------------------] at 9 fps ~ eta:  6s
-Rendering [==================&gt;----------------------] at 9 fps ~ eta:  6s
-Rendering [===================&gt;---------------------] at 9 fps ~ eta:  6s
-Rendering [====================&gt;--------------------] at 9 fps ~ eta:  5s
-Rendering [=====================&gt;-------------------] at 9 fps ~ eta:  5s
-Rendering [======================&gt;------------------] at 9 fps ~ eta:  5s
-Rendering [=======================&gt;-----------------] at 9 fps ~ eta:  5s
-Rendering [========================&gt;----------------] at 9 fps ~ eta:  4s
-Rendering [=========================&gt;---------------] at 9 fps ~ eta:  4s
-Rendering [========================&gt;--------------] at 9.1 fps ~ eta:  4s
-Rendering [==========================&gt;--------------] at 9 fps ~ eta:  4s
-Rendering [=========================&gt;-------------] at 9.1 fps ~ eta:  4s
-Rendering [==========================&gt;------------] at 9.1 fps ~ eta:  4s
-Rendering [==========================&gt;------------] at 9.1 fps ~ eta:  3s
-Rendering [===========================&gt;-----------] at 9.1 fps ~ eta:  3s
-Rendering [=============================&gt;-----------] at 9 fps ~ eta:  3s
-Rendering [============================&gt;----------] at 8.9 fps ~ eta:  3s
-Rendering [=============================&gt;---------] at 8.9 fps ~ eta:  3s
-Rendering [=============================&gt;---------] at 8.9 fps ~ eta:  2s
-Rendering [==============================&gt;--------] at 8.9 fps ~ eta:  2s
-Rendering [===============================&gt;-------] at 8.9 fps ~ eta:  2s
-Rendering [================================&gt;------] at 8.9 fps ~ eta:  2s
-Rendering [=================================&gt;-----] at 8.9 fps ~ eta:  2s
-Rendering [===================================&gt;-----] at 9 fps ~ eta:  1s
-Rendering [=================================&gt;-----] at 8.9 fps ~ eta:  1s
-Rendering [===================================&gt;-----] at 9 fps ~ eta:  1s
-Rendering [====================================&gt;----] at 9 fps ~ eta:  1s
-Rendering [=====================================&gt;---] at 9 fps ~ eta:  1s
-Rendering [======================================&gt;--] at 9 fps ~ eta:  1s
-Rendering [======================================&gt;--] at 9 fps ~ eta:  0s
-Rendering [=======================================&gt;-] at 9 fps ~ eta:  0s
-Rendering [========================================&gt;] at 9 fps ~ eta:  0s
-Rendering [=========================================] at 9 fps ~ eta:  0s
-                                                                         
-```
-
-```
-## 
-Frame 1 (1%)
-Frame 2 (2%)
-Frame 3 (3%)
-Frame 4 (4%)
-Frame 5 (5%)
-Frame 6 (6%)
-Frame 7 (7%)
-Frame 8 (8%)
-Frame 9 (9%)
-Frame 10 (10%)
-Frame 11 (11%)
-Frame 12 (12%)
-Frame 13 (13%)
-Frame 14 (14%)
-Frame 15 (15%)
-Frame 16 (16%)
-Frame 17 (17%)
-Frame 18 (18%)
-Frame 19 (19%)
-Frame 20 (20%)
-Frame 21 (21%)
-Frame 22 (22%)
-Frame 23 (23%)
-Frame 24 (24%)
-Frame 25 (25%)
-Frame 26 (26%)
-Frame 27 (27%)
-Frame 28 (28%)
-Frame 29 (29%)
-Frame 30 (30%)
-Frame 31 (31%)
-Frame 32 (32%)
-Frame 33 (33%)
-Frame 34 (34%)
-Frame 35 (35%)
-Frame 36 (36%)
-Frame 37 (37%)
-Frame 38 (38%)
-Frame 39 (39%)
-Frame 40 (40%)
-Frame 41 (41%)
-Frame 42 (42%)
-Frame 43 (43%)
-Frame 44 (44%)
-Frame 45 (45%)
-Frame 46 (46%)
-Frame 47 (47%)
-Frame 48 (48%)
-Frame 49 (49%)
-Frame 50 (50%)
-Frame 51 (51%)
-Frame 52 (52%)
-Frame 53 (53%)
-Frame 54 (54%)
-Frame 55 (55%)
-Frame 56 (56%)
-Frame 57 (57%)
-Frame 58 (58%)
-Frame 59 (59%)
-Frame 60 (60%)
-Frame 61 (61%)
-Frame 62 (62%)
-Frame 63 (63%)
-Frame 64 (64%)
-Frame 65 (65%)
-Frame 66 (66%)
-Frame 67 (67%)
-Frame 68 (68%)
-Frame 69 (69%)
-Frame 70 (70%)
-Frame 71 (71%)
-Frame 72 (72%)
-Frame 73 (73%)
-Frame 74 (74%)
-Frame 75 (75%)
-Frame 76 (76%)
-Frame 77 (77%)
-Frame 78 (78%)
-Frame 79 (79%)
-Frame 80 (80%)
-Frame 81 (81%)
-Frame 82 (82%)
-Frame 83 (83%)
-Frame 84 (84%)
-Frame 85 (85%)
-Frame 86 (86%)
-Frame 87 (87%)
-Frame 88 (88%)
-Frame 89 (89%)
-Frame 90 (90%)
-Frame 91 (91%)
-Frame 92 (92%)
-Frame 93 (93%)
-Frame 94 (94%)
-Frame 95 (95%)
-Frame 96 (96%)
-Frame 97 (97%)
-Frame 98 (98%)
-Frame 99 (99%)
-Frame 100 (100%)
-## Finalizing encoding... done!
-```
-
-&lt;img src="slides_files/figure-html/unnamed-chunk-6-1.gif" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-11-1.gif" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -758,7 +443,7 @@ Official Website: https://gganimate.com/index.html
 
 GitHub: https://github.com/thomasp85/gganimate
 
-Presentations on gganimate: https://gganimate.com/articles/extra/talks.html
+Talks on gganimate: https://gganimate.com/articles/extra/talks.html
 
 Workshop by Mitchell O'Hara-Wild: https://github.com/numbats/gganimate-workshop
 

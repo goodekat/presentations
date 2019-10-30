@@ -82,17 +82,20 @@ knitr::opts_chunk$set(echo = TRUE,
                       cache = TRUE, 
                       fig.width = 10,
                       fig.height = 5,
-                      fig.align = "center")
+                      fig.align = "center", 
+                      message = FALSE)
 
 # Load packages
+library(gapminder)
 library(gganimate)
+library(ggplot2)
 library(tidyverse)
 
 ```
 
 # Overview
 
-1. What is gganimate?
+1. Introduction
 
 2. Transition functions 
 
@@ -120,7 +123,7 @@ class: inverse, middle, center
 
 - Code from a year ago will probably not work anymore
 
-- Pederson describes it as... 
+- Pedersen describes it as... 
 
 > "a theoretical backbone of how to describe animation, and it's also an implementation of set theoretical backbones."
 
@@ -130,24 +133,217 @@ knitr::include_graphics("figures/logo.png")
 
 ---
 
-# Features of gganimate
+# gapminder Example
 
-- should interpolate the data, so the animation is smooth
-- maybe can adjust the number of frames to make it mosre smooth
-- can add a label that changes over time
-- can add shadows to trail the old data (tail or mark)
-
-- transition_time versus transition_reveal
-- could use the stat() function
-- enter grow function
+```{r echo = FALSE, fig.height = 7.5, fig.width = 10}
+ggplot(gapminder, aes(gdpPercap, lifeExp, size = pop, colour = continent)) +
+  geom_point(alpha = 0.7, show.legend = FALSE) +
+  scale_colour_manual(values = c("darkorchid4", "orange", 
+                                 "purple", "darkorange", "black")) +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  facet_wrap(~continent) +
+  labs(title = 'Year: {frame_time}', 
+       x = 'GDP per capita', 
+       y = 'life expectancy') +
+  transition_time(year) +
+  ease_aes('linear')
+```
 
 ---
 
-# Three Types of Functions
+# How does it work?
 
-- transitions: changing the data in the graphic
-- views: changing the viewpoint (i.e. x and y axes) of the graphic
-- shadows: memory of the transition
+From the documentation...
+
+> gganimate provides "a range of new grammar classes that can be added to the plot object in order to customise how it should change with time."   
+
+New Grammar Classes
+
+| Classes | | 
+| ----- | :------------ | 
+| transitions | defines how the data changes in the graphic across time |
+| views | defines changes in the viewpoint of the graphic (i.e. x and y axes) | 
+| shadows | defines how to display "memories" in the animation |
+| enter/exit | defines how the data transitions from one time point to the next |
+| ease_aes | defines how the aesthetics associated with the ease during transitions |
+
+---
+
+# Set up
+
+Packages to load if you are following along
+
+```{r eval = FALSE}
+# Installs gganimate
+install.packages("gganimate")
+
+# Loads the library
+library(gganimate)
+
+# Other libraries that will be used
+library(ggplot2)
+library(tidyverse)
+```
+
+---
+
+# Bat Data
+
+Study recorded the flying trajectories of bats (individual and paired)
+
+- **Paper**: Giuggioli L, McKetterick TJ, Holderied M (2015) Delayed response and biosonar perception explain movement coordination in trawling bats. PLOS Computational Biology. [doi:10.1371/journal.pcbi.1004089.t001](https://journals.plos.org/ploscompbiol/article/figure?id=10.1371/journal.pcbi.1004089.t001)
+
+- **Original Data**: Holderied M, Giuggioli L, McKetterick TJ (2015) Data from: Delayed response and biosonar perception explain movement coordination in trawling bats. Movebank Data Repository. [doi:10.5441/001/1.62h1f7k9](https://www.datarepository.movebank.org/handle/10255/move.421)
+
+- **My Subset of the Data**:
+    - extracted the first 5 individual bat trajectories
+    - selected 4 variables
+        - `id`: bat id
+        - `time`: time of observed location (in milliseconds)
+        - `latitude`: latitude at the time of observation
+        - `longitude`: longitude at the time of observation
+
+---
+
+# Bat Data
+
+How to access my subset of the data:
+
+```{r}
+# Link where the data are stored
+link <- "https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/bats_indv.csv"
+```
+
+```{r}
+# Access the data and convert id to a factor
+bats <- read.csv(link) %>% 
+  mutate(id = factor(id))
+```
+
+```{r}
+# Data structure
+str(bats)
+```
+
+---
+
+# Bat Data
+
+Plot of the 5 bat trajectories
+
+```{r echo = FALSE, fig.height = 7, fig.width = 10}
+bats %>%
+  ggplot(aes(x = longitude, y = latitude, color = time)) +
+  geom_point() + 
+  facet_wrap(. ~ id) +
+  scale_color_gradient2(midpoint = 6, 
+                        low = "orange", 
+                        mid = "purple",
+                        high = "black")
+```
+
+---
+
+# Basics for creating a gganimation
+
+**Step 1**: Start with a ggplot data and mapping
+
+.pull-left[
+```{r step1, eval = FALSE, echo = TRUE}
+ggplot(data = bats %>% #<<
+         filter(id == 1), #<<
+       mapping = aes(x = longitude, #<<
+                     y = latitude, #<<
+                     color = time)) #<<
+```
+]
+.pull-right[
+```{r output1, ref.label = "step1", echo = FALSE, cache = TRUE, fig.height = 5.5, fig.width = 6}
+```
+]
+
+---
+
+# Basics for creating a gganimation
+
+**Step 2**: Add layers using geoms to create static
+
+.pull-left[
+```{r step2, eval = FALSE, echo = TRUE}
+ggplot(data = bats 
+       %>% filter(id == 1), 
+       mapping = aes(x = longitude, 
+                     y = latitude, 
+                     color = time)) + 
+  geom_point() #<<
+```
+]
+.pull-right[
+```{r output2, ref.label = "step2", echo = FALSE, cache = TRUE, fig.height = 5.5, fig.width = 6}
+```
+]
+
+---
+
+# Basics for creating a gganimation
+
+**Step 3**: Add formatting options
+
+.pull-left[
+```{r step3, eval = FALSE, echo = TRUE}
+ggplot(data = bats %>% 
+         filter(id == 1)), 
+       mapping = aes(x = longitude, 
+                     y = latitude, 
+                     color = time)) + 
+  geom_point() +
+  scale_color_gradient2( #<<
+    midpoint = 6, #<<
+    low = "orange", #<<
+    mid = "purple", #<<
+    high = "black") #<<
+```
+]
+.pull-right[
+```{r output3, ref.label = "step3", echo = FALSE, cache = TRUE, fig.height = 5.5, fig.width = 6}
+```
+]
+
+---
+
+# Basics for creating a gganimation
+
+**Step 4**: Add gganimate options
+
+.pull-left[
+```{r step4, eval = FALSE, echo = TRUE}
+ggplot(data = bats %>% 
+         filter(id == 1), 
+       mapping = aes(x = longitude, 
+                     y = latitude, 
+                     color = time)) + 
+  geom_point() +
+  scale_color_gradient2(
+    midpoint = 6,
+    low = "orange",
+    mid = "purple",
+    high = "black") +
+  transition_reveal(time) #<<
+```
+]
+.pull-right[
+```{r output4, ref.label = "step4", echo = FALSE, cache = TRUE, fig.height = 5.5, fig.width = 6}
+```
+]
+
+---
+
+# Rendering process
+
+<video width="800" height="550" controls>
+  <source src="./figures/rendering.mp4" type="video/mp4">
+</video>
 
 ---
 
@@ -163,52 +359,80 @@ class: inverse, middle, center
 
 | Function | Use | 
 | :-------- | :---------------- |
-| transition_components | Transition individual components through their own lifecycle |
+| transition_states | Transition between several distinct stages of the data |
+| transition_time | Transition through distinct states in time | 
+| transition_reveal | Reveal data along a given dimension |
 | transition_events | Transition individual events in and out |
 | transition_filter | Transition between different filters | 
 | transition_layers | Build up a plot, layer by layer |
+| transition_components | Transition individual components through their own lifecycle |
 | transition_manual | Create an animation by specifying the frame membership directly |
 | transition_null | Keep all data constant across the animation |
-| transition_reveal | Reveal data along a given dimension |
-| transition_states | Transition between several distinct stages of the data |
-| transition_time | Transition through distinct states in time | 
 
 ---
 
-```{r}
-bats <- read.csv("https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/bats_indv.csv")
+# Transition: States
+
+```{r fig.height = 5.5, fig.width = 8}
+bats %>%
+  ggplot(aes(x = longitude, y = latitude, color = id)) +
+  geom_point() + 
+  scale_color_gradient2(midpoint = 6, 
+                        low = "orange", 
+                        mid = "purple",
+                        high = "black")
 ```
-
 ---
 
-```{r fig.height = 5, fig.width = 6}
-batplot1 <- bats %>%
+# Transition: Time
+
+Transition through distinct states in time
+
+```{r fig.height = 5.5, fig.width = 8}
+bats %>%
   filter(id == 1) %>%
-  mutate(time = as.numeric(date_time)) %>%
-  ggplot(aes(x = longitude, y = latitude, color = time)) +
-  geom_point()
-batplot1
+  ggplot(aes(x = longitude, y = latitude)) +
+  geom_point() +
+  transition_time(time) #<<
 ```
 
 ---
 
-```{r}
-batplot1 + 
-  transition_time(time)
+# Transition: Reveal
+
+```{r fig.height = 5.5, fig.width = 8}
+bats %>%
+  filter(id == 1) %>%
+  ggplot(aes(x = longitude, y = latitude)) +
+  geom_point() +
+  transition_reveal(time) #<<
 ```
 
 ---
 
-```{r}
-batplot1 + 
-  transition_reveal(time, keep_last = TRUE)
+# Transition: Reveal
+
+Allows data to gradually appear
+
+```{r fig.height = 5.5, fig.width = 8}
+bats %>%
+  filter(id == 1) %>%
+  ggplot(aes(x = longitude, y = latitude)) +
+  geom_path() + #<<
+  transition_reveal(time) 
 ```
 
 ---
 
-```{r}
-batplot1 + 
-  transition_time(time)
+# Transition: Reveal
+
+```{r fig.height = 5.5, fig.width = 8}
+bats %>%
+  filter(id == 1) %>%
+  ggplot(aes(x = longitude, y = latitude)) +
+  geom_path() + #<<
+  geom_point() + #<<
+  transition_reveal(time)
 ```
 
 ---
@@ -231,13 +455,25 @@ class: inverse, middle, center
 
 ---
 
+```{r eval = FALSE, fig.height = 5.5, fig.width = 8}
+try <- bats %>%
+  filter(id == 1) %>%
+  ggplot(aes(x = longitude, y = latitude)) +
+  geom_point() +
+  transition_time(time) #<<
+
+animate(try, nframes = 300)
+```
+
+---
+
 # Resources
 
 Official Website: https://gganimate.com/index.html
 
 GitHub: https://github.com/thomasp85/gganimate
 
-Presentations on gganimate: https://gganimate.com/articles/extra/talks.html
+Talks on gganimate: https://gganimate.com/articles/extra/talks.html
 
 Workshop by Mitchell O'Hara-Wild: https://github.com/numbats/gganimate-workshop
 
