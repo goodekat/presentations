@@ -151,7 +151,7 @@ class: inverse, middle, center
 
 - Updated by Thomas Lin Pedersen in 2018/2019 
 
-- Code from a year ago will probably not work anymore
+- Code from a year(ish) ago will probably not work anymore
 
 - Uses the R package [tweenr](https://github.com/thomasp85/tweenr) (also by Lin Pedersen)
 
@@ -381,7 +381,7 @@ class: inverse, middle, center
 
 ---
 
-# Transition: <font color="#EE0F60"> States </font>
+# Transition: <font color="black"> States </font>
 
 `transition_states`: Transition between several *distinct stages* of the data
 
@@ -397,7 +397,7 @@ Options:
 
 ---
 
-# Transition: <font color="#EE0F60"> States </font>
+# Transition: <font color="black"> States </font>
 
 Static plot of the 5 trajectories colored by time 
 
@@ -422,11 +422,11 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE0F60"> States </font>
+# Transition: <font color="black"> States </font>
 
 Add `transition_states` with `states = id` 
 
-Something is not quite right...
+Something is a bit strange...
 
 .left-code[
 ```{r states2, eval = FALSE, echo = TRUE}
@@ -450,7 +450,7 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE0F60"> States </font>
+# Transition: <font color="black"> States </font>
 
 From the documentation on the importance of specifying the `group`:
 
@@ -464,7 +464,7 @@ From the documentation on the importance of specifying the `group`:
 
 ---
 
-# Transition: <font color="#EE0F60"> States </font>
+# Transition: <font color="black"> States </font>
 
 Add `group = id`
 
@@ -491,7 +491,7 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE0F60"> States </font>
+# Transition: <font color="black"> States </font>
 
 Add a label to describe the state and change the transition length and time
 
@@ -624,7 +624,7 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE2C0F"> Reveal </font>
+# Transition: <font color="black"> Reveal </font>
 
 `transition_reveal`: Reveal data along a given *dimension*
 
@@ -638,7 +638,7 @@ Options:
 
 ---
 
-# Transition: <font color="#EE2C0F"> Reveal </font>
+# Transition: <font color="black"> Reveal </font>
 
 Static plot of trajectory for bat 1 (again)
 
@@ -658,7 +658,7 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE2C0F"> Reveal </font>
+# Transition: <font color="black"> Reveal </font>
 
 Add `transition_reveal` with `along = time`
 
@@ -681,7 +681,7 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE2C0F"> Reveal </font>
+# Transition: <font color="black"> Reveal </font>
 
 `transition_time` vs `transition_reveal` (from the documentation):
 
@@ -691,7 +691,7 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE2C0F"> Reveal </font>
+# Transition: <font color="black"> Reveal </font>
 
 Change to using `geom_path` instead of `geom_point` - allows data to gradually appear with `transition_reveal`
 
@@ -712,7 +712,7 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE2C0F"> Reveal </font>
+# Transition: <font color="black"> Reveal </font>
 
 If using both `geom_path` and `geom_point`, the history of the path will appear for the whole animation, but the point will only appear at the current time.
 
@@ -734,7 +734,7 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE2C0F"> Reveal </font>
+# Transition: <font color="black"> Reveal </font>
 
 History of points can be kept by assigning the `along` variable to a group
 
@@ -756,7 +756,7 @@ bats %>%
 
 ---
 
-# Transition: <font color="#EE2C0F"> Reveal </font>
+# Transition: <font color="black"> Reveal </font>
 
 Use the ggimage R package to replace the point with an image
 
@@ -865,7 +865,7 @@ class: inverse, middle, center
 
 ---
 
-# View: <font color="black"> Follow </font>
+# View: <font color="#8B16CE"> Follow </font>
 
 Adjusts the axes to follow the data in the frame
 
@@ -890,7 +890,7 @@ bats %>%
 
 ---
 
-# View: <font color="#924FC6"> Step </font>
+# View: <font color="black"> Step </font>
 
 Follows the data but switches between being static and changing to the range of the data
 
@@ -917,7 +917,7 @@ bats %>%
 
 ---
 
-# View: <font color="#924FC6"> Step </font>
+# View: <font color="black"> Step </font>
 
 Works will with `transistion_states`
 
@@ -1003,7 +1003,7 @@ class: inverse, middle, center
 
 ---
 
-# Shadow: <font color="#C64F4F"> Wake </font>
+# Shadow: <font color="#8B16CE"> Wake </font>
 
 Leaves a "wake" behind the points as they move through time - options allow for the adjustment of length of wake, size of wake, and so forth
 
@@ -1026,7 +1026,7 @@ bats %>%
 
 ---
 
-# Shadow:  <font color="#480BF2"> Trail </font>
+# Shadow:  <font color="black"> Trail </font>
 
 Leaves points behind as a memory of the trajectory the points followed (keeps every nth frame) - allows for the adjustments of the distance between points to remember, alpha of memory, and so forth
 
@@ -1063,7 +1063,7 @@ class: your-turn
 
 # Your Turn
 
-Apply use a shadow option to create the an animation such as the one below
+Apply use a shadow option to create an animation such as the one below
 
 ```{r echo = FALSE, fig.height = 6, fig.width = 7, fig.align = 'center'}
 bats %>%
