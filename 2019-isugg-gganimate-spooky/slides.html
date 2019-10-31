@@ -13,18 +13,6 @@
 class: center, middle, inverse, title-slide
 
 # <img src="figures/bat-cartoon.png" /> gganimate (with a spooky twist)
-## <html>
-<div style="float:left">
-
-</div>
-<hr color='#FFFFFF' size=1px width=796px>
-</html>
-<html>
-<div style="float:left">
-
-</div>
-<hr color='#FFFFFF' size=1px width=796px>
-</html>
 ### <font size="5"> Katherine Goode </font>
 ### <font size="5"> ISU Graphics Group - October 31, 2019 </font>
 
@@ -169,7 +157,7 @@ class: inverse, middle, center
 
 From the documentation...
 
-&gt; gganimate provides "a range of new grammar classes that can be added to the plot object in order to customise how it should change with time."  
+&gt; gganimate provides "a range of new grammar classes that can be added to the plot object in order to customize how it should change with time."  
 
 &lt;br&gt;
 
@@ -227,7 +215,7 @@ Study recorded the flying trajectories of bats (individual and paired)
 
 ```r
 # Link where the data are stored
-link &lt;- "https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/bats_indv.csv"
+link &lt;- "https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/bat-data/bats-subset.csv"
 ```
 
 
@@ -365,7 +353,7 @@ class: inverse, middle, center
 
 ---
 
-# Transition: &lt;font color="#8B16CE"&gt; States &lt;/font&gt;
+# Transition: &lt;font color="#EE0F60"&gt; States &lt;/font&gt;
 
 `transition_states`: Transition between several *distinct stages* of the data
 
@@ -381,7 +369,7 @@ Options:
 
 ---
 
-# Transition: &lt;font color="#8B16CE"&gt; States &lt;/font&gt;
+# Transition: &lt;font color="#EE0F60"&gt; States &lt;/font&gt;
 
 Static plot of the 5 trajectories colored by time 
 
@@ -406,7 +394,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#8B16CE"&gt; States &lt;/font&gt;
+# Transition: &lt;font color="#EE0F60"&gt; States &lt;/font&gt;
 
 Add `transition_states` with `states = id` 
 
@@ -434,7 +422,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#8B16CE"&gt; States &lt;/font&gt;
+# Transition: &lt;font color="#EE0F60"&gt; States &lt;/font&gt;
 
 From the documentation on the importance of specifying the `group`:
 
@@ -442,13 +430,13 @@ From the documentation on the importance of specifying the `group`:
 
 &gt; The group aesthetic, if not set, will be calculated from the interaction of all discrete aesthetics in the layer (excluding label)
 
-&gt; It is often better to set it explicetly when animating, to make sure your data is interpreted in the right way. 
+&gt; It is often better to set it explicitly when animating, to make sure your data is interpreted in the right way. 
 
 &gt; Unmatched rows will appear/disappear, potentially using an enter or exit function.
 
 ---
 
-# Transition: &lt;font color="#8B16CE"&gt; States &lt;/font&gt;
+# Transition: &lt;font color="#EE0F60"&gt; States &lt;/font&gt;
 
 Add `group = id`
 
@@ -475,7 +463,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#8B16CE"&gt; States &lt;/font&gt;
+# Transition: &lt;font color="#EE0F60"&gt; States &lt;/font&gt;
 
 Add a label to describe the state and change the transition length and time
 
@@ -507,7 +495,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#AE6845"&gt; Time &lt;/font&gt;
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
 
 `transition_time`: Transition through distinct states in *time*
 
@@ -519,7 +507,7 @@ Options:
 
 ---
 
-# Transition: &lt;font color="#AE6845"&gt; Time &lt;/font&gt;
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
 
 Static plot of trajectory for bat 1
 
@@ -539,7 +527,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#AE6845"&gt; Time &lt;/font&gt;
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
 
 Add `transition_time` with `time = time`
 
@@ -562,9 +550,9 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#AE6845"&gt; Time &lt;/font&gt;
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
 
-Try adjusting the number of frames using `animate` (more on this later)
+Try adjusting the number of frames using `animate`
 
 .left-code[
 
@@ -586,7 +574,7 @@ Try adjusting the number of frames using `animate` (more on this later)
 
 ---
 
-# Transition: &lt;font color="#AE6845"&gt; Time &lt;/font&gt;
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
 
 Example of adjusting the time range
 
@@ -608,7 +596,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#80BA54"&gt; Reveal &lt;/font&gt;
+# Transition: &lt;font color="#EE2C0F"&gt; Reveal &lt;/font&gt;
 
 `transition_reveal`: Reveal data along a given *dimension*
 
@@ -622,7 +610,7 @@ Options:
 
 ---
 
-# Transition: &lt;font color="#80BA54"&gt; Reveal &lt;/font&gt;
+# Transition: &lt;font color="#EE2C0F"&gt; Reveal &lt;/font&gt;
 
 Static plot of trajectory for bat 1 (again)
 
@@ -642,7 +630,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#80BA54"&gt; Reveal &lt;/font&gt;
+# Transition: &lt;font color="#EE2C0F"&gt; Reveal &lt;/font&gt;
 
 Add `transition_reveal` with `along = time`
 
@@ -665,7 +653,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#80BA54"&gt; Reveal &lt;/font&gt;
+# Transition: &lt;font color="#EE2C0F"&gt; Reveal &lt;/font&gt;
 
 `transition_time` vs `transition_reveal` (from the documentation):
 
@@ -675,7 +663,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#80BA54"&gt; Reveal &lt;/font&gt;
+# Transition: &lt;font color="#EE2C0F"&gt; Reveal &lt;/font&gt;
 
 Change to using `geom_path` instead of `geom_point` - allows data to gradually appear with `transition_reveal`
 
@@ -696,7 +684,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#80BA54"&gt; Reveal &lt;/font&gt;
+# Transition: &lt;font color="#EE2C0F"&gt; Reveal &lt;/font&gt;
 
 If using both `geom_path` and `geom_point`, the history of the path will appear for the whole animation, but the point will only appear at the current time.
 
@@ -718,7 +706,7 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#80BA54"&gt; Reveal &lt;/font&gt;
+# Transition: &lt;font color="#EE2C0F"&gt; Reveal &lt;/font&gt;
 
 History of points can be kept by assigning the `along` variable to a group
 
@@ -740,9 +728,9 @@ bats %&gt;%
 
 ---
 
-# Transition: &lt;font color="#80BA54"&gt; Reveal &lt;/font&gt;
+# Transition: &lt;font color="#EE2C0F"&gt; Reveal &lt;/font&gt;
 
-Use the ggimage R package to replace the poing with an image
+Use the ggimage R package to replace the point with an image
 
 .left-code[
 
@@ -775,7 +763,7 @@ class: your-turn
 
 # Your Turn
 
-Using the transitions learned so far, create the animation shown below.
+Use a transition to create the animation shown below.
 
 If you want to use the same colors, add `scale_color_manual(values = bat_colors)` with `bat_colors &lt;- c("darkorange", "orangered", "violetred", "purple", "black")`.
 
@@ -790,12 +778,12 @@ class: your-turn
 
 ```r
 bats %&gt;%
+  mutate(image = bat_image_link) %&gt;%
   ggplot(aes(x = longitude, y = latitude, group = id, color = id)) +
   geom_path() +
+  geom_image(aes(image = image), size = 0.1) +
   scale_color_manual(values = bat_colors)
 ```
-
-&lt;img src="slides_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -806,8 +794,10 @@ class: your-turn
 
 ```r
 bats %&gt;%
+  mutate(image = bat_image_link) %&gt;%
   ggplot(aes(x = longitude, y = latitude, group = id, color = id)) +
   geom_path() +
+  geom_image(aes(image = image), size = 0.1) +
   scale_color_manual(values = bat_colors) +
   transition_reveal(along = time)
 ```
@@ -837,7 +827,7 @@ class: inverse, middle, center
 
 ---
 
-# view_follow()
+# View: &lt;font color="black"&gt; Follow &lt;/font&gt;
 
 Adjusts the axes to follow the data in the frame
 
@@ -846,15 +836,12 @@ Adjusts the axes to follow the data in the frame
 ```r
 bats %&gt;%
   mutate(image = bat_image_link) %&gt;% 
+  filter(id == 3) %&gt;%
   ggplot(aes(x = longitude, 
-             y = latitude,
-             group = id, 
-             color = id)) +
-  geom_path() +
+             y = latitude)) +
   geom_image(aes(image = image),
              size = 0.1) +
-  scale_colour_manual(
-    values = bat_colors) +
+  geom_path() +
   transition_reveal(time) +
 * view_follow()
 ```
@@ -865,9 +852,36 @@ bats %&gt;%
 
 ---
 
-# view_step
+# View: &lt;font color="#924FC6"&gt; Step &lt;/font&gt;
 
-Follows the data but switches between being static and changing to the range of the data (works will with `transistion_states`)
+Follows the data but switches between being static and changing to the range of the data
+
+.left-code[
+
+```r
+bats %&gt;%
+  mutate(image = bat_image_link) %&gt;% 
+  filter(id == 3) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_image(aes(image = image),
+             size = 0.1) +
+  geom_path() +
+  transition_reveal(time) +
+* view_step(pause_length = 3,
+*           step_length = 1,
+*           nsteps = 5) #&lt;&lt;
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/view_step_out1-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# View: &lt;font color="#924FC6"&gt; Step &lt;/font&gt;
+
+Works will with `transistion_states`
 
 .left-code[
 
@@ -891,37 +905,47 @@ bats %&gt;%
 ```
 ]
 .right-plot[
-&lt;img src="slides_files/figure-html/view_step_out-1.gif" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/view_step_out2-1.gif" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
 
-# view_zoom
+# Other Views
 
-.left-code[
+| Function | Use |
+| -------- | :----------------- |
+| view_zoom | Pan and zoom smoothly between different states |
+| view_static | Keep a fixed view that include all of the data | 
+
+---
+
+class: your-turn
+
+# Your Turn
+
+Apply a viewing option to the animation from the last 'your turn' to create an animation such as the one below.
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-7-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: your-turn
+
+# Your Turn: Solution 
+
 
 ```r
 bats %&gt;%
-  ggplot(aes(x = longitude, 
-             y = latitude, 
-             color = time, 
-             group = id)) +
-  geom_point() + 
-  scale_color_gradient2(
-    midpoint = 6, 
-    low = "orange", 
-    mid = "purple",
-    high = "black"
-  ) + 
-  transition_states(states = id) +
-* view_zoom(pause_length = 5,
-*           step_length = 3,
-*           nsteps = 5)
+  mutate(image = bat_image_link) %&gt;%
+  ggplot(aes(x = longitude, y = latitude, group = id, color = id)) +
+  geom_path() +
+  geom_image(aes(image = image), size = 0.1) +
+  scale_color_manual(values = bat_colors) +
+  transition_reveal(along = time) + 
+  view_follow()
 ```
-]
-.right-plot[
-&lt;img src="slides_files/figure-html/view_zoom_out-1.gif" style="display: block; margin: auto;" /&gt;
-]
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-8-1.gif" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -931,9 +955,244 @@ class: inverse, middle, center
 
 ---
 
+# Shadow: &lt;font color="#C64F4F"&gt; Wake &lt;/font&gt;
+
+Leaves a "wake" behind the points as they move through time - options allow for the adjustment of length of wake, size of wake, and so forth
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 3) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+  transition_reveal(time) +
+* shadow_wake(wake_length = 0.1,
+*             alpha = 0.5)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/shadow_wake_out-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Shadow:  &lt;font color="#480BF2"&gt; Trail &lt;/font&gt;
+
+Leaves points behind as a memory of the trajectory the points followed (keeps every nth frame) - allows for the adjustments of the distance between points to remember, alpha of memory, and so forth
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 3) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+  transition_reveal(time) +
+* shadow_trail(distance = 0.01,
+*              alpha = 0.5,
+*              shape = 2)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/shadow_trail_out-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Other Shadows
+
+| Function | Use |
+| -------- | :----------------- |
+| shadow_mark | Show original data as background marks |
+| shadow_null | A non-existent shadow | 
+
+---
+
+class: your-turn
+
+# Your Turn
+
+Apply use a shadow option to create the an animation such as the one below
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-9-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: your-turn
+
+# Your Turn: Solution 
+
+
+```r
+bats %&gt;%
+  mutate(image = bat_image_link) %&gt;%
+  ggplot(aes(x = longitude, y = latitude, group = id, color = id)) +
+  geom_point() +
+  scale_color_manual(values = bat_colors) +
+  transition_reveal(along = time) + 
+  shadow_wake(wake_length = 0.2, size = 5, alpha = FALSE, colour = 'grey92')
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-10-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
 class: inverse, middle, center
 
 # Other
+
+---
+
+# Enter/Exit
+
+Specifies how the objects transition from one time to the next
+
+.pull-left[
+`enter_manual()`  
+`enter_appear()`   
+`enter_fade()`  
+`enter_grow()`  
+`enter_recolour()`  
+`enter_recolor()`  
+`enter_fly()`  
+`enter_drift()`  
+`enter_reset()` 
+]
+
+.pull-right[
+`exit_manual()`  
+`exit_disappear()`  
+`exit_fade()`  
+`exit_shrink()`   
+`exit_recolour()`  
+`exit_recolor()`   
+`exit_fly()`   
+`exit_drift()`  
+`exit_reset()`  
+]
+
+---
+
+# Enter/Exit
+
+.left-code[
+
+```r
+bats %&gt;%
+  ggplot(aes(
+    x = longitude, 
+    y = latitude, 
+    color = time, 
+    group = id)) + 
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black") +
+  transition_states(
+    states = id, 
+    transition_length = 2, 
+    state_length = 1) + 
+* enter_fade() +
+* exit_fade() +
+* exit_fly(x_loc = -2.66300,
+*          y_loc = 51.40692)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/enter_exit_out-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# ease_aes
+
+"defines how the aesthetics associated with the ease during transitions"
+
+- `quadratic`: Models a power-of-2 function
+- `cubic`: Models a power-of-3 function
+- `quartic`: Models a power-of-4 function
+- `quintic`: Models a power-of-5 function
+- `sine`: Models a sine function
+- `circular`: Models a pi/2 circle arc
+- `exponential`: Models an exponential function
+- `elastic`: Models an elastic release of energy
+- `back`: Models a pullback and release
+- `bounce`: Models the bouncing of a ball
+
+Modifiers: `-in`, `-out`, `-in-out`
+
+Demonstrations of the easings: [https://easings.net/en](https://easings.net/en)
+
+---
+
+# ease_aes
+
+Use `sine-in-out` to smooth the fade transitions
+
+.left-code[
+
+```r
+bats %&gt;%
+  ggplot(aes(
+    x = longitude, 
+    y = latitude, 
+    color = time, 
+    group = id)) + 
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black") +
+  transition_states(
+    states = id, 
+    transition_length = 2, 
+    state_length = 1) + 
+  enter_fade() +
+  exit_fade() +
+* ease_aes('sine-in-out')
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/ease_aes_out-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Rendering and Output
+
+.pull-left[
+Render a gganim object
+
+- `animate()`
+- `print()` 
+- `knit_print.gganim()`
+
+&lt;br&gt;
+
+Renderers provided by gganimate
+
+- `gifski_renderer()` 
+- `file_renderer()` 
+- `av_renderer()` 
+- `ffmpeg_renderer()` 
+- `magick_renderer()` 
+- `sprite_renderer()`
+]
+
+.pull-right[
+Output
+
+- `anim_save()`: Save an animation to a file
+- `last_animation()`: Retrieve the last rendered animation
+- `frame_vars()`: Access metadata about the frames in an animation
+- `split_animation()`: Split an animation into chunks
+]
 
 ---
 
