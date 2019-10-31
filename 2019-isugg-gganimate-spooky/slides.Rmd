@@ -197,8 +197,8 @@ From the documentation...
 | transitions | defines how the data changes in the graphic across time |
 | views | defines changes in the viewpoint of the graphic (i.e. x and y axes) | 
 | shadows | defines how to display "memories" in the animation |
-| enter/exit | defines how the data transitions from one time point to the next |
-| ease_aes | defines how the aesthetics associated with the ease during transitions |
+| enter/exit | defines how the data should appear and disappear during the animation |
+| ease_aes | defines the aesthetics associated with the ease during transitions |
 
 ---
 
