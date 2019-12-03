@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Visual Diagnostics for a Model Explainer - Tools for the Assessment of LIME Explanations</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Katherine Goode" />
+    <meta name="date" content="2019-12-02" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Visual Diagnostics for a Model Explainer - Tools for the Assessment of LIME Explanations
+## <html>
+<div style="float:left">
+
+</div>
+<hr color='#009999' size=1px width=796px>
+</html>
+### Katherine Goode
+### December 2, 2019
+
+---
+
+
+&lt;style&gt;
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #404040;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+.inverse {
+  background-color: #404040;
+  text-shadow: none;
+}
+.title-slide {
+  background-color: #FFFFFF;
+  border-top: 80px solid #FFFFFF;
+}
+.remark-slide-number {
+  position: inherit;
+}
+.remark-slide-number .progress-bar-container {
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  display: block;
+  left: 0;
+  right: 0;
+}
+.remark-slide-number .progress-bar {
+  height: 100%;
+  background-color: #009999;
+}
+&lt;/style&gt;
+
+
+
+# Overview
+
+&lt;br&gt; 
+
+1. Motivational Dataset
+
+2. LIME
+
+3. Motivation for Assessing LIME
+
+4. Diagnostic Plots
+
+5. Discussion and Current Work
+
+---
+
+class: inverse, center, middle
+
+# Motivational Dataset
+
+---
+
+# Bullet Matching
+
+.center[&lt;img src="./figures/gun.png" width=360&gt; &lt;img src="./figures/bullet.png" width=400&gt;]
+
+---
+
+# Hamby Bullet Study &lt;font size="5"&gt; Hamby et. al. (2009)&lt;/font&gt;
+
+- Bullets from “known” and “unknown” gun barrels
+- Sent to firearm examiners around the world
+- Examiners asked to use the known bullets to identify which barrels the unknown bullets were fired from
+
+.center[&lt;img src="./figures/hamby.png" width=550&gt;]
+
+---
+
+# CSAFE and Hamby Bullets
+
+- Center for Statistics and Applications in Forensic Evidence
+- Has access to Hamby bullets
+- Took high definition scans
+
+&lt;br&gt;
+
+.right[&lt;img src="./figures/csafe.jpg" width=450&gt;]
+
+---
+
+# Automated Bullet Matching Algorithm
+
+- Hare, Hofmann, and Carriquiry (2017): 
+  - Extracted signatures from scans
+  - Developed variables that measure similarity between signatures
+  - Fit a random forest to automate bullet matching
+  - 100% bullet matching accuracy with test set in paper (0.0039 land to land error)
+  
+.center[&lt;img src="./figures/signatures.png" width=650&gt;]
+
+---
+
+# Model Explanations
+
+Random forest model: 
+
+- High accuracy - great!
+
+- Interpretability - not so great
+
+Importance of explanations:
+
+- Understanding the model could help improve it
+
+- Firearm examiners can assess model prediction
+
+- Important to explain predictions to a jury
+
+---
+
+# Global Explanations
+
+![](slides_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+
+---
+
+# Local Explanations
+
+- Feature importance may vary on a local level
+
+- What if we are interested a particular prediction?
+
+.center[&lt;img src="./figures/heatmap.png" width=400&gt;]
+
+---
+
+class: inverse, center, middle
+
+# &lt;span style="color:lime"&gt;LIME&lt;/span&gt;
+
+---
+
+# Enter LIME
+
+- Model explainer developed by computer scientists Ribeiro, Singh, and Guestrin (2016)
+
+- Designed to assess if a black box predictive model is trustworthy
+
+- Produces "explanations" for individual predictions
+
+- Meaning:
+  - **L**ocal 
+  - **I**nterpretable
+  - **M**odel-Agnostic 
+  - **E**xplanations
+
+---
+
+# LIME Concept
+
+&lt;br&gt;
+&lt;br&gt;
+
+.center[&lt;img src="./figures/lime-good.png" width=1000&gt;]
+
+---
+
+# LIME Procedure
+
+For **one** prediction of interest...
+
+1. Data Simulation and Interpretable Transformation
+  - Simulate data from the original data 
+  - Apply a transformation that will allow for easily interpretable explanations
+  
+2. Fit an Interpretable Model:
+  - Response = Black-box predictions from simulated data
+  - Predictors = transformed simulated data
+  - Weights = distances between simulated values and prediction of interest
+  
+3. Interpret the Explainer
+
+---
+
+class: inverse, center, middle
+
+# Motivation for Assessing &lt;span style="color:lime"&gt;LIME&lt;/span&gt;
+
+---
+
+# Quality of Explanation
+
+- LIME uses an interpretable model to mimic the complex model
+
+- Quality of the explanation depends on the approximation
+
+&lt;br&gt;
+.center[&lt;img src="./figures/lime-bad.png" width=1000&gt;]
+
+---
+
+# Input Options
+
+- LIME has been implemented in Python and R
+
+- Ridge regression used as the interpretable model
+
+- Offer various implementation settings:
+
+  - Simulation method
+  - Feature selection method
+  - Computation of the weights
+  - etc.
+  
+- Provide a default method
+
+- Otherwise, no advice on how to adjust settings
+
+---
+
+class: middle, center, inverse
+
+# Diagnostic Plots
+
+---
+
+# Metric Comparison
+
+.center[&lt;img src="./figures/metrics.png" width=1000&gt;]
+
+---
+
+# Top Feature Selected Comparison
+
+.center[&lt;img src="./figures/firstfeature.png" width=1000&gt;]
+
+---
+
+class: middle, center, inverse
+
+# Discussion and Current Work
+
+---
+
+- Visual diagnostics allow for the assessment of 
+  - local explanation
+  - accuracy of local approximation
+  - consistency across implementation options
+  
+- Currently working on
+  - creating a set of visuals to assessing each step in the LIME procedure
+  - formalize the assumptions made by LIME
+  - developing an R package for the creation of these plots
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>`"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
