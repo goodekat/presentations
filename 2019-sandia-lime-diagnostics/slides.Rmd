@@ -218,6 +218,20 @@ For **one** prediction of interest...
 
 ---
 
+# Interpretable Transformation
+
+.center[<img src="./figures/bins.png" width=800>]
+
+---
+
+# LIME Explanations
+
+Bullet 1, land 2 to bullet 2, land 2
+
+.center[<img src="./figures/explainers.png" width=800>]
+
+---
+
 class: inverse, center, middle
 
 # Motivation for Assessing <span style="color:lime">LIME</span>
