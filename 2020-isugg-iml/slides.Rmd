@@ -1,0 +1,161 @@
+---
+title: "An Overview of Explainable Machine Learning Visualization Techniques"
+subtitle: <html><div style='float:left'></div><hr color='#2a7886' size=5px width=790px></html> <html><div style='float:left'></div><hr color='#512b58' size=2.5px width=790px></html> 
+author: Katherine Goode
+date: ISU Graphics Group - April 10, 2020 </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+<style>
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #396362;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #512b58;
+  border-top: 80px solid #512b58;
+  text-shadow: none;
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.remark-slide-content > h1 {
+  font-family: 'Skia';
+  font-weight: normal;
+  font-size: 45px;
+  margin-top: -95px;
+  margin-left: -00px;
+  color: #FFFFFF;
+}
+
+.title-slide {
+  background-color: #FFFFFF;
+  border-top: 80px solid #FFFFFF;
+  background-image: none;
+}
+
+.title-slide > h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide > h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide > h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+body {
+  font-family: 'Skia';
+}
+
+.remark-slide-number {
+  font-size: 13pt;
+  font-family: 'Skia';
+  color: #272822;
+  opacity: 1;
+}
+.inverse .remark-slide-number {
+  font-size: 13pt;
+  font-family: 'Skia';
+  color: #FAFAFA;
+  opacity: 1;
+}
+
+</style>
+
+
+# Overview
+
+1. Philosophical Aspects of Explainability in Machine Learning
+
+2. Model Agnostic Methods
+
+3. Random Forest Specific Techinques
+
+4. Neural Network Specific Techinques
+
+---
+
+class: inverse, middle, center
+
+# Philosophical Aspects of Explainability in Machine Learning
+
+---
+
+# Explainability versus Interpretability
+
+---
+
+# Rudin
+
+---
+
+class: inverse, middle, center
+
+# Model Agnostic Methods
+
+---
+
+# Partial Dependence Plots
+
+---
+
+# Parallel Coordinate Plots
+
+---
+
+
+# LIME
+
+---
+
+# Shapely Values
+
+---
+
+class: inverse, middle, center
+
+# Random Forest Specific Techinques
+
+---
+
+# KLIMT
+
+---
+
+class: inverse, middle, center
+
+# Neural Network Specific Techinques
+
