@@ -109,6 +109,25 @@ library(knitr)
 opts_chunk$set(echo = FALSE)
 ```
 
+# To Do
+
+Materials to go through...
+
+- Overviews:
+  - IML by Molnar
+  - Gilpin
+  - Mohseni
+  - Ming
+  - Guidotti
+  
+- Specific methods:
+  - Cortez and Embrechts
+  - Natalia's paper
+  - Distill articles
+  - Hara and Hayashi
+
+---
+
 # The Plan...
 
 **Setting the Stage**
@@ -124,6 +143,14 @@ opts_chunk$set(echo = FALSE)
 - Random Forest Specific
 
 - Neural Network Specific
+
+- Software
+
+**Concluding Thoughts**
+
+- A Cautionary Conclusion
+
+- Additional Resources
 
 ---
 
@@ -193,7 +220,7 @@ So many definitions...
 
 # Explainability versus Interpretability
 
-**[The Mythos of Model Interpretability (Liption 2017)](https://arxiv.org/pdf/1606.03490.pdf)**
+**[The Mythos of Model Interpretability (Lipton 2017)](https://arxiv.org/pdf/1606.03490.pdf)**
 
 - A whole paper dedicated to the philosophical discussion of what interpretability is in machine learning
 
@@ -261,10 +288,27 @@ class: inverse, middle, center
 
 ---
 
+# Interactive Partial Dependence Plots
+
+Krause, Perer, and Ng 2016
+
+---
+
 # Parallel Coordinate Plots
 
 ---
 
+# Visualizing Feature Importance
+
+Casalicchio, Molnar, and Bischl (2019)
+
+---
+
+# Counterfactual Examples 
+
+Laugel et. al. 2019: "A counterfactual explanation is thus a data instance, close to this observation, that is predicted to belong to a different class. This form of explanation provides a user tangible explanations that are directly understandable and actionable, which can be seen as an advantage."
+
+---
 
 # LIME
 
@@ -284,6 +328,20 @@ class: inverse, middle, center
 
 ---
 
+# ggRandomforest
+
+---
+
+# Rfviz
+
+---
+
+# Forest Floor Visualizations
+
+Welling et. al. (2016)
+
+---
+
 class: inverse, middle, center
 
 # Neural Network Specific Techniques
@@ -293,3 +351,35 @@ class: inverse, middle, center
 # Zooming In
 
 https://distill.pub/2020/circuits/zoom-in/
+
+---
+
+class: inverse, middle, center
+
+# Software
+
+---
+
+class: inverse, middle, center
+
+# A Cautionary Conclusion
+
+---
+
+# Concerns with LIME
+
+---
+
+# Concerns with counterfactual examples
+
+Laugel et. al. (2019) paper:
+
+"Several troublesome issues have been identified: [Baehrens et al., 2010] e.g. notice that modeling the decision function of a black-box classifier with a surrogate model trained on generated instances can result in explanation vectors that point in the wrong directions in some areas of the feature space in a trivial problem. The stability of post-hoc explainer systems has been criticized as well, showing that some of these approaches are locally not stable enough [Alvarez Melis and Jaakkola, 2018] or on the contrary too stable and thus not locally accurate enough [Laugel et al., 2018b]."
+
+---
+
+class: inverse, middle, center
+
+# Additional Resources
+
+---
