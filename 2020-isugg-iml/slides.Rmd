@@ -1,6 +1,6 @@
 ---
-title: "An Overview of Explainable Machine Learning Visualization Techniques"
-subtitle: <html><div style='float:left'></div><hr color='#2a7886' size=5px width=790px></html> <html><div style='float:left'></div><hr color='#512b58' size=2.5px width=790px></html> 
+title: "An Overview of Visualization Techniques for Explainable Machine Learning"
+subtitle: <html><div style='float:left'></div><hr color='#005082' size=5px width=790px></html> <html><div style='float:left'></div><hr color='#000839' size=2.5px width=790px></html> 
 author: Katherine Goode
 date: ISU Graphics Group - April 10, 2020 </font>
 output:
@@ -15,9 +15,15 @@ output:
 
 <style>
 
+/* colors: #ffa41b, #000839, #005082, #00a8cc */
+a, a > code {
+  color: #ffa41b;
+  text-decoration: none;
+}
+
 .remark-slide-content {
   background-color: #FFFFFF;
-  border-top: 80px solid #396362;
+  border-top: 80px solid #005082;
   font-size: 20px;
   font-weight: 300;
   line-height: 1.5;
@@ -25,8 +31,8 @@ output:
 }
 
 .inverse {
-  background-color: #512b58;
-  border-top: 80px solid #512b58;
+  background-color: #000839;
+  border-top: 80px solid #000839;
   text-shadow: none;
 	background-position: 50% 75%;
   background-size: 150px;
@@ -95,30 +101,140 @@ body {
 
 </style>
 
+```{r setup, echo = FALSE}
+# Packages
+library(knitr)
 
-# Overview
+# R markdown options
+opts_chunk$set(echo = FALSE)
+```
 
-1. Philosophical Aspects of Explainability in Machine Learning
+# The Plan...
+
+1. Definitions and Philosophical Aspects
 
 2. Model Agnostic Methods
 
-3. Random Forest Specific Techinques
+3. Random Forest Specific Techniques 
 
-4. Neural Network Specific Techinques
+4. Neural Network Specific Techniques
 
 ---
 
 class: inverse, middle, center
 
-# Philosophical Aspects of Explainability in Machine Learning
+# Definitions and Philosophical Aspects
+
+---
+
+# Machine Learning
+
+Machine learning models may provide magical predictions,...
+
+```{r out.width = "50%", fig.align = 'center'}
+include_graphics("./figures/wizard-cat.jpg")
+```
+
+---
+
+# Black Box Models
+
+...but being able to explain how many machine learning models produce the predictions is not an easy task.
+
+```{r out.width = "60%", fig.align = 'center'}
+include_graphics("./figures/confused-cat.jpg")
+```
+
+---
+
+# The Importance of Explanability
+
+```{r out.width = "600px", fig.align = 'right'}
+include_graphics("./figures/nn.png")
+```
+
+```{r out.width = "37%"}
+include_graphics("./figures/patient.jpeg")
+include_graphics("./figures/self-driving-car.jpg")
+```
 
 ---
 
 # Explainability versus Interpretability
 
+So many definitions...
+
+**[Interpretable Machine Learning (Molnar 2020)](https://christophm.github.io/interpretable-ml-book/)**
+
+- "I will use both the terms **interpretable** and **explainable** interchangeably"
+- "I will use “**explanation**” for explanations of individual predictions."
+
+**[Methods for Interpreting and Understanding Deep Neural Networks (Montavon, Samek, and Muller 2017)](https://arxiv.org/pdf/1706.07979.pdf)**
+
+- "**post-hoc interpretability**, i.e. a trained model is given and our goal is to understand what the model predicts (e.g. categories) in terms what is readily interpretable (e.g. the input variables)"
+- "Post-hoc interpretability should be contrasted to incorporating **interpretability directly** into the structure of the model..."
+- "...when using the word “**understanding**”, we refer to a functional understanding of the model, in contrast to a lower-level mechanistic or algorithmic understanding of it."
+- also distinguish between **interpretation** and **explanation**
+
 ---
 
-# Rudin
+# Explainability versus Interpretability
+
+**[The Mythos of Model Interpretability (Liption 2017)](https://arxiv.org/pdf/1606.03490.pdf)**
+
+- A whole paper dedicated to the philosophical discussion of what interpretability is in machine learning
+
+**[Explaining Explanations: An Overview of Interpretability of Machine Learning (Gilpin et. al. 2019)](https://arxiv.org/pdf/1806.00069.pdf)**
+
+- "We take the stance that **interpretability** alone is insufficient.
+In order for humans to trust black-box methods, we need **explainability** – models that are able to summarize the reasons for neural network behavior, gain the trust of users, or produce insights about the causes of their decisions"
+- Implies that you need both interpretability and explainability?
+
+---
+
+# Explainability versus Interpretability
+
+My definitions (based on a conversation with **[Nick Street](https://tippie.uiowa.edu/people/nick-street)** (University of Iowa))...
+
+.pull-left[
+**Interpretability** = the ability to directly use the parameters of a model to understand the mechanism of how the model makes predictions
+
+- a linear model coefficient: indicates the amount the response variable changes based on a change in the predictor variable
+  
+<br>
+
+$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\cdots+\hat{\beta}_px_p $$
+]
+
+.pull-right[
+**Explainability** = the ability to use the model in an indirect manner to understand the relationships in the data captured by the mode
+
+- LIME: model agnostic method that uses a surrogate model
+
+```{r fig.cap = "Figure from LIME paper (Ribeiro 2016)"}
+include_graphics("./figures/lime.png")
+```
+
+]
+
+
+---
+
+# Should we explain black-box models?
+
+[**Stop Explaining Black Box Machine Learning Models for High Stakes Decisions and Use Interpretable Models Instead**](https://arxiv.org/pdf/1811.10154.pdf) by [**Cynthia Rudin**](https://users.cs.duke.edu/~cynthia/):
+
+- Debunks the “accuracy-interpretability trade-off” myth
+
+```{r out.width = "25%", fig.align = "center"}
+include_graphics("./figures/trade-off.png")
+```
+
+- "Explanations must be wrong. They cannot have perfect fidelity with respect to the original model. If the explanation was completely faithful to what the original model computes, the explanation would equal the original model..."
+
+- "...it is possible that the explanation leaves out so much information that it makes no sense."
+
+- Developed machine learning models with natural interpretability
 
 ---
 
@@ -147,7 +263,7 @@ class: inverse, middle, center
 
 class: inverse, middle, center
 
-# Random Forest Specific Techinques
+# Random Forest Specific Techniques
 
 ---
 
@@ -157,5 +273,10 @@ class: inverse, middle, center
 
 class: inverse, middle, center
 
-# Neural Network Specific Techinques
+# Neural Network Specific Techniques
 
+---
+
+# Zooming In
+
+https://distill.pub/2020/circuits/zoom-in/
