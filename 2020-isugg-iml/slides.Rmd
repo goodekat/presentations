@@ -1,6 +1,6 @@
 ---
 title: "An Overview of Visualization Techniques for Explainable Machine Learning"
-subtitle: <html><div style='float:left'></div><hr color='#005082' size=5px width=790px></html> <html><div style='float:left'></div><hr color='#000839' size=2.5px width=790px></html> 
+subtitle: <html><div style='float:left'></div><hr color='#005082' size=5px width=790px></html> <html><div style='float:left'></div><hr color='#000839' size=2.5px width=790px></html> <html><div style='float:left'></div><hr color='#00a8cc' size=1px width=790px></html> 
 author: Katherine Goode
 date: ISU Graphics Group - April 10, 2020 </font>
 output:
@@ -33,6 +33,14 @@ a, a > code {
 .inverse {
   background-color: #000839;
   border-top: 80px solid #000839;
+  text-shadow: none;
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.inverse2 {
+  background-color: #00a8cc;
+  border-top: 80px solid #00a8cc;
   text-shadow: none;
 	background-position: 50% 75%;
   background-size: 150px;
@@ -92,6 +100,7 @@ body {
   color: #272822;
   opacity: 1;
 }
+
 .inverse .remark-slide-number {
   font-size: 13pt;
   font-family: 'Skia';
@@ -99,9 +108,31 @@ body {
   opacity: 1;
 }
 
-.tiny{font-size: 40%}
+.inverse2 .remark-slide-number {
+  font-size: 13pt;
+  font-family: 'Skia';
+  color: #FAFAFA;
+  opacity: 1;
+}
 
 </style>
+
+```{css, echo = FALSE}
+.tiny{font-size: 30%}
+.small{font-size: 50%}
+
+.left-code {
+  color: #777;
+  width: 40%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 59%;
+  float: right;
+  padding-left: 1%;
+}
+```
 
 ```{r setup, echo = FALSE, message = FALSE}
 # Packages
@@ -112,8 +143,9 @@ library(knitr)
 library(mlr)
 
 # R markdown options
-opts_chunk$set(echo = FALSE, dpi = 200)
+opts_chunk$set(echo = FALSE, dpi = 200, cache = TRUE)
 ```
+
 
 # To Do
 
@@ -205,17 +237,18 @@ include_graphics("./figures/court.jpg")
 
 **General trends I've noticed:**
 
-- Recent (last 10 years)
+- Mnay recent (last 5 years)
 
-- Machine learning and computer science perspectives
+- Often machine learning and computer science perspectives
 
-- Eurpoean authors
+- Many Eurpoean authors
   - [General Data Protection Regulation](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation) (GDPR) implemented in 2018
   - [Goodman and Flaxman (2016)](https://arxiv.org/abs/1606.08813): "It is reasonable to suppose that any adequate explanation would, at a minimum, provide an account of how input features relate to predictions, allowing one to answer questions such as: Is the model more or less likely to recommend a loan if the applicant is a minority?"
 
 **Key resource for this talk:**
 
 - [Interpretable Machine Learning](https://christophm.github.io/interpretable-ml-book/) by Christoph Molnar
+- Corresponding R package: [iml](https://github.com/christophM/iml)
 
 ---
 
@@ -330,28 +363,31 @@ DT::datatable(bike,
 
 # Random Forest Model with Bike Data
 
-Fit a random forest model using the `mlr` package
-
-  - response: count of bicycles rented during a day
-  - predictors: all other 11 variables in bike data (season, holiday indicator, year...)
+**Random forest model**
 
 ```{r echo = TRUE}
-# Create a task (specify data and response)
-bike_task = mlr::makeRegrTask(data = bike, target = "cnt")
-
-# Specify a learner (random forest)
-bike_lrn = mlr::makeLearner(cl = 'regr.randomForest', id = 'bike-rf')
-
-# Fit the random forest model
-bike_mod = mlr::train(learner = bike_lrn, task = bike_task)
+bike_mod = randomForest::randomForest(x = bike %>% select(-cnt),
+                           y = bike$cnt)
 ```
 
-<br> 
+**Feature Importance Plot**
 
-Extra info:
+```{r fig.width = 7, fig.height = 3}
+# Determine the order of feature importances
+bike_vi = bike_mod$importance %>%
+  data.frame() %>%
+  mutate(var = rownames(bike_mod$importance)) %>%
+  arrange(IncNodePurity)
 
-- [`mlr`](https://mlr.mlr-org.com/) developed by [this](https://www.compstat.statistik.uni-muenchen.de/) working group
-- [`mlr3`](https://mlr3.mlr-org.com/) new version of the package
+# Create a feature importance plot
+bike_vi %>%
+  mutate(var = factor(var, levels = pull(bike_vi, var))) %>%
+  ggplot(aes(x = var, y = IncNodePurity)) + 
+  geom_col() + 
+  coord_flip() + 
+  labs(x = "Feature", y = "Feature Importance")
+```
+
 
 ---
 
@@ -388,16 +424,27 @@ include_graphics("./figures/agnostic.png")
 
 ---
 
+class: inverse2, center, middle
+
+# Model Agnostic Methods:
+
+## .center[Visualizations Prediction]
+
+---
+
 # Partial Dependence Plots .tiny[[Friedman 2001](https://projecteuclid.org/euclid.aos/1013203451)]
 
-**Use**: Visualzing the marginal relationship between one or two predictor variables and model predictions
+**Purpose**: Visualize marginal relationship between one (or two) predictors and model predictions
 
-**Method**: For a given model...
+**Estimated partial dependence function:**
 
-1. Obtain predictions for all observations in data
-2. For one variable, compute average prediction...
+$$\hat{f}_{x_{int}}(x_{int})=\frac{1}{n}\sum_{i=1}^n\hat{f}(x_{int},x^{(i)}_{other})$$
 
-```{r message = FALSE, warning = FALSE, fig.width = 12, fig.height = 4}
+- $\hat{f}=$ machine learning model fit using predictor variables 
+- $x_{int}=$ value of the predictor of interest
+- $x^{(i)}_{other}=$ vector of training data values of other predictors in the model for observation $i$
+
+```{r message = FALSE, warning = FALSE, fig.width = 9, fig.height = 2.5}
 # Based on code from Molnar's IML GitHub repo
 bike_pred = Predictor$new(bike_mod, data = bike)
 pdp = FeatureEffect$new(bike_pred, "temp", method = "pdp") 
@@ -408,34 +455,299 @@ pdp$set.feature("hum")
 p2 = pdp$plot() + 
   scale_x_continuous('Humidity', limits = c(0, NA)) + 
   scale_y_continuous('', limits = c(0, 5500))
-pdp$set.feature("windspeed")
-p3 = pdp$plot() + 
-  scale_x_continuous('Wind speed', limits = c(0, NA)) + 
+pdp$set.feature("season")
+p3 = ggplot(pdp$results) + 
+  geom_col(aes(x = season, y = .value), width = 0.3) + 
+  scale_x_discrete('Season') + 
   scale_y_continuous('', limits = c(0, 5500))
-gridExtra::grid.arrange(p1, p2, p3, ncol = 3)
+gridExtra::grid.arrange(p1, p2, p3, ncol = 3) 
 ```
 
 ---
 
-# Interactive Partial Dependence Plots
+# Partial Dependence Plots in iml
 
-Krause, Perer, and Ng 2016
+.pull-left[
+```{r echo = TRUE, message = FALSE}
+# Create a "predictor" object that 
+# holds the model and the data
+bike_pred = 
+  Predictor$new(
+    model = bike_mod,
+    data = bike)
+
+# Compute the partial dependence 
+# function for temp and windspeed
+pdp = 
+  FeatureEffect$new(
+    predictor = bike_pred, 
+    feature = c("hum", "temp"), 
+    method = "pdp") 
+
+# Create the partial dependence plot
+plt = 
+  pdp$plot() + 
+  viridis::scale_fill_viridis(
+    option = "D") + 
+  labs(x = "Humidity", 
+       y = "Temperature", 
+       fill = "Prediction")
+```
+]
+
+.pull-right[
+**Partial dependence plot with two variables**
+
+```{r fig.width = 4.1, fig.height = 3}
+plt
+```
+]
+
+---
+
+# Thoughts on Partial Dependence Plots
+
+**Advantages**
+
+- Easy to interpret (if features are not correlated):
+  - "The partial dependence plot shows how the average prediction in your dataset changes when the j-th feature is changed."
+  
+- Easy to implement
+
+**Disadvantages**
+
+- Difficult to visualize more than 2 features
+
+- Over interpret regions with not much data if the predictor distributions are not included on the plot
+
+- If features are correlated, the interpretation is not so simple
+
+---
+
+# Interactive PDPs .tiny[[Krause, Perer, and Ng 2016](https://josuakrause.github.io/info/prospector.html)]
+
+```{r out.width = "100%"}
+include_graphics("./figures/prospector.png")
+```
+
+---
+
+# Individual Conditional Expectation .tiny[[Goldstein et. al. 2013](https://arxiv.org/pdf/1309.6392.pdf)]
+
+**Purpose**: Similar to partial dependence plots, but consider each observation separately instead of taking an average.
+
+**Estimated individual conditional expectation function:**
+
+$$\hat{f}^{(i)}_{x_{int}}(x_{int})=\hat{f}(x_{int},x^{(i)}_{other})$$
+
+- $\hat{f}=$ machine learning model fit using predictor variables 
+- $x_{int}=$ value of the predictor of interest
+- $x^{(i)}_{other}=$ vector of training data values of other predictors in the model for observation $i$
+
+```{r message = FALSE, warning = FALSE, fig.width = 9, fig.height = 2.5}
+# Based on code from Molnar's IML GitHub repo
+ice = FeatureEffect$new(bike_pred, "temp", method = "ice") 
+p4 = ice$plot() +  
+  scale_x_continuous('Temperature', limits = c(0, NA)) + 
+  scale_y_continuous('Predicted number of bikes', limits = c(0, 5500))
+ice$set.feature("windspeed")
+p5 = ice$plot() + 
+  scale_x_continuous('Wind speed', limits = c(0, NA)) + 
+  scale_y_continuous('', limits = c(0, 5500))
+ice$set.feature("season")
+p6 = ggplot(ice$results) + 
+  geom_line(aes(x = season, y = .value, group = .id), alpha = 0.25) + 
+  scale_x_discrete('Season') + 
+  scale_y_continuous('', limits = c(0, 5500))
+gridExtra::grid.arrange(p4, p5, p6, ncol = 3) 
+```
+
+---
+
+# ICE Plots in iml
+
+.left-code[
+```{r echo = TRUE}
+# Compute the ICE function
+ice1 = FeatureEffect$new(
+  predictor = bike_pred,
+  feature = "temp",
+  method = "ice")
+
+# Create the plot
+ice1_plt = ice1$plot()
+```
+
+]
+
+.right-plot[
+
+**ICE plot for temperature**
+
+```{r fig.width = 4, fig.height = 3.5}
+ice1_plt 
+```
+]
+
+---
+
+# Centered ICE Plots
+
+"Sometimes it can be hard to tell whether the ICE curves differ between individuals because they start at different predictions. A simple solution is to center the curves at a certain point in the feature and display only the difference in the prediction to this point." - Molnar 
+
+.left-code[
+```{r echo = TRUE}
+# Center the ICE function for 
+# temperature at the 
+# minimum temperature and 
+# include the pdp
+ice2 = FeatureEffect$new(
+  predictor = bike_pred,
+  feature = "temp",
+  center.at = min(bike$temp),
+  method = "pdp+ice")
+
+# Create the plot
+ice2_plt = ice2$plot()
+```
+
+]
+
+.right-plot[
+```{r fig.width = 4, fig.height = 3.5}
+ice2_plt 
+```
+
+]
+
+---
+
+# Thoughts on ICE Plots
+
+**Advantages**
+
+- Intuitive to interpret (if features are not correlated) 
+
+- Easy to implement
+
+**Disadvantages**
+
+- Difficult to visualize more than 1 feature
+
+- Over interpret regions with not much data if the predictor distributions are not included on the plot
+
+- If features are correlated, the interpretation is not so simple
+
+- Overcrowding with too many observations
+
+---
+
+# Addressing Correlation and Interactions
+
+.pull-left[
+**Accumulated Local Effects (ALE) Plots**  
+[Apley and Zhu (2016)](https://arxiv.org/pdf/1612.08468.pdf)
+
+- Similar to PDPs: consider how a feature influences predictions on average
+- In contrast to PDPs: faster to create and account for correlation
+
+```{r message = FALSE, fig.width = 4, fig.height = 3}
+set.seed(20200407)
+FeatureEffect$new(predictor = bike_pred, 
+                  feature = c("hum", "temp"), 
+                  method = "ale", grid.size = 40)$plot() +   
+  scale_x_continuous("Relative Humidity") + 
+  scale_y_continuous("Temperature")+
+  viridis::scale_fill_viridis(option = "D") + 
+  labs(fill = "ALE")
+```
+
+]
+
+.pull-right[
+**Feature Interaction Plots**
+
+- Metrics that measure effect of interactions on the predictions
+  - H-statistic [Friedman and Popescu (2008)](https://projecteuclid.org/euclid.aoas/1223908046)
+  - Variable Interaction Networks (VIN) [Hooker (2004)](http://faculty.bscb.cornell.edu/~hooker/VIN-kdd.pdf)
+  - PDPs based on interactions [Greenwell et. al. (2018)](https://arxiv.org/pdf/1805.04755.pdf)
+  
+```{r message = FALSE, fig.width = 4, fig.height = 2.5}
+int = Interaction$new(predictor = bike_pred, 
+                      grid.size = 100, 
+                      feature = "season") 
+plot(int) + 
+  scale_x_continuous("2-way interaction strength")
+```
+
+]
 
 ---
 
 # Parallel Coordinate Plots
 
+Provide a nice overview of the predictions across 
+
+**PCP plot with bike data** (made with [ggpcp](https://github.com/yaweige/ggpcp))
+
+```{r fig.width = 10, fig.height = 5.5}
+# Determine order of features 
+bike_ft_ordered = bike_vi %>% arrange(desc(IncNodePurity)) %>% pull(var)
+
+# Create the pcp
+bike %>%
+  mutate(rf_pred = predict(bike_mod)) %>%
+  ggplot(aes(color = rf_pred)) + 
+  ggpcp::geom_pcp(aes(vars = dplyr::vars(all_of(bike_ft_ordered))), alpha = 0.4) + 
+  viridis::scale_color_viridis(option = "D") + 
+  labs(x = "Featured ordered by feature importance (left to right)",
+       y = "Standardized Feature Value",
+       color = "Random Forest Prediction") + 
+  theme(legend.position = "bottom") + 
+  guides(color = guide_colourbar(barwidth = 15))
+```
+
 ---
 
-# Visualizing Feature Importance
+# Interactive Parallel Coordinate Plots .tiny[[Beckett (2018)](https://digitalcommons.usu.edu/gradreports/1335/)]
+
+R package [Rfviz] for interactive parallel coordinate plots with random forest models, but it could be extended to other machine learning models.
+
+```{r out.width = "95%"}
+include_graphics("./figures/rfviz.png")
+```
+
+---
+
+class: inverse2, center, middle
+
+# Model Agnostic Methods:
+
+## .center[Feature Importance]
+
+---
+
+# Permutation Feature Importance
+
+Molnar
+
+---
+
+# Local Feature Importance Measures
 
 Casalicchio, Molnar, and Bischl (2019)
 
 ---
 
-# Counterfactual Examples 
+class: inverse2, center, middle
 
-Laugel et. al. 2019: "A counterfactual explanation is thus a data instance, close to this observation, that is predicted to belong to a different class. This form of explanation provides a user tangible explanations that are directly understandable and actionable, which can be seen as an advantage."
+# Model Agnostic Methods:
+
+## .center[Surrogate Models]
+
+---
+
+# Global Surrogate Models
 
 ---
 
@@ -444,6 +756,18 @@ Laugel et. al. 2019: "A counterfactual explanation is thus a data instance, clos
 ---
 
 # Shapely Values
+
+---
+
+class: inverse, middle, center
+
+# Example-Based Explanations
+
+---
+
+# Counterfactual Examples 
+
+Laugel et. al. 2019: "A counterfactual explanation is thus a data instance, close to this observation, that is predicted to belong to a different class. This form of explanation provides a user tangible explanations that are directly understandable and actionable, which can be seen as an advantage."
 
 ---
 
@@ -480,6 +804,10 @@ class: inverse, middle, center
 # Zooming In
 
 https://distill.pub/2020/circuits/zoom-in/
+
+---
+
+# Other Distill Articles
 
 ---
 
