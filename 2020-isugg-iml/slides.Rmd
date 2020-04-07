@@ -99,14 +99,20 @@ body {
   opacity: 1;
 }
 
+.tiny{font-size: 40%}
+
 </style>
 
-```{r setup, echo = FALSE}
+```{r setup, echo = FALSE, message = FALSE}
 # Packages
+library(dplyr)
+library(iml)
+library(ggplot2)
 library(knitr)
+library(mlr)
 
 # R markdown options
-opts_chunk$set(echo = FALSE)
+opts_chunk$set(echo = FALSE, dpi = 200)
 ```
 
 # To Do
@@ -119,6 +125,7 @@ Materials to go through...
   - Mohseni
   - Ming
   - Guidotti
+  - Wickham
   
 - Specific methods:
   - Cortez and Embrechts
@@ -136,6 +143,8 @@ Materials to go through...
 
 - Definitions and Philosophical Aspects
 
+- Washington D.C. Bike Rental Example Data
+
 **Methods**
 
 - Model Agnostic
@@ -143,8 +152,6 @@ Materials to go through...
 - Random Forest Specific
 
 - Neural Network Specific
-
-- Software
 
 **Concluding Thoughts**
 
@@ -194,6 +201,24 @@ include_graphics("./figures/court.jpg")
 
 ---
 
+# Literature on Explanability
+
+**General trends I've noticed:**
+
+- Recent (last 10 years)
+
+- Machine learning and computer science perspectives
+
+- Eurpoean authors
+  - [General Data Protection Regulation](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation) (GDPR) implemented in 2018
+  - [Goodman and Flaxman (2016)](https://arxiv.org/abs/1606.08813): "It is reasonable to suppose that any adequate explanation would, at a minimum, provide an account of how input features relate to predictions, allowing one to answer questions such as: Is the model more or less likely to recommend a loan if the applicant is a minority?"
+
+**Key resource for this talk:**
+
+- [Interpretable Machine Learning](https://christophm.github.io/interpretable-ml-book/) by Christoph Molnar
+
+---
+
 class: inverse, middle, center
 
 # Definitions and Philosophical Aspects
@@ -202,7 +227,7 @@ class: inverse, middle, center
 
 # Explainability versus Interpretability
 
-So many definitions...
+I have not found agreed upon definitions.
 
 **[Interpretable Machine Learning (Molnar 2020)](https://christophm.github.io/interpretable-ml-book/)**
 
@@ -222,7 +247,7 @@ So many definitions...
 
 **[The Mythos of Model Interpretability (Lipton 2017)](https://arxiv.org/pdf/1606.03490.pdf)**
 
-- A whole paper dedicated to the philosophical discussion of what interpretability is in machine learning
+- Paper dedicated to the philosophical discussion of what interpretability is in machine learning
 
 **[Explaining Explanations: An Overview of Interpretability of Machine Learning (Gilpin et. al. 2019)](https://arxiv.org/pdf/1806.00069.pdf)**
 
@@ -280,11 +305,115 @@ include_graphics("./figures/trade-off.png")
 
 class: inverse, middle, center
 
+# Washington D.C. Bike Rental Example Data
+
+---
+
+# Washington D.C. Bike Rentals
+
+Used in Interpretable Machine Learning. I accessed the data [here](https://github.com/christophM/interpretable-ml-book/blob/master/data/bike.RData).
+
+```{r echo = TRUE}
+bike <- load("data/bike.RData")
+data(bike)
+```
+
+```{r}
+DT::datatable(bike,
+              class = 'cell-border stripe',
+          options = list(dom = 'tp',
+                         scrollX = TRUE, 
+                         pageLength = 4))
+```
+
+---
+
+# Random Forest Model with Bike Data
+
+Fit a random forest model using the `mlr` package
+
+  - response: count of bicycles rented during a day
+  - predictors: all other 11 variables in bike data (season, holiday indicator, year...)
+
+```{r echo = TRUE}
+# Create a task (specify data and response)
+bike_task = mlr::makeRegrTask(data = bike, target = "cnt")
+
+# Specify a learner (random forest)
+bike_lrn = mlr::makeLearner(cl = 'regr.randomForest', id = 'bike-rf')
+
+# Fit the random forest model
+bike_mod = mlr::train(learner = bike_lrn, task = bike_task)
+```
+
+<br> 
+
+Extra info:
+
+- [`mlr`](https://mlr.mlr-org.com/) developed by [this](https://www.compstat.statistik.uni-muenchen.de/) working group
+- [`mlr3`](https://mlr3.mlr-org.com/) new version of the package
+
+---
+
+class: inverse, middle, center
+
 # Model Agnostic Methods
 
 ---
 
-# Partial Dependence Plots
+# Overview of Model Agnostic Methods
+
+.pull-left[
+**Advantages**
+
+- Can be applied to any model
+
+- Convenient if comparing various types of predictive models
+
+- Visualization or model based approach
+
+<br>
+
+**Disadvantages**
+
+- Must work with any model
+
+]
+
+.pull-right[
+```{r out.width = "150%", fig.cap = "From Interpretable Machine Learning (Molnar)"}
+include_graphics("./figures/agnostic.png")
+```
+]
+
+---
+
+# Partial Dependence Plots .tiny[[Friedman 2001](https://projecteuclid.org/euclid.aos/1013203451)]
+
+**Use**: Visualzing the marginal relationship between one or two predictor variables and model predictions
+
+**Method**: For a given model...
+
+1. Obtain predictions for all observations in data
+2. For one variable, compute average prediction...
+
+```{r message = FALSE, warning = FALSE, fig.width = 12, fig.height = 4}
+# Based on code from Molnar's IML GitHub repo
+bike_pred = Predictor$new(bike_mod, data = bike)
+pdp = FeatureEffect$new(bike_pred, "temp", method = "pdp") 
+p1 = pdp$plot() +  
+  scale_x_continuous('Temperature', limits = c(0, NA)) + 
+  scale_y_continuous('Predicted number of bikes', limits = c(0, 5500))
+pdp$set.feature("hum")
+p2 = pdp$plot() + 
+  scale_x_continuous('Humidity', limits = c(0, NA)) + 
+  scale_y_continuous('', limits = c(0, 5500))
+pdp$set.feature("windspeed")
+p3 = pdp$plot() + 
+  scale_x_continuous('Wind speed', limits = c(0, NA)) + 
+  scale_y_continuous('', limits = c(0, 5500))
+gridExtra::grid.arrange(p1, p2, p3, ncol = 3)
+```
 
 ---
 
@@ -351,12 +480,6 @@ class: inverse, middle, center
 # Zooming In
 
 https://distill.pub/2020/circuits/zoom-in/
-
----
-
-class: inverse, middle, center
-
-# Software
 
 ---
 
