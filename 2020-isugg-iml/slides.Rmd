@@ -446,7 +446,7 @@ $$\hat{f}_{x_{int}}(x_{int})=\frac{1}{n}\sum_{i=1}^n\hat{f}(x_{int},x^{(i)}_{oth
 
 ```{r message = FALSE, warning = FALSE, fig.width = 9, fig.height = 2.5}
 # Based on code from Molnar's IML GitHub repo
-bike_pred = Predictor$new(bike_mod, data = bike)
+bike_pred = Predictor$new(bike_mod, data = bike, y = bike$cnt)
 pdp = FeatureEffect$new(bike_pred, "temp", method = "pdp") 
 p1 = pdp$plot() +  
   scale_x_continuous('Temperature', limits = c(0, NA)) + 
@@ -567,25 +567,34 @@ gridExtra::grid.arrange(p4, p5, p6, ncol = 3)
 # ICE Plots in iml
 
 .left-code[
-```{r echo = TRUE}
+```{r echo = TRUE, eval = FALSE}
 # Compute the ICE function
-ice1 = FeatureEffect$new(
+ice = 
+  FeatureEffect$new( #<<
   predictor = bike_pred,
   feature = "temp",
   method = "ice")
 
 # Create the plot
-ice1_plt = ice1$plot()
+plot(ice) #<<
 ```
 
 ]
 
 .right-plot[
 
-**ICE plot for temperature**
+.center[**ICE plot for temperature**]
 
 ```{r fig.width = 4, fig.height = 3.5}
-ice1_plt 
+# Compute the ICE function
+ice = 
+  FeatureEffect$new(
+  predictor = bike_pred,
+  feature = "temp",
+  method = "ice")
+
+# Create the plot
+plot(ice) 
 ```
 ]
 
@@ -596,28 +605,39 @@ ice1_plt
 "Sometimes it can be hard to tell whether the ICE curves differ between individuals because they start at different predictions. A simple solution is to center the curves at a certain point in the feature and display only the difference in the prediction to this point." - Molnar 
 
 .left-code[
-```{r echo = TRUE}
+```{r echo = TRUE, eval = FALSE}
 # Center the ICE function for 
 # temperature at the 
 # minimum temperature and 
 # include the pdp
-ice2 = FeatureEffect$new(
+ice_centered = 
+  FeatureEffect$new(#<<
   predictor = bike_pred,
   feature = "temp",
   center.at = min(bike$temp),
   method = "pdp+ice")
 
 # Create the plot
-ice2_plt = ice2$plot()
+plot(ice_centered) #<<
 ```
-
 ]
 
 .right-plot[
 ```{r fig.width = 4, fig.height = 3.5}
-ice2_plt 
-```
+# Center the ICE function for 
+# temperature at the 
+# minimum temperature and 
+# include the pdp
+ice_centered = 
+  FeatureEffect$new(
+  predictor = bike_pred,
+  feature = "temp",
+  center.at = min(bike$temp),
+  method = "pdp+ice")
 
+# Create the plot
+plot(ice_centered)
+```
 ]
 
 ---
@@ -652,7 +672,6 @@ ice2_plt
 - In contrast to PDPs: faster to create and account for correlation
 
 ```{r message = FALSE, fig.width = 4, fig.height = 3}
-set.seed(20200407)
 FeatureEffect$new(predictor = bike_pred, 
                   feature = c("hum", "temp"), 
                   method = "ale", grid.size = 40)$plot() +   
@@ -684,6 +703,54 @@ plot(int) +
 
 ---
 
+# ALE and Interaction Plots in iml
+
+Code for the plots on the previous slide
+
+.pull-left[
+**Accumulated Local Effects (ALE) Plot**
+
+```{r eval = FALSE, echo = TRUE}
+# Compute the ALEs
+ale = FeatureEffect$new( #<<
+  predictor = bike_pred,
+  feature = c("hum", "temp"), 
+  method = "ale", 
+  grid.size = 40)
+
+# Plot the ALEs
+plot(ale) + #<<
+  scale_x_continuous(
+    "Relative Humidity") + 
+  scale_y_continuous(
+    "Temperature")+
+  viridis::scale_fill_viridis(
+    option = "D") + 
+  labs(fill = "ALE")
+```
+
+]
+
+.pull-right[
+**Feature Interaction Plot**
+
+```{r eval = FALSE, echo = TRUE}
+# Compute the interaction metrics
+int = 
+  Interaction$new( #<<
+    predictor = bike_pred,
+    grid.size = 100, 
+    feature = "season") 
+
+# Plot the interaction metrics
+plot(int) + #<<
+  scale_x_continuous(
+    "2-way interaction strength")
+```
+
+]
+---
+
 # Parallel Coordinate Plots
 
 Provide a nice overview of the predictions across 
@@ -699,6 +766,29 @@ bike %>%
   mutate(rf_pred = predict(bike_mod)) %>%
   ggplot(aes(color = rf_pred)) + 
   ggpcp::geom_pcp(aes(vars = dplyr::vars(all_of(bike_ft_ordered))), alpha = 0.4) + 
+  viridis::scale_color_viridis(option = "D") + 
+  labs(x = "Featured ordered by feature importance (left to right)",
+       y = "Standardized Feature Value",
+       color = "Random Forest Prediction") + 
+  theme(legend.position = "bottom") + 
+  guides(color = guide_colourbar(barwidth = 15))
+```
+
+---
+
+# Parallel Coordinate Plots in ggpcp
+
+Code for the plot on the previous slide
+
+```{r eval = FALSE, echo = TRUE}
+# Determine order of features 
+bike_ft_ordered = bike_vi %>% arrange(desc(IncNodePurity)) %>% pull(var)
+
+# Create the pcp
+bike %>%
+  mutate(rf_pred = predict(bike_mod)) %>% 
+  ggplot(aes(color = rf_pred)) + 
+  ggpcp::geom_pcp(aes(vars = dplyr::vars(all_of(bike_ft_ordered))), alpha = 0.4) + #<<
   viridis::scale_color_viridis(option = "D") + 
   labs(x = "Featured ordered by feature importance (left to right)",
        y = "Standardized Feature Value",
@@ -729,7 +819,66 @@ class: inverse2, center, middle
 
 # Permutation Feature Importance
 
-Molnar
+**Background**
+
+- Idea originally proposed by [Brieman (2001)](https://www.stat.berkeley.edu/~breiman/randomforest2001.pdf) for random forests
+
+- Adapted to be used with all models by [Fisher, Rudin, and Dominici (2018)](https://arxiv.org/pdf/1801.01489v1.pdf)
+
+  - Call this meausre the model class reliance
+
+**Concept**
+
+- Measure feature importance by seeing how much the prediction error is affected when a feature is permuted
+  
+  - important feature: one that affects the prediction error when changed
+  
+  - nonimportant feature: one that does not affect the prediction error when changed
+
+---
+
+# Permutation Feature Importance in iml
+
+**Permutation feature importance of bike data random forest**
+  
+.left-code[
+```{r eval = FALSE, echo = TRUE}
+# Create the predictor 
+# (seemingly FeatureImp 
+# requires y)
+bike_pred = 
+  Predictor$new( #<<
+    model = bike_mod, 
+    data = bike, 
+    y = bike$cnt)
+
+# Compute the feature
+# importance values
+bike_imp = 
+  FeatureImp$new( #<<
+    predictor = bike_pred, 
+    loss = 'mae')
+
+# Plot the feature
+# importance values
+plot(bike_imp) #<<
+```
+]
+
+.right-plot[
+
+```{r fig.height = 4, fig.width = 6}
+bike_pred = Predictor$new(bike_mod, data = bike, y = bike$cnt)
+bike_imp = FeatureImp$new(predictor = bike_pred, loss = 'mae')
+plot(bike_imp)
+```
+
+Point = median permutation importance  
+Bars = 5th and 95th permutation importance quantiles
+
+]
+
+
 
 ---
 
