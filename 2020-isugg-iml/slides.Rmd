@@ -880,21 +880,19 @@ Bars = 5th and 95th permutation importance quantiles
 
 ---
 
-# Permutation FI with p-values .tiny[[Atlmann et. al. (2010)](https://academic.oup.com/bioinformatics/article/26/10/1340/193348)]
+# Other Feature Importance Values
 
-Permutation based feature importance method that returns p-values
+**Permutation FI with p-values** 
+  - [Atlmann et. al. (2010)](https://academic.oup.com/bioinformatics/article/26/10/1340/193348)
+  - Permutation based feature importance method that returns p-values
 
----
+**Local Feature Importance** 
+  - [Casalicchio, Molnar, and Bischl (2019)](https://arxiv.org/pdf/1804.06620.pdf)
+  - Individual Conditional Importance (ICI) Plots
+  - Partial Importance (PI) Plots
 
-# Shapley Feature Importance .tiny[[Casalicchio, Molnar, and Bischl (2019)](https://arxiv.org/pdf/1804.06620.pdf)]
-
----
-
-# Local Feature Importance .tiny[[Casalicchio, Molnar, and Bischl (2019)](https://arxiv.org/pdf/1804.06620.pdf)]
-
-.pull-left[**Individual Conditional Importance (ICI) Plots**]
-
-.pull-right[**Partial Importance (PI) Plots**]
+**Shapley Feature Importance** 
+  - [Casalicchio, Molnar, and Bischl (2019)](https://arxiv.org/pdf/1804.06620.pdf)
 
 ---
 
