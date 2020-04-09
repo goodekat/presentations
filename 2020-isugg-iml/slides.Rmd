@@ -1,7 +1,6 @@
 ---
-title: An Overview of Visualization Techniques for Explainable Machine Learning <div style='float:left'></div><hr color='#005082' size=1px width=796px>
-author: Katherine Goode
-date: ISU Graphics Group - April 10, 2020 
+title: "![](./figures/lime-sine.png) An Overview of Visualization Techniques for Explainable Machine Learning"
+author: Katherine Goode - ISU Graphics Group - April 10, 2020 
 output:
   xaringan::moon_reader:
     css: [default, metropolis, metropolis-fonts]
@@ -180,12 +179,11 @@ include_graphics("./figures/court.jpg")
   - [General Data Protection Regulation](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation) (GDPR) implemented in 2018
   - [Goodman and Flaxman (2016)](https://arxiv.org/abs/1606.08813): "It is reasonable to suppose that any adequate explanation would, at a minimum, provide an account of how input features relate to predictions, allowing one to answer questions such as: Is the model more or less likely to recommend a loan if the applicant is a minority?"
 
-**Key resource for this talk:**
+**Key resources for this talk:**
 
 - [Interpretable Machine Learning](https://christophm.github.io/interpretable-ml-book/) by Christoph Molnar
 - Corresponding R package: [iml](https://github.com/christophM/iml)
-- [Computational statistics working group](https://www.compstat.statistik.uni-muenchen.de/) at Ludwig-Maximilians-Universiy in Munich led by [Bernd Bischl](https://www.compstat.statistik.uni-muenchen.de/people/bischl/)
-  - [mlr](https://mlr.mlr-org.com/) and [mlr3](https://mlr3.mlr-org.com/) R packages
+- [Computational statistics working group](https://www.compstat.statistik.uni-muenchen.de/) at Ludwig-Maximilians-Universiy in Munich led by [Bernd Bischl](https://www.compstat.statistik.uni-muenchen.de/people/bischl/) ([mlr](https://mlr.mlr-org.com/) and [mlr3](https://mlr3.mlr-org.com/) R packages)
 
 ---
 
@@ -199,9 +197,9 @@ include_graphics("./figures/court.jpg")
 
 - Model Agnostic
 
-- Random Forest Specific
+- Random Forest Specific Techniques
 
-- Neural Network Specific
+- Neural Network Specific Techniques
 
 **Concluding Thoughts**
 
@@ -1451,13 +1449,18 @@ class: inverse, middle, center
 
 ---
 
-# Other Methods
+# More Methods
+
+.pull-left[
+**Model Agnostic Methods**
 
 - Scoped Rules (Anchors) [Ribeiro, Singh, Guestrin (2018)](https://homes.cs.washington.edu/~marcotcr/aaai18.pdf)
 
 - SHAP [Lundberg and Lee (2017)](https://papers.nips.cc/paper/7062-a-unified-approach-to-interpreting-model-predictions)
 
-Example-Based Explanations:
+- Sensativity Analyses [Cortez and Embrechts (2013)](https://www.sciencedirect.com/science/article/pii/S0020025512007098)
+
+**Example-Based Explanations**
 
 - Counterfactual examples
 
@@ -1467,23 +1470,44 @@ Example-Based Explanations:
 
 - Influential instances
 
-Neural Networks: 
+]
 
-- [Other Distill Articles](https://distill.pub/)
+.pull-left[
+**Model Specific**
 
-- Overviews:
-  - IML by Molnar
-  - Gilpin
-  - Mohseni
-  - Ming
-  - Guidotti
-  - Wickham
+- Neural networks: See articles on [Distill](https://distill.pub/)
+
+- Tree ensembles:
+    - [da Silva, Cook, and Lee (2017)](https://arxiv.org/pdf/1704.02502.pdf)
+  - [Hara and Hayashi (2016)](https://arxiv.org/pdf/1606.05390.pdf)
+
+**General Model Viz**
+
+- Visualizing statistical models: Removing the blindfold [Wickham, Cook, and Hofmann (2015)](https://onlinelibrary.wiley.com/doi/abs/10.1002/sam.11271)
+
+<br>
+
+Many more....
+
+]
+
+---
+
+# Overviews
+
+**Additional Resources for Overviews for Explainable Machine Learning**
+
+[Gilpin et. al. (2019)](https://arxiv.org/pdf/1806.00069.pdf)
+  - Explaining Explanations: An Overview of Interpretability of Machine Learning 
+
+[Mohseni, Zarei, and Ragan (2019)](https://arxiv.org/pdf/1811.11839.pdf)
+  - A Multidisciplinary Survey and Framework for Design and Evaluation of Explainable AI Systems
   
-- Specific methods:
-  - Cortez and Embrechts
-  - Natalia's paper
-  - Distill articles
-  - Hara and Hayashi
+[Ming (2017)](http://www.cse.ust.hk/~huamin/explainable_AI_yao.pdf)
+  - A Survey on Visualization for Explainable Classifiers
+  
+[Guidotti et. al. (2018)](https://arxiv.org/pdf/1802.01933.pdf)
+  - A Survey Of Methods For Explaining Black Box Models
 
 ---
 
@@ -1493,9 +1517,46 @@ class: inverse, middle, center
 
 ---
 
-# Concerns
+# Some thoughts on EML
 
-Concerns with LIME
+.pull-left[
+**Review of method types**
 
-Concerns with counterfactual examples: Laugel et. al. (2019) paper:
+- model agnostic versus model specific
+
+- global versus local explanations
+
+- static versus interactive
+
+- models versus metrics
+
+**Good News**
+
+- many methods to try out
+
+- lots of research opportunities
+
+- opportunity for visualizations to show off their worth
+
+]
+
+.pull-right[
+**Cautions**
+
+- this is a relatively new field
+
+- unsure which are the most trusted methods
+
+- a seemingly simple method may not be so simple
+
+- model based methods 
+
+  - add an aditional layer of complexity to an already complex situation
+
+  - almost seems naïve to expect a simple model to capture the complex relationship in a black-box model
+]
+
+  
+
+
 
