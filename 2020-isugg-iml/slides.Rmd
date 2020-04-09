@@ -1,8 +1,7 @@
 ---
-title: "An Overview of Visualization Techniques for Explainable Machine Learning"
-subtitle: <html><div style='float:left'></div><hr color='#005082' size=5px width=790px></html> <html><div style='float:left'></div><hr color='#000839' size=2.5px width=790px></html> <html><div style='float:left'></div><hr color='#00a8cc' size=1px width=790px></html> 
+title: An Overview of Visualization Techniques for Explainable Machine Learning <div style='float:left'></div><hr color='#005082' size=1px width=796px>
 author: Katherine Goode
-date: ISU Graphics Group - April 10, 2020 </font>
+date: ISU Graphics Group - April 10, 2020 
 output:
   xaringan::moon_reader:
     css: [default, metropolis, metropolis-fonts]
@@ -33,14 +32,6 @@ a, a > code {
 .inverse {
   background-color: #000839;
   border-top: 80px solid #000839;
-  text-shadow: none;
-	background-position: 50% 75%;
-  background-size: 150px;
-}
-
-.inverse2 {
-  background-color: #00a8cc;
-  border-top: 80px solid #00a8cc;
   text-shadow: none;
 	background-position: 50% 75%;
   background-size: 150px;
@@ -108,18 +99,12 @@ body {
   opacity: 1;
 }
 
-.inverse2 .remark-slide-number {
-  font-size: 13pt;
-  font-family: 'Skia';
-  color: #FAFAFA;
-  opacity: 1;
-}
-
 </style>
 
 ```{css, echo = FALSE}
 .tiny{font-size: 30%}
 .small{font-size: 50%}
+.medium{font-size: 75%}
 
 .left-code {
   color: #777;
@@ -148,57 +133,6 @@ library(tree)
 # R markdown options
 opts_chunk$set(echo = FALSE, dpi = 200, cache = TRUE)
 ```
-
-
-# To Do
-
-Materials to go through...
-
-- Overviews:
-  - IML by Molnar
-  - Gilpin
-  - Mohseni
-  - Ming
-  - Guidotti
-  - Wickham
-  
-- Specific methods:
-  - Cortez and Embrechts
-  - Natalia's paper
-  - Distill articles
-  - Hara and Hayashi
-
----
-
-# The Plan...
-
-**Setting the Stage**
-
-- Motivation
-
-- Definitions and Philosophical Aspects
-
-**Methods**
-
-- Model Agnostic
-
-- Random Forest Specific
-
-- Neural Network Specific
-
-**Concluding Thoughts**
-
-- Additional Methods and Resources
-
-- A Cautionary Conclusion
-
----
-
-class: inverse, middle, center
-
-# Motivation
-
----
 
 # Machine Learning
 
@@ -238,11 +172,11 @@ include_graphics("./figures/court.jpg")
 
 **General trends I've noticed:**
 
-- Mnay recent (last 5 years)
+- Many recent papers
 
 - Often machine learning and computer science perspectives
 
-- Many Eurpoean authors
+- Lots of European authors
   - [General Data Protection Regulation](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation) (GDPR) implemented in 2018
   - [Goodman and Flaxman (2016)](https://arxiv.org/abs/1606.08813): "It is reasonable to suppose that any adequate explanation would, at a minimum, provide an account of how input features relate to predictions, allowing one to answer questions such as: Is the model more or less likely to recommend a loan if the applicant is a minority?"
 
@@ -250,6 +184,30 @@ include_graphics("./figures/court.jpg")
 
 - [Interpretable Machine Learning](https://christophm.github.io/interpretable-ml-book/) by Christoph Molnar
 - Corresponding R package: [iml](https://github.com/christophM/iml)
+- [Computational statistics working group](https://www.compstat.statistik.uni-muenchen.de/) at Ludwig-Maximilians-Universiy in Munich led by [Bernd Bischl](https://www.compstat.statistik.uni-muenchen.de/people/bischl/)
+  - [mlr](https://mlr.mlr-org.com/) and [mlr3](https://mlr3.mlr-org.com/) R packages
+
+---
+
+# The Plan...
+
+**Setting the Stage**
+
+- Definitions and Philosophical Aspects
+
+**Methods**
+
+- Model Agnostic
+
+- Random Forest Specific
+
+- Neural Network Specific
+
+**Concluding Thoughts**
+
+- Additional Methods and Resources
+
+- A Cautionary Conclusion
 
 ---
 
@@ -261,9 +219,9 @@ class: inverse, middle, center
 
 # Explainability versus Interpretability
 
-I have not found agreed upon definitions.
+There are not agreed upon definitions...
 
-**[Interpretable Machine Learning (Molnar 2020)](https://christophm.github.io/interpretable-ml-book/)**
+.medium[**[Interpretable Machine Learning (Molnar 2020)](https://christophm.github.io/interpretable-ml-book/)**
 
 - "I will use both the terms **interpretable** and **explainable** interchangeably"
 - "I will use “**explanation**” for explanations of individual predictions."
@@ -275,10 +233,6 @@ I have not found agreed upon definitions.
 - "...when using the word “**understanding**”, we refer to a functional understanding of the model, in contrast to a lower-level mechanistic or algorithmic understanding of it."
 - also distinguish between **interpretation** and **explanation**
 
----
-
-# Explainability versus Interpretability
-
 **[The Mythos of Model Interpretability (Lipton 2017)](https://arxiv.org/pdf/1606.03490.pdf)**
 
 - Paper dedicated to the philosophical discussion of what interpretability is in machine learning
@@ -288,6 +242,7 @@ I have not found agreed upon definitions.
 - "We take the stance that **interpretability** alone is insufficient.
 In order for humans to trust black-box methods, we need **explainability** – models that are able to summarize the reasons for neural network behavior, gain the trust of users, or produce insights about the causes of their decisions"
 - Implies that you need both interpretability and explainability?
+]
 
 ---
 
@@ -391,7 +346,7 @@ DT::datatable(bike,
 
 ---
 
-class: inverse2, center, middle
+class: inverse, center, middle
 
 # Model Agnostic Methods:
 
@@ -763,7 +718,7 @@ include_graphics("./figures/rfviz.png")
 
 ---
 
-class: inverse2, center, middle
+class: inverse, center, middle
 
 # Model Agnostic Methods:
 
@@ -878,7 +833,7 @@ ICI and PI available in the [featureImportance](https://github.com/giuseppec/fea
 
 ---
 
-class: inverse2, center, middle
+class: inverse, center, middle
 
 # Model Agnostic Methods:
 
@@ -1118,7 +1073,7 @@ ggplot(case1_perms, aes(x = x1, y = x2, color = pred)) +
 
 ---
 
-# Local Surrogate Model: LIME
+# Local Surrogate Model: LIME .tiny[[Ribeiro, Singh, Guestrin (2016)](https://arxiv.org/pdf/1602.04938.pdf)]
 
 **LIME** = Local Interpretable Model-Agnostic Explanations
 
@@ -1173,7 +1128,88 @@ eoi_plot(sine_qb$explain[1:2,])
 
 ---
 
-# Shapely Values
+class: inverse, center, middle
+
+# Model Agnostic Methods:
+
+## .center[Game Theory Based Method]
+
+---
+
+# Shapely Values .tiny[[Štrumbelj and Kononenko (2014)](https://link.springer.com/article/10.1007/s10115-013-0679-x)]
+
+**Idea**: Use game theory to determine contributions of predictor variables to one prediction of interest
+
+**Game Theory Connection**: [Shapley values](https://www.rand.org/content/dam/rand/pubs/research_memoranda/2008/RM670.pdf) are "a method for assigning payouts to players depending on their contribution to the total payout."
+
+| Game Theory Term | Machine Learning Meaning |
+| ----------- | ---------------- |
+| collaborative game | machine learning model prediction for one prediction |
+| players | predictor variables | 
+| payout | contribution of a predictor variable to the prediction | 
+| gain | actual prediction - average prediction for all instances |
+
+```{r out.width = "50%", fig.align = "center"}
+include_graphics("./figures/shapely.png")
+```
+
+---
+
+# Shapely Values in iml
+
+**Interpretation**: "The value of the $j$th feature contributed $\phi_j$ to the prediction of this particular instance compared to the average prediction for the dataset."
+
+.pull-left[
+```{r echo = TRUE, eval = FALSE}
+# Select obs of interest and perpare data
+x_int = bike[names(bike) != 'cnt'][285,]
+
+# Compute prediction values
+avg_pred = mean(predict(bike_mod))
+actual_pred = predict(bike_mod, newdata = bike[names(bike) != 'cnt'][285,])
+diff_pred = actual_pred - avg_pred
+
+# Compute shapley values
+predictor = 
+  Predictor$new(model = bike_mod, data = bike[names(bike) != 'cnt'])
+shapley = 
+  Shapley$new(predictor = predictor, #<<
+              x.interest = x_int) #<<
+
+# Create the plot
+plot(shapley) +  
+  scale_y_continuous("Feature value contribution") +
+  ggtitle(sprintf("Actual prediction: %.0f\nAverage prediction: %.0f\nDifference: %.0f", actual_pred, avg_pred, diff_pred))
+```
+]
+
+.pull-right[
+
+**Shapely values for one observation from the bike rental random forest**
+
+```{r}
+# Select obs of interest and perpare data
+x_int = bike[names(bike) != 'cnt'][285,]
+
+# Compute prediction values
+avg_pred = mean(predict(bike_mod))
+actual_pred = predict(bike_mod, newdata = bike[names(bike) != 'cnt'][285,])
+diff_pred = actual_pred - avg_pred
+
+# Compute shapley values
+predictor = 
+  Predictor$new(model = bike_mod, data = bike[names(bike) != 'cnt'])
+shapley = 
+  Shapley$new(predictor = predictor, #<<
+              x.interest = x_int) #<<
+
+# Create the plot
+plot(shapley) +  
+  scale_y_continuous("Feature value contribution") +
+  ggtitle(sprintf("Actual prediction: %.0f\nAverage prediction: %.0f\nDifference: %.0f", actual_pred, avg_pred, diff_pred))
+```
+
+]
 
 ---
 
@@ -1183,36 +1219,159 @@ class: inverse, middle, center
 
 ---
 
+# Quick intro to random forests
+
+**Idea**: Aggregation of many trees (bootstrap data and randomly select predictors for each tree)
+
+```{r out.width = "90%", fig.align = "center"}
+include_graphics("./figures/rf.png")
+```
+
+
+---
+
 # Feature Importance Plot
 
-```{r fig.width = 7, fig.height = 3}
+**Mean decrease in impurity (gini importance)**: measures the average improvement in node purity for a predictor variable 
+
+.pull-left[
+```{r echo = TRUE, eval = FALSE}
+# Extract the importance values
+bike_rfimp <- bike_mod$importance
+
+# Put the feature importance in a df
+bike_vi <-
+  data.frame(var = rownames(bike_rfimp),
+             bike_rfimp) %>%
+  arrange(IncNodePurity)
+
 # Create a feature importance plot
 bike_vi %>%
-  mutate(var = factor(var, levels = pull(bike_vi, var))) %>%
-  ggplot(aes(x = var, y = IncNodePurity)) + 
+  mutate(var = factor(x = var, levels = bike_vi$var)) %>%
+  ggplot(aes(x = var, 
+             y = IncNodePurity)) + 
   geom_col() + 
   coord_flip() + 
   labs(x = "Feature")
 ```
+]
+
+.pull-right[
+
+**Bike random forest feature importance plot**
+
+```{r fig.width = 5, fig.height = 5}
+# Extract the importance values
+bike_rfimp <- bike_mod$importance
+
+# Put the feature importance in a df
+bike_vi <-
+  data.frame(var = rownames(bike_rfimp),
+             bike_rfimp) %>%
+  arrange(IncNodePurity)
+
+# Create a feature importance plot
+bike_vi %>%
+  mutate(var = factor(x = var, levels = bike_vi$var)) %>%
+  ggplot(aes(x = var, 
+             y = IncNodePurity)) + 
+  geom_col() + 
+  coord_flip() + 
+  labs(x = "Feature")
+```
+]
+
 
 ---
 
-# KLIMT
+# Visualizing Sets of Trees .tiny[[Simon Urbanek (2008)](https://haralick.org/DV/Handbook_of_Data_Visualization.pdf)]
+
+**Cut points from all trees for two predictor variables**
+
+```{r out.width = "80%", fig.align = "center"}
+include_graphics("./figures/rf-splits.png")
+```
 
 ---
 
-# ggRandomforest
+# Visualizing Sets of Trees .tiny[[Simon Urbanek (2008)](https://haralick.org/DV/Handbook_of_Data_Visualization.pdf)]
+
+**Trace plots of all trees in a random forest**
+
+```{r out.width = "80%", fig.align = "center"}
+include_graphics("./figures/rf-trace.png")
+```
 
 ---
 
-# Rfviz
+# ggRandomForests .tiny[[Ehrlinger (2015)](https://arxiv.org/pdf/1501.07196.pdf)]
+
+R package for visually exploring random forests fit using randomForests or randomForest
+
+```{r echo = TRUE}
+library(ggRandomForests)
+```
+
+
+.pull-left[
+**Out-of-bag errors versus number of trees**
+```{r message = FALSE, echo = TRUE, fig.height = 3, fig.width = 4}
+plot(gg_error(bike_mod)) + theme_gray()
+```
+]
+
+.pull-right[
+**Variable importance plot**
+```{r echo = TRUE, fig.height = 3, fig.width = 4}
+plot(gg_vimp(bike_mod)) + theme_gray()
+```
+
+]
+
 
 ---
 
-# Forest Floor Visualizations
+# rfviz .tiny[[Beckett (2018)](https://chrisbeckett8.github.io/Rfviz.html)]
 
-Welling et. al. (2016)
+Previously mentioned...R package for interacting with parallel coordinate plots for random forests
 
+```{r message = FALSE, eval = FALSE, echo = TRUE}
+# Prepare data
+rfprep <- rfviz::rf_prep(x = bike[names(bike) != "cnt"], y = bike$cnt)
+
+# View plots
+rfviz::rf_viz(rfprep, input = TRUE, imp = TRUE, cmd = TRUE, hl_color = 'black')
+```
+
+```{r out.width = "70%", fig.align = "center"}
+include_graphics("./figures/rfviz-bike.png")
+```
+
+
+---
+
+# Forest Floor Visualizations .tiny[[Welling et. al. (2016)](https://arxiv.org/pdf/1605.09196.pdf)]
+
+.pull-left[
+- Method that creates plots similar to partial dependence plots
+
+- From the paper: 
+
+  "*We suggest to first use feature contributions, a method to decompose trees by splitting features, and then subsequently perform projections. The advantages of forest floor over partial dependence plots is that interactions are not masked by averaging.*"
+  
+- R package: [`forestFloor`](https://github.com/sorhawell/forestFloor)
+  - I struggled to get it to work...
+]
+
+.pull-right[
+
+**Forest floor plots** (figure from the paper)
+
+```{r out.width = "80%", fig.align = "center"}
+include_graphics("./figures/forestfloor.png")
+```
+
+]
 ---
 
 class: inverse, middle, center
@@ -1221,13 +1380,68 @@ class: inverse, middle, center
 
 ---
 
-# Zooming In
+# Quick intro to random forests
 
-https://distill.pub/2020/circuits/zoom-in/
+**Idea**: Combination of many non-linear regression models
+
+```{r out.width = "80%", fig.align = "center"}
+include_graphics("./figures/nn-concept.png")
+```
+
+.small[Image [source](http://www.datastuff.tech/machine-learning/convolutional-neural-networks-an-introduction-tensorflow-eager/)]
 
 ---
 
-# Other Distill Articles
+# Feature Visualization .tiny[[overview article by Olah, Mordvintsev, and Schubert (2017)](https://distill.pub/2017/feature-visualization/)]
+
+**Idea**: Determine values of predictor variables that maximize activation functions at a specific "location" in the neural network
+
+**Formula Version**: For a node in the network: $\ \ \ \underset{x}{\arg\max} \ f_j(x, w_j)$
+
+- $x$ = values of predictor variables
+- $w_j$ = estimated weights at node $j$
+- $f_j$ = activation function used at node $j$
+
+```{r out.width = "90%", fig.align = "center"}
+include_graphics("./figures/feature-viz.png")
+```
+.small[Image from [Olah, Mordvintsev, and Schubert (2017)](https://distill.pub/2017/feature-visualization/)]
+
+---
+
+# Saliency Maps .tiny[[Simonyan,  (2014)](https://arxiv.org/abs/1312.6034)]
+
+.pull-left[
+**Purpose**: To identify the features that are important for making a prediction for a single observation
+
+**Concept**: Makes use of back-propogation algorithm to determine graident values associated with a predictor variable which indicate how much a predictor variable influences the prediction
+
+**In practice**: 
+
+- Commonly used with convolutional neural networks to identify important pixels in an image
+
+- Many algorithms for creating saliency maps
+
+]
+
+.pull-right[
+```{r out.width = "95%", fig.align = "center"}
+include_graphics("./figures/saliency.png")
+```
+.center[.small[Image from [Simonyan, Vedaldi, and Zisserman (2014)](https://arxiv.org/abs/1312.6034)]]
+]
+
+---
+
+# Grand Tours .tiny[[Li, Zhao, and Scheidegger (2020)](https://distill.pub/2020/grand-tour/)]
+
+**Idea**: Make use of the Grand Tour to visualize behaviors of neural networks 
+
+```{r out.width = "90%", fig.align = "center"}
+include_graphics("./figures/grand-tour.png")
+```
+
+.small[Image from [Simonyan, Vedaldi, and Zisserman (2014)](https://distill.pub/2020/grand-tour/)]
 
 ---
 
@@ -1237,13 +1451,40 @@ class: inverse, middle, center
 
 ---
 
-# Other Model Agnostic Methods
+# Other Methods
 
-**Example-Based Explanations**
+- Scoped Rules (Anchors) [Ribeiro, Singh, Guestrin (2018)](https://homes.cs.washington.edu/~marcotcr/aaai18.pdf)
 
-- Counterfactual Examples
-  - Laugel et. al. 2019: "A counterfactual explanation is thus a data instance, close to this observation, that is predicted to belong to a different class. This form of explanation provides a user tangible explanations that are directly understandable and actionable, which can be seen as an advantage."
+- SHAP [Lundberg and Lee (2017)](https://papers.nips.cc/paper/7062-a-unified-approach-to-interpreting-model-predictions)
+
+Example-Based Explanations:
+
+- Counterfactual examples
+
+- Adversarial examples
+
+- Prototypes and criticisms
+
+- Influential instances
+
+Neural Networks: 
+
+- [Other Distill Articles](https://distill.pub/)
+
+- Overviews:
+  - IML by Molnar
+  - Gilpin
+  - Mohseni
+  - Ming
+  - Guidotti
+  - Wickham
   
+- Specific methods:
+  - Cortez and Embrechts
+  - Natalia's paper
+  - Distill articles
+  - Hara and Hayashi
+
 ---
 
 class: inverse, middle, center
@@ -1252,12 +1493,9 @@ class: inverse, middle, center
 
 ---
 
-# Concerns with LIME
+# Concerns
 
----
+Concerns with LIME
 
-# Concerns with counterfactual examples
+Concerns with counterfactual examples: Laugel et. al. (2019) paper:
 
-Laugel et. al. (2019) paper:
-
-"Several troublesome issues have been identified: [Baehrens et al., 2010] e.g. notice that modeling the decision function of a black-box classifier with a surrogate model trained on generated instances can result in explanation vectors that point in the wrong directions in some areas of the feature space in a trivial problem. The stability of post-hoc explainer systems has been criticized as well, showing that some of these approaches are locally not stable enough [Alvarez Melis and Jaakkola, 2018] or on the contrary too stable and thus not locally accurate enough [Laugel et al., 2018b]."
