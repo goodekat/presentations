@@ -197,9 +197,9 @@ include_graphics("./figures/court.jpg")
 
 - Model Agnostic
 
-- Random Forest Specific Techniques
+- Random Forest Specific
 
-- Neural Network Specific Techniques
+- Neural Network Specific
 
 **Concluding Thoughts**
 
@@ -286,7 +286,7 @@ include_graphics("./figures/trade-off.png")
 
 - "...it is possible that the explanation leaves out so much information that it makes no sense."
 
-- Rudin has worked on machine learning models with natural interpretability
+- Rudin has worked on developing machine learning models with direct interpretability
 
 ---
 
