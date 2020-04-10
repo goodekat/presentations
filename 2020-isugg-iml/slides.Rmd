@@ -181,7 +181,7 @@ include_graphics("./figures/court.jpg")
 
 **Key resources for this talk:**
 
-- [Interpretable Machine Learning](https://christophm.github.io/interpretable-ml-book/) by Christoph Molnar
+- [Interpretable Machine Learning](https://christophm.github.io/interpretable-ml-book/) by [Christoph Molnar](https://www.compstat.statistik.uni-muenchen.de/people/molnar/)
 - Corresponding R package: [iml](https://github.com/christophM/iml)
 - [Computational statistics working group](https://www.compstat.statistik.uni-muenchen.de/) at Ludwig-Maximilians-University in Munich led by [Bernd Bischl](https://www.compstat.statistik.uni-muenchen.de/people/bischl/) ([mlr](https://mlr.mlr-org.com/) and [mlr3](https://mlr3.mlr-org.com/) R packages)
 
@@ -305,8 +305,6 @@ class: inverse, middle, center
 
 - Convenient if comparing various types of predictive models
 
-- Visualization or model based approach
-
 <br>
 
 **Disadvantages**
@@ -348,7 +346,7 @@ class: inverse, center, middle
 
 # Model Agnostic Methods:
 
-## .center[Visualizations Prediction]
+## .center[Prediction Visualizations]
 
 ---
 
@@ -802,7 +800,7 @@ include_graphics("./figures/pfip.png")
 # More Feature Importance .tiny[[Casalicchio, Molnar, and Bischl (2019)](https://arxiv.org/pdf/1804.06620.pdf)]
 
 .pull-left[
-Introduce three measures for feature importance: 
+Three additional measures for feature importance: 
 
 **Individual Conditional Importance (ICI)**
 
@@ -1536,7 +1534,7 @@ class: inverse, middle, center
 
 - lots of research opportunities
 
-- opportunity for visualizations to show off their worth
+- opportunity for creating useful visualizations
 
 ]
 
