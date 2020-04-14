@@ -785,7 +785,7 @@ Bars = 5th and 95th permutation importance quantiles
 
 ---
 
-# Permutation FI with p-values .tiny[[Atlmann et. al. (2010)](https://academic.oup.com/bioinformatics/article/26/10/1340/193348)]
+# Permutation FI with p-values .tiny[[Altmann et. al. (2010)](https://academic.oup.com/bioinformatics/article/26/10/1340/193348)]
 
 - Permutation based feature importance method that returns p-values
 
