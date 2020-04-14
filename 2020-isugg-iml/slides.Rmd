@@ -726,7 +726,7 @@ class: inverse, center, middle
 
 **Background**
 
-- Idea originally proposed by [Brieman (2001)](https://www.stat.berkeley.edu/~breiman/randomforest2001.pdf) for random forests
+- Idea originally proposed by [Breiman (2001)](https://www.stat.berkeley.edu/~breiman/randomforest2001.pdf) for random forests
 
 - Adapted to be used with all models by [Fisher, Rudin, and Dominici (2018)](https://arxiv.org/pdf/1801.01489v1.pdf)
 
