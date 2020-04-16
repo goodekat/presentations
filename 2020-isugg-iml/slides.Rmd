@@ -912,7 +912,7 @@ sine_lime_explain <- apply_lime(
 
 # Extract the perms and associated predictions pertaining to case 1
 case1_perms <- sine_lime_explain$explain$perms_raw[[1]]
-case1_perms$pred <- sine_lime_explain$explain$perms_pred_complex[[1]][,1]
+case1_perms$pred <- sine_lime_explain$explain$perms_pred_complex[[1]][,2]
 
 # Plot the training data observed classes
 sine_pred = ggplot(case1_perms, aes(x = x1, y = x2, color = pred)) + 
