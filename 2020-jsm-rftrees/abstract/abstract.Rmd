@@ -25,7 +25,7 @@ Using Trees to Interpret Random Forests
 
 **Abstract Text (1,200-character limit)**
 
-Random forests are a commonly used machine learning models in prediction problems. However, the ability to explain a prediction produced by a random forest is limited. We will present two methods we have developed that use regression/classification trees to explain predictions made by random forests.
+Random forests are commonly used machine learning models for prediction problems. However, the ability to explain a prediction produced by a random forest is limited. We present a visualization method for explaining predictions made by a random forest that identifies key tree structures in the model.
 
 **Abstract Keywords**
 
