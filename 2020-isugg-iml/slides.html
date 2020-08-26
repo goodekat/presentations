@@ -682,9 +682,9 @@ Three additional measures for feature importance:
 
 - aggregate of ICI values
 
-**Shapely Feature Importance (SFIMP)**
+**Shapley Feature Importance (SFIMP)**
 
-- based on shapely values
+- based on Shapley values
 
 ]
 
@@ -787,7 +787,7 @@ class: inverse, center, middle
 
 ---
 
-# Shapely Values .tiny[[Štrumbelj and Kononenko (2014)](https://link.springer.com/article/10.1007/s10115-013-0679-x)]
+# Shapley Values .tiny[[Štrumbelj and Kononenko (2014)](https://link.springer.com/article/10.1007/s10115-013-0679-x)]
 
 **Idea**: Use game theory to determine contributions of predictor variables to one prediction of interest
 
@@ -800,11 +800,11 @@ class: inverse, center, middle
 | payout | contribution of a predictor variable to the prediction | 
 | gain | actual prediction - average prediction for all instances |
 
-&lt;img src="./figures/shapely.png" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="./figures/Shapley.png" width="50%" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Shapely Values in iml
+# Shapley Values in iml
 
 **Interpretation**: "The value of the `\(j\)`th feature contributed `\(\phi_j\)` to the prediction of this particular instance compared to the average prediction for the dataset."
 
@@ -835,7 +835,7 @@ plot(shapley) +
 
 .pull-right[
 
-**Shapely values for one observation from the bike rental random forest**
+**Shapley values for one observation from the bike rental random forest**
 
 ![](slides_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
 
