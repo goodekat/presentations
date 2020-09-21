@@ -1,14 +1,10 @@
 # My Academic Presentations
 
-### 2017
+### 2020
 
-- [**isugg-lime**](https://goodekat.github.io/presentations/2017-isugg-lime/slides.html#1): presentation for the ISU Graphics Group providing an introduction to LIME
+- [**isugg-fpca-pfi**](https://goodekat.github.io/presentations/2020-isugg-fpca-pfi/slides_with_SAND.pdf): presentation for ISU graphics group on my research with Sandia National Labs relating to explaining neural network predictions with functional data as inputs
 
-### 2018
-
-- [**isugg-ggResidpanel**](https://goodekat.github.io/presentations/2018-isugg-ggResidpanel/talk.html): presentation for the ISU Graphics Group with Katie Rey introducing our R package ggResidpanel  
-
-- [**kstate-ggresidpanel**](https://goodekat.github.io/presentations/2018-kstate-ggresidpanel/poster.pdf): poster presented at the Kansas State Conference on Applied Statistics in Agriculture with Katie Rey introducing our R package ggResidpanel
+- [**isugg-iml**](https://goodekat.github.io/presentations/2020-isugg-iml/slides.html): presentation for ISU graphics group providing an overview of research on using visualization for explainable machine learning
 
 ### 2019
 
@@ -30,8 +26,13 @@
 
 - [**sandia-lime-diagnostics**](https://goodekat.github.io/presentations/2019-sandia-lime-diagnostics/slides.html): presentation for Sandia statistics department on my research relating to diagnostics for LIME
 
-### 2020
+### 2018
 
-- [**isugg-fpca-pfi**](https://goodekat.github.io/presentations/2020-isugg-fpca-pfi/slides_with_SAND.pdf): presentation for ISU graphics group on my research with Sandia National Labs relating to explaining neural network predictions with functional data as inputs
+- [**isugg-ggResidpanel**](https://goodekat.github.io/presentations/2018-isugg-ggResidpanel/talk.html): presentation for the ISU Graphics Group with Katie Rey introducing our R package ggResidpanel  
 
-- [**isugg-iml**](https://goodekat.github.io/presentations/2020-isugg-iml/slides.html): presentation for ISU graphics group providing an overview of research on using visualizaiton for explainable machine learning
+- [**kstate-ggresidpanel**](https://goodekat.github.io/presentations/2018-kstate-ggresidpanel/poster.pdf): poster presented at the Kansas State Conference on Applied Statistics in Agriculture with Katie Rey introducing our R package ggResidpanel
+
+### 2017
+
+- [**isugg-lime**](https://goodekat.github.io/presentations/2017-isugg-lime/slides.html#1): presentation for the ISU Graphics Group providing an introduction to LIME
+
