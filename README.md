@@ -27,3 +27,11 @@
 - [**nccc-lmm_residuals**](https://goodekat.github.io/presentations/2019-nccc-lmm_residuals/slides.html#1): presentation and discussion for the NCCC-170 meeting on residuals for mixed models
 
 - [**samsi-rho-glucose**](https://goodekat.github.io/presentations/2019-samsi-rho-glucose/slides.html#1): animation used for the presentation given by my group (Rho) at the IMSM workshop on an analysis of continuously monitored glucose data
+
+- [**sandia-lime-diagnostics**](https://goodekat.github.io/presentations/2019-sandia-lime-diagnostics/slides.html): presentation for Sandia statistics department on my research relating to diagnostics for LIME
+
+### 2020
+
+- [**isugg-fpca-pfi**](https://goodekat.github.io/presentations/2020-isugg-fpca-pfi/slides_with_SAND.pdf): presentation for ISU graphics group on my research with Sandia National Labs relating to explaining neural network predictions with functional data as inputs
+
+- [**isugg-iml**](https://goodekat.github.io/presentations/2020-isugg-iml/slides.html): presentation for ISU graphics group providing an overview of research on using visualizaiton for explainable machine learning
