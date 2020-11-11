@@ -2,6 +2,8 @@
 
 ### 2020
 
+- [**aaai-fpca-pfi**](https://goodekat.github.io/presentations/2020-aaai-fpca-pfi/slides.pdf): presentation for the AAAI fall symposium on Artificial Intelligence in Government and Public Sector
+
 - [**isugg-fpca-pfi**](https://goodekat.github.io/presentations/2020-isugg-fpca-pfi/slides_with_SAND.pdf): presentation for ISU graphics group on my research with Sandia National Labs relating to explaining neural network predictions with functional data as inputs
 
 - [**isugg-iml**](https://goodekat.github.io/presentations/2020-isugg-iml/slides.html): presentation for ISU graphics group providing an overview of research on using visualization for explainable machine learning
