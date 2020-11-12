@@ -1,0 +1,645 @@
+---
+title: "The Delta Method and msm R Rackage"
+author: 
+  - "<br>"
+  - "Iowa State University, Ecology 607"
+  - "November 16, 2020"
+  - "Katherine Goode (kgoode\\@iastate.edu)"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE}
+# R packages
+library(knitr)
+library(xaringanthemer)
+
+options(htmltools.dir.version = FALSE)
+
+# R markdown options
+opts_chunk$set(
+  dpi = 200,
+  message = FALSE,
+  fig.align = "center"
+)
+```
+
+```{r xaringan-themer, include = FALSE, warning = FALSE}
+style_mono_accent(
+  base_color = "#1c5253",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google = google_font("Montserrat", "300", "300i"),
+  code_font_google = google_font("Fira Mono"), 
+  text_slide_number_color = "black", 
+  header_h1_font_size = "2rem", 
+  header_h2_font_size = "1.5rem", 
+  header_h3_font_size = "1.25rem"
+)
+```
+
+# Background: AES Stats Consulting
+
+- Offer help with data analyses for ISU researchers (includes graduate students, post docs, faculty, and staff)
+
+- Consulting website: [https://www.stat.iastate.edu/statistical-consulting](https://www.stat.iastate.edu/statistical-consulting)
+
+```{r echo = FALSE, out.width = "90%"}
+include_graphics("figures/aes.png")
+```
+
+---
+
+# Overview
+
+<br>
+
+1. What is the delta method?  
+
+2. Mathematical details  
+
+3. `msm` R package  
+
+4. Using `purrr` with `msm`
+
+---
+
+class: inverse, center, middle
+
+# What is the delta method?
+
+---
+
+# Computing a confidence interval
+
+Suppose you take measurements of the length of 30 frogs and want to compute:
+
+- mean length  
+
+- standard deviation of lengths  
+
+- confidence interval for a mean
+
+What do you need to compute a confidence interval for a mean? 
+
+<br>
+
+```{r echo = FALSE, out.width = "45%"}
+include_graphics("figures/frog.jpeg")
+```
+
+---
+
+# Standard error
+
+Confidence interval for a sample mean:
+ 
+<br>
+
+$$\bar{y} \pm z \cdot \mbox{SE}\left[\bar{y}\right]$$
+
+<br>
+
+where $\bar{y}$ is the sample mean, $z$ is a normal quantile, and 
+
+<br>
+
+$$\mbox{SE}\left[\bar{y}\right] = \mbox{sd}\left[\bar{y}\right] = \sqrt{Var\left[\bar{y}\right]} = \frac{s}{\sqrt{n}}$$
+
+<br>
+
+where $s$ is the sample standard deviation and $n$ is the sample size.
+
+<br>
+
+### Standard error: estimate of variability associated with a statistic
+
+---
+
+# Computing standard errors
+
+Some standard errors can be derived using nice properties and have commonly known "nice" formulas (like a sample mean)
+
+<br>
+
+$$
+\begin{array}
+\mbox{SE}\left[\bar{y}\right] & = & \sqrt{Var\left[\frac{1}{n} \sum_{i=1}^n y_i \right]} \\
+& = & \sqrt{\left(\frac{1}{n}\right)^2\left(\sum_{i=1}^n Var\left[y_i\right]\right)}\\
+& = & \sqrt{\frac{1}{n^2}\left(n Var\left[y_i \right]\right)}\\
+& = & \sqrt{\frac{1}{n}Var\left[y_i\right]}\\
+& = & \frac{\sqrt{Var\left[y_i\right]}}{\sqrt{n}}\\
+& = & \frac{s}{\sqrt{n}}
+\end{array}
+$$
+
+<br>
+
+Others do not...
+
+---
+
+# Estimating tricky standard errors 
+
+### Delta method: general approach to estimating standard errors
+
+If
+
+- you have a parameter estimate you want to compute a standard error for
+
+- but it doesn't have a commonly used formula
+
+<br>
+
+and
+
+- your parameter estimate is a function of other parameters that do have computed standard errors 
+
+- some other assumptions are met (to be discussed)
+
+<br>
+
+then
+
+- *delta method* can be used to compute the standard error
+
+---
+
+# Mark Recapture Example
+
+Suppose you have data on mule deer survival and calculate several quantities: 
+
+<br>
+
+**(1) Logistic regression equation in MARK for quarterly survival:**
+
+<br>
+
+$$\log\left(\frac{S_i}{1-S_i}\right)=\beta_0+\beta_1\cdot\mbox{age}_i+\beta_2\cdot \mbox{age}_i^2$$ 
+
+for $i=1,...,n$ where $S_i$ represents the quarterly survival at $\mbox{age}_i$
+
+<br>
+
+**(2) Quarterly survival estimates for specific ages:**
+
+<br>
+
+$$S_i=\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}_i+\beta_2\cdot\mbox{age}_i^2\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}_i+\beta_2\cdot\mbox{age}_i^2\right)}.$$
+
+---
+
+<br>
+
+**(3) Annual survival for a specific age:** 
+
+$$(S_i)^4$$
+
+<br>
+
+Now suppose that you are interested in obtaining confidence intervals for the $\beta$'s, $S_i$ and $(S_i)^4$. Which have nicely derived standard error formulas? 
+<br>
+<br>
+
+- $\beta$'s
+
+<br>
+
+- $S_i$
+
+<br>
+
+- $(S_i)^4$
+
+---
+
+<br>
+
+**(3) Annual survival for a specific age:** 
+
+$$(S_i)^4$$
+
+<br>
+
+Out of the quantities in these formulas, which have nicely derived standard error formulas? 
+
+<br>
+
+- $\beta$'s - Yes!
+
+<br>
+
+- $S_i$ - Yes!
+
+<br>
+
+- $(S_i)^4$ - No, will need to derive the standard error using delta method
+
+---
+
+# Summary
+
+<br>
+
+- Standard errors estimate variability associated with a statistic
+
+<br>
+
+- Standard errors are often used to compute confidence intervals
+
+<br>
+
+- **When you need to obtain a standard error for a statistic that doesn't have a nice formula...**
+
+  - **Delta method can be helpful!**
+  
+  - **(In certain situations)**
+
+---
+
+class: inverse, center, middle
+
+# Mathematical Details
+
+---
+
+# Definitions
+
+| Value | Definition | Example |
+| :---: | :--------: | :-----: |
+| $\boldsymbol{\theta}=(\theta_1,...,\theta_p)$ |  parameter vector with mean $\boldsymbol{\theta}$ and covariance matrix $c_n^2\boldsymbol{\Sigma}$ | $\boldsymbol{\beta}=\left(\beta_0, \beta_1, \beta_2\right)$ |
+| $\hat{\boldsymbol{\theta}}_n$ | a sequence of asymptotically normal estimators of $\boldsymbol{\theta}$ | $\hat{\boldsymbol{\beta}}_n=\left(\hat{\beta}_0, \hat{\beta}_1, \hat{\beta}_2\right)$ |
+| $g(\boldsymbol{\theta})$ | a real-valued function of $\boldsymbol{\theta}$ that is continuously differentiable in a neighborhood of $\boldsymbol{\theta}$ | $S^4=g\left(\boldsymbol{\beta}\right) =\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^4$ |
+| $g\left(\hat{\boldsymbol{\theta}}\right)$ | vector of estimates of $g(\boldsymbol{\theta})$ | $\hat{S^4} = g\left(\hat{\boldsymbol{\beta}}_n\right)=\left(g\left(\hat{\beta}_0\right), g\left(\hat{\beta}_1\right), g\left(\hat{\beta}_2\right)\right)$|
+
+---
+
+# The Delta Method
+
+When the data are IID:
+
+$$g\left(\hat{\boldsymbol{\theta}}\right) \sim N\left(g(\boldsymbol{\theta}), \ \textbf{d}Cov\left(\hat{\boldsymbol{\theta}}\right)\textbf{d}'\right)$$
+where $\textbf{d}$ vector of length $p$ with a $j$th element of $$\frac{\partial g(\boldsymbol{\theta})}{\partial \theta_j}$$
+
+Note that $Cov\left(\hat{\boldsymbol{\theta}}\right)$ is estimated by the negative inverse Hessian matrix
+
+<br>
+
+Thus, the standard error of $g\left(\hat{\boldsymbol{\theta}}\right)$ can be computed as
+
+<br>
+
+$$SE\left(g\left(\hat{\boldsymbol{\theta}}\right)\right)=\sqrt{Cov\left(g\left(\hat{\boldsymbol{\theta}}\right)\right)}=\sqrt{\textbf{d}Cov\left(\hat{\boldsymbol{\theta}}\right)\textbf{d}'}.$$
+
+That is...You can use the above formula to compute the standard error for $g(\hat{\boldsymbol{\theta}})$!
+
+---
+
+$$\left(\frac{\partial g(\boldsymbol{\beta})}{\partial \beta_0}, \frac{\partial g(\boldsymbol{\beta})}{\partial \beta_1}, \frac{\partial g(\boldsymbol{\beta})}{\partial \beta_2}\right)$$
+
+---
+
+# Applying the Delta Method to Derive the Standard Error
+
+In our problem, $\hat{\boldsymbol{\beta}}_n=\left(\hat{\beta}_0, \hat{\beta}_1, \hat{\beta}_2\right)$ is our estimator of $\boldsymbol{\beta}=\left(\beta_0, \beta_1, \beta_2\right)$. Our real-valued function $g(\cdot)$ is
+
+$$g\left(\boldsymbol{\beta}\right)=\left(\frac{\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^4=S^4.$$
+
+Keep in mind that $S$ is a function of age, so that when we compute the estimated variance of $g\left(\boldsymbol{\beta}\right)$, it will be for a specified age.
+
+We need to use $g\left(\boldsymbol{\beta}\right)$ to obtain the elements of $\textbf{d}$ by taking the partial derivatives of $g\left(\boldsymbol{\beta}\right)$ in terms of $\beta_0, \beta_1$, and $\beta_2$. These are listed below with details of the derivation included for the partial derivative of $g(\boldsymbol{\beta})$ in terms of $\beta_0$. The others were computed similarly.
+
+---
+
+# Derivatives 
+
+$$\begin{eqnarray*}
+\frac{\partial g(\boldsymbol{\beta})}{\partial \beta_0}
+& = & \frac{\partial}{\partial \beta_0} \left(\frac{\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^4\\
+\\
+& = & 4\left(\frac{\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^3\times\\
+& & \ \ \ \ \ \frac{\partial}{\partial\beta_0}\left(\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)\left(1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)\right)^{-1}\right)\\
+\\
+& = & 4\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^3\times\\
+& & \ \ \ \ \ \left(\left(\frac{\partial}{\partial\beta_0}\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)\right)\left(1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)\right)^{-1}+\right).\\
+& & \ \ \ \ \ \ \ \ \ \ \left.\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)\left(\frac{\partial}{\partial\beta_0}\left(1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)\right)^{-1}\right)\right)\\
+\\
+& = & 4\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^3\times\\
+& & \ \ \ \ \ \left(\left(\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)(1)\right)\left(1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)\right)^{-1}+\right.\\
+& & \ \ \ \ \ \ \ \ \ \ \left.\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)\left(-\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)(1)}{\left(1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)\right)^{2}}\right)\right)
+\end{eqnarray*}
+\begin{eqnarray*}
+& = & 4\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^3\times\\
+& & \ \ \ \ \ \left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}-\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^{2}\right)\\
+\\
+& = & 4\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^4\left(1-\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)\\
+\\
+\\
+\frac{\partial g(\boldsymbol{\beta})}{\partial \beta_1}
+& = & \frac{\partial}{\partial \beta_1} \left(\frac{\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^4\\
+\\
+& = & 4\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^4\left(1-\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)(\mbox{age})\\
+\\
+\\
+\frac{\partial g(\boldsymbol{\beta})}{\partial \beta_2}
+& = & \frac{\partial}{\partial \beta_2} \left(\frac{\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+
+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^4\\
+\\
+& = & 4\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)^4\left(1-\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}\right)(\mbox{age}^2)
+\end{eqnarray*}$$
+
+Thus,
+  $$\textbf{d}'=\left[\begin{array}{l} 
+  4\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+  \right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}
+  \right)^4\left(1-\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^
+  2\right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}
+  \right)\\
+  4\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+  \right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}
+  \right)^4\left(1-\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+  \right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}
+  \right)(\mbox{age})\\
+  4\left(\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+  \right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}
+  \right)^4\left(1-\frac{\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2
+  \right)}{1+\exp\left(\beta_0+\beta_1\cdot\mbox{age}+\beta_2\cdot\mbox{age}^2\right)}
+  \right)(\mbox{age}^2)
+  \end{array}\right].$$
+  
+With this, we can compute the standard error of $\hat{S}^4=g\left(\hat{\boldsymbol{\beta}}\right)$ for a given age as
+
+$$SE\left[\hat{S}^4\right]=\sqrt{Var\left[g\left(\hat{\boldsymbol{\beta}}\right)\right]}=\sqrt{\textbf{d}Cov\left[\hat{\boldsymbol{\beta}}\right]\textbf{d}'}$$
+
+where the values of $\beta_0$, $\beta_1$, and $\beta_2$ in $\textbf{d}$ will be replaced by $\hat{\beta}_0$, $\hat{\beta}_1$, and $\hat{\beta}_2$.
+
+---
+
+# Function for Computing the Standard Error in R
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(readr)
+```
+
+I wrote the function `compute_annual_se` to implement the delta method computations to compute the standard error for annual survival. The function also returns the estimate of the annual survival and a 95% confidence interval for annual survival. The inputs and outputs of the function are as follows.
+
+Inputs:
+
+* `age`: age at which to compute the annual survival estimate and standard error
+* `betas`: estimated logistic regression coefficients (should be a vector of length 3)
+* `vcov`: estimated variance covariance matrix of the logistic regression coefficients (should be a 3x3 matrix)
+
+Outputs:
+
+* data frame with the variables of 
+    + `Age`: age that was specified for the computations
+    + `Annual_Survival`: estimated annual survival for the specified `Age`
+    + `Annual_SE`: standard error for the annual survival (estimated using the delta method)
+    + `Annual_Lower`: lower bound of the 95% confidence interval for annual survival
+    + `Annual_Upper`: upper bound of the 95% confidence interval for annual survival
+
+The code for the function `compute_annual_se` is included below.
+
+\vspace{0.5cm}
+
+```{r}
+# Function for computing the standard error of the estimate of annual survival
+compute_annual_se <- function(age, betas, vcov){
+  
+  # Separate the betas
+  b0 <- betas[1]
+  b1 <- betas[2]
+  b2 <- betas[3]
+  
+  # Compute the logit of quarterly survival for the given age
+  logit_s <- b0 + (b1 * age) + (b2 * (age^2))
+  
+  # Compute the quarterly survival
+  s <- exp(logit_s) / (1 + exp(logit_s))
+  
+  # Create an empty 1x3 matrix to store the elements of d in
+  d <- matrix(NA, nrow = 1, ncol = 3)
+  
+  # Compute the elements of d (partial derivatives of g(beta))
+  d[1] <- 4 * (s^4) * (1 - s)
+  d[2] <- 4 * age * (s^4) * (1 - s)
+  d[3] <- 4 * (age^2) * (s^4) * (1 - s)
+  
+  # Compute the standard error of annual survival (using the delta method)
+  se <- sqrt(d %*% vcov %*% t(d))
+  
+  # Compute the estimate of annual survival
+  annual <- s^4
+  
+  # Compute the lower and upper bounds of the 95% CI for annual survival
+  lower <- annual - (1.96 * se)
+  upper <- annual + (1.96 * se)
+  
+  # Return the age, annual survial estimate, annual survival standard error, and 
+  # the lower and upper bounds of the 95% CI for the annual survival
+  return(data.frame(Age = age,
+                    Annual_Survival = annual, 
+                    Annual_SE = se, 
+                    Annual_Lower = lower, 
+                    Annual_Upper = upper))
+  
+}
+```
+
+# Applying the Standard Error Function
+
+I transferred the values from the `AgeEquations.xlsx` spreadsheet that Bob provided to me to separate .csv files. These files are described and read in below.
+
+The file `age_and_survival.csv` contains a data frame with the logit of quarterly survival, quarterly survival, standard error of quarterly survival, and annual survival computed by Bob based on the logistic regression model fit in MARK. This dataset is read in with the following code, and the first six rows of the dataset are included in the table below.
+
+\vspace{0.5cm}
+
+```{r}
+# Read in the survival data put together by Bob
+survival_data <- read.csv("../../../../Desktop/consulting/clients/Klaver_Bob/data/age_and_survival.csv") %>%
+  rename(Quarterly = S..Qarterly.,
+         Annual = S.Annual.)
+```
+
+\vspace{0.25cm}
+
+```{r echo = FALSE}
+# Print the head of the survival data
+kable(head(survival_data))
+```
+
+The file `betas.csv` contains the estimates of logistic regression coefficients, and the file `vcov.csv` contains the estimated covariance matrix of coefficients. These files are read in with the following code.
+
+\vspace{0.5cm}
+
+```{r}
+# Read in the beta estimates and the variance covariance matrix of the betas
+betas <- read_csv("../../../../Desktop/consulting/clients/Klaver_Bob/data/betas.csv", col_names = FALSE) %>% as.matrix()
+vcov <- read_csv("../../../../Desktop/consulting/clients/Klaver_Bob/data/vcov.csv", col_names = FALSE) %>% as.matrix()
+```
+
+\vspace{0.25cm}
+
+The estimates of the coefficients are $\boldsymbol{\hat{\beta}}=\left(\right.$ `r sprintf("%.2f, %.2f, %.2f", betas[1], betas[2], betas[3])` $\left.\right)$, and the estimated variance covariance matrix, $Var\left[\hat{\beta}\right]$ is as follows.
+
+```{r echo = FALSE}
+kable(round(vcov, 3), col.names = rep("", 3))
+```
+
+The following code applies the `compute_annual_se` function to all of the ages included in the `survival_data`. This code makes use of the `map_df` function from the `purrr` package in R, which is similar to the apply family in base R. The first six rows of the resulting dataset are shown in the table below.
+
+\vspace{0.5cm}
+
+```{r}
+# Apply the compute_annual_se function to all of the ages in the survival data
+survival_data_annual <- purrr::map_df(survival_data$Age, 
+                                      compute_annual_se, 
+                                      betas = betas, 
+                                      vcov = vcov)
+```
+
+\vspace{0.25cm}
+
+```{r echo = FALSE}
+# Print the head of the survival_data_annual
+kable(head(survival_data_annual))
+```
+
+The code below joins Bob's survival dataset with the dataset obtained using the `compute_annual_se` function. It also renames some of the variables in Bob's dataset to better distinguish the variables, and it computes 95% confidence intervals for $S^4$ by first computing 95% confidence intervals for $S$ and then raising the lower and upper bounds to the fourth power. The first six rows of the resulting dataset are shown in the two tables below.
+
+\vspace{0.5cm}
+
+```{r}
+# Join Bob's survival data with the values computed by the compute_annual_se function
+# Also rename some variables and add the "easy" CI bounds
+survival_data_joined <- full_join(survival_data, survival_data_annual, by = "Age") %>%
+  rename(Quarterly_Survival = Quarterly,
+         Quarterly_SE = SE, 
+         Annual_Survival_Bob = Annual) %>%
+  mutate(Annual_Lower_Easy = (Quarterly_Survival - (1.96 * Quarterly_SE))^4,
+         Annual_Upper_Easy = (Quarterly_Survival + (1.96 * Quarterly_SE))^4)
+```
+
+\vspace{0.25cm}
+
+```{r echo = FALSE}
+# Print the head of the survival_data_joined
+kable(head(survival_data_joined)[,1:6])
+kable(head(survival_data_joined)[,7:11])
+```
+
+The plot below shows the estimated annual survival (black solid line) versus age. The blue dashed lines are the 95% confidence interval for annual survival computed using the delta method, and the grey dotted lines are the 95% confidence interval computed the "easy" way by raising the lower and upper bounds of the confidence interval for the quarterly survival to the fourth power.
+
+\vspace{0.5cm}
+
+```{r echo = FALSE, fig.width = 7, fig.height = 5}
+# Plot the estimated annual survival and confidence intervals
+ggplot(survival_data_joined, aes(x = Age, y = Annual_Survival)) + 
+  geom_line() +
+  geom_line(aes(x = Age, y = Annual_Lower), linetype = "dashed", color = "blue") + 
+  geom_line(aes(x = Age, y = Annual_Upper), linetype = "dashed", color = "blue") + 
+  geom_line(aes(x = Age, y = Annual_Lower_Easy), linetype = "dotted", color = "darkgrey") + 
+  geom_line(aes(x = Age, y = Annual_Upper_Easy), linetype = "dotted", color = "darkgrey") +
+  labs(y = "Annual Surivial") + 
+  theme_classic()
+```
+
+# Comparing My Function to `msm` R Package Function
+
+While working on this problem, I discovered that the R package `msm` contains the function `deltamethod` that can be used to apply the delta method to obtain a standard error. This function requires a formula representing the function $g(\cdot)$ as the first argument, the estimated coefficients from the logistic regression as the second argument, and the variance-covariance matrix of the coefficients for the third argument. I wrote the function `apply_msm_deltamethod` to apply the function `deltamethod` to a specified age. The inputs and output of the function are as follows.
+
+Inputs:
+
+* `age`: age at which to compute the annual survival estimate and standard error
+* `betas`: estimated logistic regression coefficients (should be a vector of length 3)
+* `vcov`: estimated variance covariance matrix of the logistic regression coefficients (should be a 3x3 matrix)
+
+Outputs:
+
+* data frame with the variables of 
+    + `Age`: age that was specified for the computations
+    + `msm_SE`: SE of annual survival that was computed using the msm function `deltamethod` for the specified age
+    
+The code for the function is shown below.
+
+\vspace{0.5cm}
+
+```{r}
+# Function for applying the msm function deltamethod to a specified age
+apply_msm_deltamethod <- function(age, betas, vcov){
+  
+  # Create the form of the formula to put in the deltamethod function
+  formula <- sprintf("~ (exp(x1 + (x2 * %f) + (x3 * %f)) / 
+                     (1 + exp(x1 + (x2 * %f) + (x3 * %f))))^4", age, age^2, age, age^2)
+
+  # Apply the deltamethod function
+  se = msm::deltamethod(as.formula(formula), mean = betas, cov = vcov)
+  
+  # Return the se in a dataframe
+  return(data.frame(Age = age,
+                    msm_SE = se))
+    
+}
+```
+
+\vspace{0.25cm}
+
+The code below uses the function `apply_msm_deltamethod` to apply the `msm` function `deltamethod` to all of the ages in the survival data. It then joins the newly computed standard error to the survival data. The first six rows of the resulting data frame are shown in the table below.
+
+\vspace{0.5cm}
+
+```{r}
+# Compute the annual standard errors for all ages using the deltamethod function
+mse_values <- purrr::map_df(survival_data_joined$Age, 
+                            apply_msm_deltamethod, 
+                            betas = betas, 
+                            vcov = vcov)
+```
+
+\vspace{0.25cm}
+
+```{r echo = FALSE}
+# Print the head of the survival_data_joined
+kable(head(mse_values))
+```
+
+The plot below shows the annual standard error that I computed versus the standard error computed by the `msm` package. The solid line is the 1-1 line. All of the points appear to fall on this lines, which indicates that my computations agree with the `msm` package.
+
+\vspace{0.5cm}
+
+```{r echo = FALSE, fig.width = 4, fig.height = 2, fig.align = "center"}
+# Join the msm_SE with the survival data and plot my SE versus the msm SE
+full_join(survival_data_joined, mse_values, by = "Age") %>%
+  ggplot(aes(x = msm_SE, y = Annual_SE)) +
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0) + 
+  theme_classic()
+```
+
+---
+
+# Additional Resource
+
+A good reference on the delta method that also describes how to apply the delta method in R can be found on the [IDRE website](https://stats.idre.ucla.edu/r/faq/how-can-i-estimate-the-standard-error-of-transformed-regression-parameters-in-r-using-the-delta-method/).
