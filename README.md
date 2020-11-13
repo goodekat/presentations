@@ -2,9 +2,9 @@
 
 ### 2020
 
-- [**aaai-fpca-pfi**](https://goodekat.github.io/presentations/2020-aaai-fpca-pfi/slides.pdf): presentation for the AAAI fall symposium on Artificial Intelligence in Government and Public Sector on my research with Sandia National Labs relating to explaining neural network predictions with functional data as inputs
-
 - [**isu-delta-method**](https://goodekat.github.io/presentations/2020-isu-delta-method/slides.html): presentation for ISU ecology 607 on the delta method and msm R package
+
+- [**aaai-fpca-pfi**](https://goodekat.github.io/presentations/2020-aaai-fpca-pfi/slides.pdf): presentation for the AAAI fall symposium on Artificial Intelligence in Government and Public Sector on my research with Sandia National Labs relating to explaining neural network predictions with functional data as inputs
 
 - [**isugg-fpca-pfi**](https://goodekat.github.io/presentations/2020-isugg-fpca-pfi/slides_with_SAND.pdf): presentation for ISU graphics group on my research with Sandia National Labs relating to explaining neural network predictions with functional data as inputs
 
