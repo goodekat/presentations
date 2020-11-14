@@ -145,7 +145,6 @@ Others do not...
 When computing "tricky" standard errors, it may be helpful to use the...
 
 &gt; **Delta method**: approach to approximate standard errors of transformed parameters
-
 If
 
 - want a SE for a parameter estimate
@@ -413,7 +412,6 @@ library(dplyr); library(readr)
 # standard error of quarterly survival, and annual survival 
 # computed based on the logistic regression model fit in MARK
 survival_data &lt;- read_csv("data/deer_model_results.csv")
-
 # Print the head of the data
 head(survival_data)
 ```
@@ -495,34 +493,27 @@ Output: data frame with the variables of...
 ```r
 # Function for computing annual survival standard error
 compute_annual_se &lt;- function(age, betas, vcov){
-
   # Separate the betas
   b0 &lt;- betas[1]; b1 &lt;- betas[2]; b2 &lt;- betas[3]
-
   # Compute logit of quarterly survival for given age
   logit_s &lt;- b0 + (b1 * age) + (b2 * (age^2))
-
   # Compute quarterly and annual survival
   s &lt;- exp(logit_s) / (1 + exp(logit_s))
   annual &lt;- s^4
   
   # Create empty 1x3 matrix to store the elements of d
   d &lt;- matrix(NA, nrow = 1, ncol = 3)
-
   # Compute elements of d (partial derivatives of g(beta))
   d[1] &lt;- 4 * (s^4) * (1 - s)
   d[2] &lt;- 4 * age * (s^4) * (1 - s)
   d[3] &lt;- 4 * (age^2) * (s^4) * (1 - s)
-
   # Compute standard error of annual survival (using delta method)
 * se &lt;- sqrt(d %*% vcov %*% t(d))
   
   # Compute lower and upper bounds of 95% CI for annual survival
 * lower &lt;- annual - (1.96 * se); upper &lt;- annual + (1.96 * se)
-
   # Return age, annual survival estimate, standard error, 95% CI
   return(data.frame(age, annual_survival = annual, se, lower, upper))
-
 }
 ```
 ]
@@ -630,11 +621,9 @@ class: inverse, center, middle
 - From the online [documentation](https://cran.r-project.org/web/packages/msm/index.html):
 
 &gt; R package for continuous-time multi-state modeling of panel data
-
 - From the [vignette](https://cran.r-project.org/web/packages/msm/vignettes/msm-manual.pdf):
 
 &gt; The multi-state Markov model is a useful way of describing a process in which an individual moves through a series of states in continuous time. The msm package for R allows a general multi-state model to be fitted to longitudinal data.
-
 .content-box[
 - Provides an easier way to apply the delta method:
 
@@ -657,7 +646,6 @@ Inputs:
 &gt; `$$g(\hat{\boldsymbol{\beta}})=\frac{1}{\hat{\beta}_0+\hat{\beta}_1}$$`
 &gt;
 &gt; then type function as: `g = ~ 1 / (x1 + x2)`
-
 - `mean	` = vector of estimated parameters: `\(\hat{\boldsymbol{\theta}}\)`
 
 - `cov` = estimated variance-covariance matrix: `\(Cov\left(\hat{\boldsymbol{\theta}}\right)\)`
@@ -688,11 +676,9 @@ Compute standard error for
 set.seed(1000)
 x1 &lt;- 1:100; y &lt;- rnorm(100, 4*x1, 5)
 m1 &lt;- lm(y ~ x1)
-
 # Extract the model coefficients and variance-covariance matrix
 bhat1 &lt;- coef(m1)
 vc1 &lt;- vcov(m1)
-
 # Estimate of (1 / (b0hat + b1hat))
 1 / (bhat1[[1]] + bhat1[[2]])
 ```
@@ -732,11 +718,9 @@ Compute standard error for
 set.seed(1000)
 x1 &lt;- 1:100; x2 &lt;- runif(100); y &lt;- rnorm(100, 4*x1, 5)
 m2 &lt;- lm(y ~ x1 + x2)
-
 # Extract the model coefficients and variance-covariance matrix
 bhat2 &lt;- coef(m2)[1:2]
 vc2 &lt;- vcov(m2)[1:2,1:2]
-
 # Estimate of (1 / (b0hat + b1hat))
 1 / (bhat2[[1]] + bhat2[[2]])
 ```
@@ -788,7 +772,6 @@ For the mule deer example, compute the standard error for `\(\hat{S^4}\)` when `
 ```r
 # Create the form of the formula to put in the deltamethod function
 formula = "~ (exp(x1 + x2 + x3)) / (1 + exp(x1 + x2 + x3))^4"
-
 # Apply the deltamethod function
 se = msm::deltamethod(
   as.formula(formula),
@@ -805,7 +788,6 @@ se
 Bonus: How to compute the standard error for `\(\hat{S^4}\)` for an arbitrary age in R?
 
 &gt; See next slide
-
 ---
 
 ## Arbitrary age
@@ -815,19 +797,15 @@ Function for applying the msm function deltamethod to a specified age:
 
 ```r
 apply_msm_deltamethod &lt;- function(age, betas, vcov){
-
   # Create the form of the formula to put in the deltamethod function
   formula &lt;- 
     sprintf("~ (exp(x1 + (x2 * %f) + (x3 * %f)) /
             (1 + exp(x1 + (x2 * %f) + (x3 * %f))))^4", 
             age, age^2, age, age^2)
-
   # Apply the deltamethod function
   se = msm::deltamethod(as.formula(formula), mean = betas, cov = vcov)
-
   # Return the se in a dataframe
   return(data.frame(age, se))
-
 }
 ```
 
@@ -1090,21 +1068,17 @@ Let's consider two examples:
 (1) Age = Juvenile, Site = Rural, Time = 1999
 
 &gt; All of these categories are the reference categories in the model, which means they are contained in the intercept. As a result,
-
 &gt; `$$g\left(\boldsymbol{\beta}\right)  = f=\frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{(1+e^{\eta_r\left(\boldsymbol{\beta}\right)})(1+e^{\eta_S\left(\boldsymbol{\beta}\right)})}=\frac{e^{\beta_{r,0}}}{(1+e^{\beta_{r,0}})(1+e^{\beta_{S,0}})}.$$`
-
 &gt; In R: 
 
 ```r
 g_jr99 = "~ exp(x1) / ((1 + exp(x1)) * (1 + exp(x2)))"
 ```
-
 &lt;br&gt;
 
 (2) Age = Sub Adult, Site = Urban, Time = 2000
 
 &gt; None of these categories are reference categories, so this calculation will be a bit more complicated...
-
 ---
 
 .medium[
