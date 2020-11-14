@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ### Iowa State University, Ecology 607
 ### November 16, 2020
 ### Katherine Goode (kgoode@iastate.edu)
-### <br><br>Find slides at: goodekat.github.io/presentations.html
+### <br><br><small>Find slides at: goodekat.github.io/presentations.html
 
 ---
 
@@ -26,7 +26,7 @@ class: center, middle, inverse, title-slide
 &lt;style type="text/css"&gt;
 .tiny{font-size: 30%}
 .small{font-size: 50%}
-.medium{font-size: 75%}
+.medium{font-size: 90%}
 &lt;/style&gt;
 
 
@@ -54,6 +54,8 @@ class: center, middle, inverse, title-slide
 3. Delta method in R by hand
 
 4. Delta method in R via `msm`
+
+5. A more complicated example
 
 ---
 
@@ -315,8 +317,6 @@ What is the notation in this context?
 
 ## Computing mule deer standard error
 
-&lt;br&gt;
-
 Now, how to compute the standard error for `\(S_i^4\)`?
 
 &lt;br&gt;
@@ -400,7 +400,7 @@ library(dplyr); library(readr)
 # Load data frame of quarterly survival, quarterly survival, 
 # standard error of quarterly survival, and annual survival 
 # computed based on the logistic regression model fit in MARK
-survival_data &lt;- read_csv("data/age_and_survival.csv")
+survival_data &lt;- read_csv("data/deer_age_and_survival.csv")
 
 # Print the head of the data
 head(survival_data)
@@ -427,7 +427,7 @@ head(survival_data)
 
 ```r
 # Load logistic regression coefficient estimates
-betas &lt;- read_csv("data/betas.csv", col_names = FALSE) %&gt;% as.matrix()
+betas &lt;- read_csv("data/deer_betas.csv", col_names = FALSE) %&gt;% as.matrix()
 betas
 ```
 
@@ -443,7 +443,7 @@ betas
 
 ```r
 # Load estimated variance covariance matrix of the logistic regression coefficients
-vcov &lt;- read_csv("data/vcov.csv", col_names = FALSE) %&gt;% as.matrix()
+vcov &lt;- read_csv("data/deer_vcov.csv", col_names = FALSE) %&gt;% as.matrix()
 vcov
 ```
 
@@ -860,6 +860,581 @@ purrr::map_df(.x = 1:11, .f = apply_msm_deltamethod, betas, vcov)
 - A good reference on the delta method that also describes how to apply the delta method in R can be found on the [IDRE website](https://stats.idre.ucla.edu/r/faq/how-can-i-estimate-the-standard-error-of-transformed-regression-parameters-in-r-using-the-delta-method/).
 
 - Another delta method function ([`delta.method`](https://www.rdocumentation.org/packages/alr3/versions/1.1.12/topics/delta.method#:~:text=estimated%20regression%20coefficients-,delta.,known%20or%20estimated%20covariance%20matrix)) the [alr3](https://www.rdocumentation.org/packages/alr3/versions/1.1.12) R package
+
+---
+
+class: inverse, center, middle
+
+# A more complicated example
+
+---
+
+## Canadian goose data
+
+.pull-left[
+- Canada goose banding and recovery data using Burnham joint live-dead mark recapture models in RMark
+
+- Burnham model uses Seber parameterization 
+  - `\(S\)` = survival
+  - `\(F\)` = fidelity
+  - `\(r\)` = dead recovery rate
+  - `\(p\)` = live recapture rate
+]
+
+.pull-right[
+&lt;img src="figures/geese.jpeg" width="100%" style="display: block; margin: auto;" /&gt;
+]
+ 
+- Interested in point estimate and 95% confidence intervals for Brownie parameterization of dead recovery rate (f): 
+  `$$f=r(1-S)$$`
+  
+- Not a way to change parameterization in RMark for Burnham models or a previously derived estimator for SE of `\(f\)`
+
+- Let's use the delta method!
+
+---
+
+## More details on the data
+
+**Three predictor variables:**
+
+- Age (3 levels):  
+  - Juvenile: 0 yrs old, binned as (0, 0.5]
+  - Sub adult: 1 or 2 yrs old, binned as (0.5, 2.5]
+  - Adult: 3 yrs or older, binned as (2.5, 23]
+  
+- Site (2 levels): Rural or urban 
+
+- Time (21 levels): Year as a factor from 1999-2019
+
+---
+
+## More details on the Rmark models
+
+**Mark recapture models: **
+
+  - `\(S\)`, `\(F\)`, `\(r\)`, and `\(p\)` are all modeled using logistic regressions with formulas including age x site x time
+  
+  - For example:
+
+`$$\log\left(\frac{r}{1-r}\right) \sim \mbox{age} \times \mbox{site} \times \mbox{time}$$`
+`$$\log\left(\frac{S}{1-S}\right) \sim \mbox{age} \times \mbox{site} \times \mbox{time}$$`
+
+- Have beta estimates and the variance-covariance matrix for `\(r\)` and `\(S\)` 
+
+**Load models and extract betas and variance-covariance matrix:**
+
+
+```r
+geese_models = readRDS("data/geese_model_results.rds")
+geese_betas &lt;- geese_models$results$beta
+geese_vc &lt;- geese_models$results$beta.vcv
+```
+
+---
+
+## Coefficients and variance covariance matrix
+
+
+```r
+str(geese_betas)
+```
+
+```
+## 'data.frame':	492 obs. of  4 variables:
+##  $ estimate: num  1.017 -0.885 -0.165 0.282 0.54 ...
+##  $ se      : num  0.805 7.243 0.822 3.616 1.073 ...
+##  $ lcl     : num  -0.562 -15.082 -1.775 -6.805 -1.563 ...
+##  $ ucl     : num  2.6 13.31 1.45 7.37 2.64 ...
+```
+
+
+```r
+str(geese_vc)
+```
+
+```
+##  num [1:492, 1:492] 0.649 -4.491 -0.646 -1.883 -0.564 ...
+```
+
+
+```r
+head(geese_betas)
+```
+
+```
+##                  estimate        se         lcl       ucl
+## S:(Intercept)   1.0168546 0.8054464  -0.5618204  2.595530
+## S:age(0.5,2.5] -0.8853253 7.2430156 -15.0816360 13.310986
+## S:age(2.5,23]  -0.1645426 0.8218269  -1.7753233  1.446238
+## S:siteUrban     0.2818604 3.6156143  -6.8047437  7.368465
+## S:time2000      0.5401300 1.0729408  -1.5628339  2.643094
+## S:time2001      1.4300495 0.8101876  -0.1579182  3.018017
+```
+
+---
+
+## Applying the delta method
+
+### Step 1: Need to determine `\(g\left(\boldsymbol{\beta}\right)\)` (that is, how is `\(f\)` related to the `\(\boldsymbol{\beta}\)`s)
+
+This relationship will be passed into the `deltamethod` function. 
+
+Recall `\(f = r(1-S)\)` and let...
+
+.pull-left[
+&lt;small&gt;
+`\begin{eqnarray*}
+\eta_r\left(\boldsymbol{\beta}\right) &amp; = &amp; \log\left(\frac{r}{1-r}\right)\\
+&amp; = &amp; \beta_{r,Intercept} + \\
+&amp; &amp; \beta_{r,Sub Adult} \times I[\mbox{age = sub adult}]\\
+&amp; &amp; +\beta_{r,Adult} \times I[\mbox{age = adult}]\\
+&amp; &amp; + \beta_{r,Urban} \times I[\mbox{rite = urban}]\\
+&amp; &amp; + \beta_{r,2000} \times I[\mbox{year = 2000}]\\
+&amp; &amp; + \beta_{r,2001} \times I[\mbox{year = 2001}]\\
+&amp; &amp; \vdots\\
+&amp; &amp; + \beta_{r,Adult,Urban,2019}\\
+&amp; &amp; \ \ \ \times I[Age = Adult] \\ 
+&amp; &amp; \ \ \ \times I[Site = Urban]\\
+&amp; &amp; \ \ \ \times I[Time = 2019]
+\end{eqnarray*}`
+&lt;/small&gt;
+]
+
+.pull-right[
+&lt;small&gt;
+`\begin{eqnarray*}
+\eta_S\left(\boldsymbol{\beta}\right) &amp; = &amp; \log\left(\frac{S}{1-S}\right)\\
+&amp; = &amp; \beta_{S,Intercept} + \\
+&amp; &amp; \beta_{S,Sub Adult} \times I[\mbox{age = sub adult}]\\
+&amp; &amp; +\beta_{S,Adult} \times I[\mbox{age = adult}]\\
+&amp; &amp; + \beta_{S,Urban} \times I[\mbox{Site = urban}]\\
+&amp; &amp; + \beta_{S,2000} \times I[\mbox{year = 2000}]\\
+&amp; &amp; + \beta_{S,2001} \times I[\mbox{year = 2001}]\\
+&amp; &amp; \vdots\\
+&amp; &amp; + \beta_{S,Adult,Urban,2019}\\
+&amp; &amp; \ \ \ \times I[Age = Adult] \\ 
+&amp; &amp; \ \ \ \times I[Site = Urban]\\
+&amp; &amp; \ \ \ \times I[Time = 2019]
+\end{eqnarray*}`
+&lt;/small&gt;
+]
+
+---
+
+If we solve
+
+`$$\eta_r\left(\boldsymbol{\beta}\right)=\log\left(\frac{r}{1-r}\right) \ \ \ \ \ \mbox{ and } \ \ \ \ \ \eta_S\left(\boldsymbol{\beta}\right)=\log\left(\frac{S}{1-S}\right)$$`
+
+&lt;br&gt;
+
+for `\(r\)` and `\(S\)`, we get:
+
+`$$r = \frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_r\left(\boldsymbol{\beta}\right)}} \ \ \ \ \ \mbox{ and } \ \ \ \ \ S = \frac{e^{\eta_S\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_S\left(\boldsymbol{\beta}\right)}}$$`
+
+Finally, we can relate `\(f\)` to the `\(\beta\)`s as:
+
+$$ 
+`\begin{eqnarray}
+f &amp; = &amp; r(1-S)\\
+&amp; = &amp; \frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_r\left(\boldsymbol{\beta}\right)}}\left(1 -\frac{e^{\eta_S\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_S\left(\boldsymbol{\beta}\right)}}\right)\\
+&amp; = &amp; \frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_r\left(\boldsymbol{\beta}\right)}}\left(\frac{1+e^{\eta_S\left(\boldsymbol{\beta}\right)}-e^{\eta_S\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_S\left(\boldsymbol{\beta}\right)}}\right)\\
+&amp; = &amp; \frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{(1+e^{\eta_r\left(\boldsymbol{\beta}\right)})(1+e^{\eta_S\left(\boldsymbol{\beta}\right)})}\\
+&amp; = &amp; g\left(\boldsymbol{\beta}\right) 
+\end{eqnarray}`
+$$
+
+---
+
+## Applying the delta method
+
+### Step 2: Code `\(g(\boldsymbol{\beta})\)` as a formula in R
+
+Let's consider two examples: 
+
+#### 1. Age = Juvenile, Site = Rural, Time = 1999
+
+All of these categories are the reference categories in the model, which means they are contained in the intercept. As a result,
+
+`$$g\left(\boldsymbol{\beta}\right)  = f=\frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{(1+e^{\eta_r\left(\boldsymbol{\beta}\right)})(1+e^{\eta_S\left(\boldsymbol{\beta}\right)})}=\frac{e^{\beta_{r,0}}}{(1+e^{\beta_{r,0}})(1+e^{\beta_{S,0}})}.$$`
+In R:
+
+
+```r
+g_jr99 = "~ exp(x1) / ((1 + exp(x1)) * (1 + exp(x2)))"
+```
+
+#### 2. Age = Sub Adult, Site = Urban, Time = 2000
+
+None of these categories are reference categories, so this calculation will be a bit more complicated...
+
+---
+
+.medium[
+Again, 
+
+`$$g\left(\boldsymbol{\beta}\right) = f=\frac{e^{\eta_r \left(\boldsymbol{\beta}\right)}}{(1+e^{\eta_r \left(\boldsymbol{\beta}\right)})(1+e^{\eta_S \left(\boldsymbol{\beta}\right)})},$$`
+
+but in this situation,
+
+.pull-left[
+`\begin{eqnarray*}
+\eta_r\left(\boldsymbol{\beta}\right) &amp; = &amp; \beta_{r,Intercept}\\
+&amp; &amp; +\beta_{r,SubAdult}\\
+&amp; &amp; +\beta_{r,Urban}\\
+&amp; &amp; +\beta_{r,2000}\\
+&amp; &amp; +\beta_{r,SubAdult,Urban}\\
+&amp; &amp; +\beta_{r,SubAdult,2000}\\
+&amp; &amp; +\beta_{r,Urban,2000}\\
+&amp; &amp; +\beta_{r,SubAdult,Urban,2000}
+\end{eqnarray*}`
+]
+
+.pull-right[
+`\begin{eqnarray*}
+\eta_S \left(\boldsymbol{\beta}\right) &amp; = &amp; \beta_{S,Intercept}\\
+&amp; &amp; +\beta_{S,SubAdult}\\
+&amp; &amp; +\beta_{S,Urban}\\
+&amp; &amp; +\beta_{S,2000}\\
+&amp; &amp; +\beta_{S,SubAdult,Urban}\\
+&amp; &amp; +\beta_{S,SubAdult,2000}\\
+&amp; &amp; +\beta_{S,Urban,2000}\\
+&amp; &amp; +\beta_{S,SubAdult,Urban,2000}.
+\end{eqnarray*}`
+]
+
+In R:
+
+
+```r
+g_su00_part1 = "(exp(x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8))" 
+g_su00_part2 = "(1 + exp(x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8))"
+g_su00_part3 = "(1 + exp(x9 + x10 + x11 + x12 + x13 + x14 + x15 + x16))"
+g_su00 = paste0("~", g_su00_part1, "/", 
+                  "(", g_su00_part2, "*", g_su00_part3, ")")
+```
+]
+
+---
+
+## Applying the delta method
+
+### Step 3: Obtain correct subset of `\(\boldsymbol{\beta}\)`s and variance-covariance matrix
+
+Source helpful function and cleaned up versions of betas and variance-covariance values:
+
+
+```r
+source("code/geese_functions.R")
+geese_betas_clean = read.csv("data/geese_betas_df.csv")
+geese_vc_clean = read.csv("data/geese_vc_df.csv")
+```
+
+.pull-left[
+
+```r
+res_jr99 &lt;-
+  get_betas_and_vc(
+    age = "Juvenile",
+    site = "Rural",
+    time = 1999,
+    betas_full = geese_betas_clean,
+    vc_full = geese_vc_clean
+  )
+```
+]
+
+.pull-right[
+
+```r
+res_su00 &lt;-
+  get_betas_and_vc(
+    age = "Sub Adult",
+    site = "Urban",
+    time = 2000,
+    betas_full = geese_betas_clean,
+    vc_full = geese_vc_clean
+  )
+```
+]
+
+---
+
+
+```r
+str(res_jr99)
+```
+
+```
+## List of 3
+##  $ case : chr [1:3] "Juvenile" "Rural" "1999"
+##  $ betas:'data.frame':	2 obs. of  2 variables:
+##   ..$ term: chr [1:2] "r:(Intercept)" "S:(Intercept)"
+##   ..$ beta: num [1:2] -0.31 1.02
+##  $ vc   : num [1:2, 1:2] 1.056 0.824 0.824 0.649
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : chr [1:2] "r:(Intercept)" "S:(Intercept)"
+##   .. ..$ : chr [1:2] "r:(Intercept)" "S:(Intercept)"
+```
+
+```r
+str(res_su00)
+```
+
+```
+## List of 3
+##  $ case : chr [1:3] "Sub Adult" "Urban" "2000"
+##  $ betas:'data.frame':	16 obs. of  2 variables:
+##   ..$ term: chr [1:16] "r:(Intercept)" "r:age(0.5,2.5]" "r:age(0.5,2.5]:siteUrban" "r:age(0.5,2.5]:siteUrban:time2000" ...
+##   ..$ beta: num [1:16] -0.31 -4.6 9.35 -9.59 2.79 ...
+##  $ vc   : num [1:16, 1:16] 1.06 11.57 -46.55 49.24 -13.18 ...
+##   ..- attr(*, "dimnames")=List of 2
+##   .. ..$ : chr [1:16] "r:(Intercept)" "r:age(0.5,2.5]" "r:age(0.5,2.5]:siteUrban" "r:age(0.5,2.5]:siteUrban:time2000" ...
+##   .. ..$ : chr [1:16] "r:(Intercept)" "r:age(0.5,2.5]" "r:age(0.5,2.5]:siteUrban" "r:age(0.5,2.5]:siteUrban:time2000" ...
+```
+
+---
+
+## Applying the delta method
+
+### Step 4: Input formula, betas, and variance-covariance into the `deltamethod` function
+
+
+```r
+msm::deltamethod(
+  g = as.formula(g_jr99),
+  mean = res_jr99$betas$beta,
+  cov = res_jr99$vc
+)
+```
+
+```
+## [1] 0.006699222
+```
+
+```r
+msm::deltamethod(
+  g = as.formula(g_su00),
+  mean = res_su00$betas$beta,
+  cov = res_su00$vc
+)
+```
+
+```
+## [1] 0.02203537
+```
+
+---
+
+## Could go a step further and write a function
+
+
+```r
+compute_dmse(
+  age = "Juvenile",
+  site = "Rural",
+  time = 1999,
+  betas_full = geese_betas_clean,
+  vc_full = geese_vc_clean
+)
+```
+
+```
+##        age  site time          se
+## 1 Juvenile Rural 1999 0.006699222
+```
+
+
+```r
+compute_dmse(
+  age = "Sub Adult",
+  site = "Urban",
+  time = 2000,
+  betas_full = geese_betas_clean,
+  vc_full = geese_vc_clean
+)
+```
+
+```
+##         age  site time         se
+## 1 Sub Adult Urban 2000 0.02203537
+```
+
+---
+
+## And even apply purrr
+
+
+```r
+# Create a data frame with all combinations of age, site, and year
+var_values = expand.grid(
+  age = c("Juvenile", "Sub Adult", "Adult"),
+  site = c("Rural", "Urban"),
+  year = 1999:2019
+)
+```
+
+
+```r
+# Apply compute_dmse to age, site, and time combinations
+dmses &lt;-
+* purrr::pmap_df(
+    .l = list(
+      age = var_values$age,
+      site = var_values$site,
+      time = var_values$year
+    ),
+    .f = compute_dmse,
+    betas_full = geese_betas_clean,
+    vc_full = geese_vc_clean
+  )
+```
+
+---
+
+
+```r
+# Print the results
+dmses
+```
+
+```
+##           age  site time          se
+## 1    Juvenile Rural 1999 0.006699222
+## 2   Sub Adult Rural 1999 0.105557655
+## 3       Adult Rural 1999 0.010529005
+## 4    Juvenile Urban 1999 0.044303939
+## 5   Sub Adult Urban 1999 2.033184865
+## 6       Adult Urban 1999 0.073883274
+## 7    Juvenile Rural 2000 0.007520864
+## 8   Sub Adult Rural 2000 0.028782852
+## 9       Adult Rural 2000 0.008844291
+## 10   Juvenile Urban 2000 0.037995040
+## 11  Sub Adult Urban 2000 0.022035371
+## 12      Adult Urban 2000 0.046603707
+## 13   Juvenile Rural 2001 0.006023243
+## 14  Sub Adult Rural 2001 0.017613253
+## 15      Adult Rural 2001 0.006642993
+## 16   Juvenile Urban 2001 0.017539830
+## 17  Sub Adult Urban 2001 0.035064093
+## 18      Adult Urban 2001 0.035557015
+## 19   Juvenile Rural 2002 0.005919942
+## 20  Sub Adult Rural 2002 0.006651031
+## 21      Adult Rural 2002 0.005579023
+## 22   Juvenile Urban 2002 0.022907490
+## 23  Sub Adult Urban 2002 0.026073092
+## 24      Adult Urban 2002 0.020918193
+## 25   Juvenile Rural 2003 0.005781577
+## 26  Sub Adult Rural 2003 0.014146065
+## 27      Adult Rural 2003 0.005801654
+## 28   Juvenile Urban 2003 0.023690377
+## 29  Sub Adult Urban 2003 0.027192810
+## 30      Adult Urban 2003 0.020392056
+## 31   Juvenile Rural 2004 0.005567117
+## 32  Sub Adult Rural 2004 0.007413391
+## 33      Adult Rural 2004 0.005030922
+## 34   Juvenile Urban 2004 0.030693798
+## 35  Sub Adult Urban 2004 0.041046351
+## 36      Adult Urban 2004 0.015406036
+## 37   Juvenile Rural 2005 0.006157793
+## 38  Sub Adult Rural 2005 0.012886358
+## 39      Adult Rural 2005 0.005017700
+## 40   Juvenile Urban 2005 0.019170416
+## 41  Sub Adult Urban 2005 0.034591611
+## 42      Adult Urban 2005 0.016096216
+## 43   Juvenile Rural 2006 0.006057877
+## 44  Sub Adult Rural 2006 0.012947870
+## 45      Adult Rural 2006 0.004649674
+## 46   Juvenile Urban 2006 0.023110312
+## 47  Sub Adult Urban 2006 0.029286150
+## 48      Adult Urban 2006 0.014888054
+## 49   Juvenile Rural 2007 0.006371335
+## 50  Sub Adult Rural 2007 0.013248017
+## 51      Adult Rural 2007 0.004961234
+## 52   Juvenile Urban 2007 0.025362577
+## 53  Sub Adult Urban 2007 0.024914791
+## 54      Adult Urban 2007 0.016571485
+## 55   Juvenile Rural 2008 0.006476688
+## 56  Sub Adult Rural 2008 0.006501164
+## 57      Adult Rural 2008 0.005631671
+## 58   Juvenile Urban 2008 0.039124743
+## 59  Sub Adult Urban 2008 0.039525796
+## 60      Adult Urban 2008 0.018613332
+## 61   Juvenile Rural 2009 0.006767766
+## 62  Sub Adult Rural 2009 0.016293928
+## 63      Adult Rural 2009 0.005475990
+## 64   Juvenile Urban 2009 0.023622668
+## 65  Sub Adult Urban 2009 0.044530427
+## 66      Adult Urban 2009 0.012202278
+## 67   Juvenile Rural 2010 0.007229592
+## 68  Sub Adult Rural 2010 0.016025808
+## 69      Adult Rural 2010 0.005158723
+## 70   Juvenile Urban 2010 0.026129494
+## 71  Sub Adult Urban 2010 0.024203804
+## 72      Adult Urban 2010 0.013552451
+## 73   Juvenile Rural 2011 0.005635871
+## 74  Sub Adult Rural 2011 0.006439201
+## 75      Adult Rural 2011 0.004215156
+## 76   Juvenile Urban 2011 0.017574107
+## 77  Sub Adult Urban 2011 0.018265344
+## 78      Adult Urban 2011 0.010528493
+## 79   Juvenile Rural 2012 0.006199779
+## 80  Sub Adult Rural 2012 0.006243897
+## 81      Adult Rural 2012 0.004442830
+## 82   Juvenile Urban 2012 0.017482259
+## 83  Sub Adult Urban 2012 0.019918093
+## 84      Adult Urban 2012 0.008756455
+## 85   Juvenile Rural 2013 0.007040906
+## 86  Sub Adult Rural 2013 0.006377887
+## 87      Adult Rural 2013 0.004468607
+## 88   Juvenile Urban 2013 0.021615330
+## 89  Sub Adult Urban 2013 0.029103120
+## 90      Adult Urban 2013 0.009794203
+## 91   Juvenile Rural 2014 0.006660940
+## 92  Sub Adult Rural 2014 0.007147839
+## 93      Adult Rural 2014 0.004315902
+## 94   Juvenile Urban 2014 0.019314914
+## 95  Sub Adult Urban 2014 0.031210211
+## 96      Adult Urban 2014 0.008204686
+## 97   Juvenile Rural 2015 0.006494021
+## 98  Sub Adult Rural 2015 0.009099505
+## 99      Adult Rural 2015 0.004044825
+## 100  Juvenile Urban 2015 0.022375954
+## 101 Sub Adult Urban 2015 0.026945050
+## 102     Adult Urban 2015 0.005848340
+## 103  Juvenile Rural 2016 0.006297477
+## 104 Sub Adult Rural 2016 0.006716235
+## 105     Adult Rural 2016 0.003857642
+## 106  Juvenile Urban 2016 0.011599867
+## 107 Sub Adult Urban 2016 0.019987409
+## 108     Adult Urban 2016 0.007812362
+## 109  Juvenile Rural 2017 0.006345627
+## 110 Sub Adult Rural 2017 0.007747271
+## 111     Adult Rural 2017 0.005181650
+## 112  Juvenile Urban 2017 0.013011888
+## 113 Sub Adult Urban 2017 0.021705729
+## 114     Adult Urban 2017 0.008497679
+## 115  Juvenile Rural 2018 0.006113766
+## 116 Sub Adult Rural 2018 0.007009918
+## 117     Adult Rural 2018 0.005614345
+## 118  Juvenile Urban 2018 0.010475895
+## 119 Sub Adult Urban 2018 0.012519795
+## 120     Adult Urban 2018 0.006143865
+## 121  Juvenile Rural 2019 0.006934403
+## 122 Sub Adult Rural 2019 0.008205309
+## 123     Adult Rural 2019 0.007542469
+## 124  Juvenile Urban 2019 0.009714176
+## 125 Sub Adult Urban 2019 0.013610229
+## 126     Adult Urban 2019 0.010998244
+```
+
+---
+
+## Summary
+
+- For more complicated problems, be careful figuring out relationship between quantity of interest and the `\(\boldsymbol{\beta}\)`s
+
+- Writing functions in R to apply the delta method is a good when many cases
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

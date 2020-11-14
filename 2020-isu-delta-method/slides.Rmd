@@ -5,7 +5,7 @@ author:
   - "Iowa State University, Ecology 607"
   - "November 16, 2020"
   - "Katherine Goode (kgoode\\@iastate.edu)"
-date: "<br><br>Find slides at: goodekat.github.io/presentations.html"
+date: "<br><br><small>Find slides at: goodekat.github.io/presentations.html"
 output:
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -19,7 +19,7 @@ output:
 ```{css, echo = FALSE}
 .tiny{font-size: 30%}
 .small{font-size: 50%}
-.medium{font-size: 75%}
+.medium{font-size: 90%}
 ```
 
 ```{r setup, include = FALSE}
@@ -48,7 +48,8 @@ style_mono_accent(
   header_h2_font_size = "1.75rem",
   header_h3_font_size = "1.25rem",
   colors = c(orange = "#ff8811"), 
-  link_color = "#07A1D3"
+  link_color = "#07A1D3", 
+  code_highlight_color = "#B8F752"
 )
 ```
 
@@ -75,6 +76,8 @@ include_graphics("figures/aes.png")
 3. Delta method in R by hand
 
 4. Delta method in R via `msm`
+
+5. A more complicated example
 
 ---
 
@@ -338,8 +341,6 @@ What is the notation in this context?
 
 ## Computing mule deer standard error
 
-<br>
-
 Now, how to compute the standard error for $S_i^4$?
 
 <br>
@@ -421,7 +422,7 @@ library(dplyr); library(readr)
 # Load data frame of quarterly survival, quarterly survival, 
 # standard error of quarterly survival, and annual survival 
 # computed based on the logistic regression model fit in MARK
-survival_data <- read_csv("data/age_and_survival.csv")
+survival_data <- read_csv("data/deer_age_and_survival.csv")
 
 # Print the head of the data
 head(survival_data)
@@ -435,7 +436,7 @@ head(survival_data)
 
 ```{r}
 # Load logistic regression coefficient estimates
-betas <- read_csv("data/betas.csv", col_names = FALSE) %>% as.matrix()
+betas <- read_csv("data/deer_betas.csv", col_names = FALSE) %>% as.matrix()
 betas
 ```
 
@@ -443,7 +444,7 @@ betas
 
 ```{r}
 # Load estimated variance covariance matrix of the logistic regression coefficients
-vcov <- read_csv("data/vcov.csv", col_names = FALSE) %>% as.matrix()
+vcov <- read_csv("data/deer_vcov.csv", col_names = FALSE) %>% as.matrix()
 vcov
 ```
 
@@ -781,3 +782,366 @@ purrr::map_df(.x = 1:11, .f = apply_msm_deltamethod, betas, vcov)
 - A good reference on the delta method that also describes how to apply the delta method in R can be found on the [IDRE website](https://stats.idre.ucla.edu/r/faq/how-can-i-estimate-the-standard-error-of-transformed-regression-parameters-in-r-using-the-delta-method/).
 
 - Another delta method function ([`delta.method`](https://www.rdocumentation.org/packages/alr3/versions/1.1.12/topics/delta.method#:~:text=estimated%20regression%20coefficients-,delta.,known%20or%20estimated%20covariance%20matrix)) the [alr3](https://www.rdocumentation.org/packages/alr3/versions/1.1.12) R package
+
+---
+
+class: inverse, center, middle
+
+# A more complicated example
+
+---
+
+## Canadian goose data
+
+.pull-left[
+- Canada goose banding and recovery data using Burnham joint live-dead mark recapture models in RMark
+
+- Burnham model uses Seber parameterization 
+  - $S$ = survival
+  - $F$ = fidelity
+  - $r$ = dead recovery rate
+  - $p$ = live recapture rate
+]
+
+.pull-right[
+```{r echo = FALSE, out.width = "100%"}
+include_graphics("figures/geese.jpeg") 
+```
+]
+ 
+- Interested in point estimate and 95% confidence intervals for Brownie parameterization of dead recovery rate (f): 
+  $$f=r(1-S)$$
+  
+- Not a way to change parameterization in RMark for Burnham models or a previously derived estimator for SE of $f$
+
+- Let's use the delta method!
+
+---
+
+## More details on the data
+
+**Three predictor variables:**
+
+- Age (3 levels):  
+  - Juvenile: 0 yrs old, binned as (0, 0.5]
+  - Sub adult: 1 or 2 yrs old, binned as (0.5, 2.5]
+  - Adult: 3 yrs or older, binned as (2.5, 23]
+  
+- Site (2 levels): Rural or urban 
+
+- Time (21 levels): Year as a factor from 1999-2019
+
+---
+
+## More details on the Rmark models
+
+**Mark recapture models: **
+
+  - $S$, $F$, $r$, and $p$ are all modeled using logistic regressions with formulas including age x site x time
+  
+  - For example:
+
+$$\log\left(\frac{r}{1-r}\right) \sim \mbox{age} \times \mbox{site} \times \mbox{time}$$
+$$\log\left(\frac{S}{1-S}\right) \sim \mbox{age} \times \mbox{site} \times \mbox{time}$$
+
+- Have beta estimates and the variance-covariance matrix for $r$ and $S$ 
+
+**Load models and extract betas and variance-covariance matrix:**
+
+```{r}
+geese_models = readRDS("data/geese_model_results.rds")
+geese_betas <- geese_models$results$beta
+geese_vc <- geese_models$results$beta.vcv
+```
+
+---
+
+## Coefficients and variance covariance matrix
+
+```{r}
+str(geese_betas)
+```
+
+```{r}
+str(geese_vc)
+```
+
+```{r}
+head(geese_betas)
+```
+
+---
+
+## Applying the delta method
+
+### Step 1: Need to determine $g\left(\boldsymbol{\beta}\right)$ (that is, how is $f$ related to the $\boldsymbol{\beta}$s)
+
+This relationship will be passed into the `deltamethod` function. 
+
+Recall $f = r(1-S)$ and let...
+
+.pull-left[
+<small>
+\begin{eqnarray*}
+\eta_r\left(\boldsymbol{\beta}\right) & = & \log\left(\frac{r}{1-r}\right)\\
+& = & \beta_{r,Intercept} + \\
+& & \beta_{r,Sub Adult} \times I[\mbox{age = sub adult}]\\
+& & +\beta_{r,Adult} \times I[\mbox{age = adult}]\\
+& & + \beta_{r,Urban} \times I[\mbox{rite = urban}]\\
+& & + \beta_{r,2000} \times I[\mbox{year = 2000}]\\
+& & + \beta_{r,2001} \times I[\mbox{year = 2001}]\\
+& & \vdots\\
+& & + \beta_{r,Adult,Urban,2019}\\
+& & \ \ \ \times I[Age = Adult] \\ 
+& & \ \ \ \times I[Site = Urban]\\
+& & \ \ \ \times I[Time = 2019]
+\end{eqnarray*}
+</small>
+]
+
+.pull-right[
+<small>
+\begin{eqnarray*}
+\eta_S\left(\boldsymbol{\beta}\right) & = & \log\left(\frac{S}{1-S}\right)\\
+& = & \beta_{S,Intercept} + \\
+& & \beta_{S,Sub Adult} \times I[\mbox{age = sub adult}]\\
+& & +\beta_{S,Adult} \times I[\mbox{age = adult}]\\
+& & + \beta_{S,Urban} \times I[\mbox{Site = urban}]\\
+& & + \beta_{S,2000} \times I[\mbox{year = 2000}]\\
+& & + \beta_{S,2001} \times I[\mbox{year = 2001}]\\
+& & \vdots\\
+& & + \beta_{S,Adult,Urban,2019}\\
+& & \ \ \ \times I[Age = Adult] \\ 
+& & \ \ \ \times I[Site = Urban]\\
+& & \ \ \ \times I[Time = 2019]
+\end{eqnarray*}
+</small>
+]
+
+---
+
+If we solve
+
+$$\eta_r\left(\boldsymbol{\beta}\right)=\log\left(\frac{r}{1-r}\right) \ \ \ \ \ \mbox{ and } \ \ \ \ \ \eta_S\left(\boldsymbol{\beta}\right)=\log\left(\frac{S}{1-S}\right)$$
+
+<br>
+
+for $r$ and $S$, we get:
+
+$$r = \frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_r\left(\boldsymbol{\beta}\right)}} \ \ \ \ \ \mbox{ and } \ \ \ \ \ S = \frac{e^{\eta_S\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_S\left(\boldsymbol{\beta}\right)}}$$
+
+Finally, we can relate $f$ to the $\beta$s as:
+
+$$ 
+\begin{eqnarray}
+f & = & r(1-S)\\
+& = & \frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_r\left(\boldsymbol{\beta}\right)}}\left(1 -\frac{e^{\eta_S\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_S\left(\boldsymbol{\beta}\right)}}\right)\\
+& = & \frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_r\left(\boldsymbol{\beta}\right)}}\left(\frac{1+e^{\eta_S\left(\boldsymbol{\beta}\right)}-e^{\eta_S\left(\boldsymbol{\beta}\right)}}{1+e^{\eta_S\left(\boldsymbol{\beta}\right)}}\right)\\
+& = & \frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{(1+e^{\eta_r\left(\boldsymbol{\beta}\right)})(1+e^{\eta_S\left(\boldsymbol{\beta}\right)})}\\
+& = & g\left(\boldsymbol{\beta}\right) 
+\end{eqnarray}
+$$
+
+---
+
+## Applying the delta method
+
+### Step 2: Code $g(\boldsymbol{\beta})$ as a formula in R
+
+Let's consider two examples: 
+
+#### 1. Age = Juvenile, Site = Rural, Time = 1999
+
+All of these categories are the reference categories in the model, which means they are contained in the intercept. As a result,
+
+$$g\left(\boldsymbol{\beta}\right)  = f=\frac{e^{\eta_r\left(\boldsymbol{\beta}\right)}}{(1+e^{\eta_r\left(\boldsymbol{\beta}\right)})(1+e^{\eta_S\left(\boldsymbol{\beta}\right)})}=\frac{e^{\beta_{r,0}}}{(1+e^{\beta_{r,0}})(1+e^{\beta_{S,0}})}.$$
+In R:
+
+```{r}
+g_jr99 = "~ exp(x1) / ((1 + exp(x1)) * (1 + exp(x2)))"
+```
+
+#### 2. Age = Sub Adult, Site = Urban, Time = 2000
+
+None of these categories are reference categories, so this calculation will be a bit more complicated...
+
+---
+
+.medium[
+Again, 
+
+$$g\left(\boldsymbol{\beta}\right) = f=\frac{e^{\eta_r \left(\boldsymbol{\beta}\right)}}{(1+e^{\eta_r \left(\boldsymbol{\beta}\right)})(1+e^{\eta_S \left(\boldsymbol{\beta}\right)})},$$
+
+but in this situation,
+
+.pull-left[
+\begin{eqnarray*}
+\eta_r\left(\boldsymbol{\beta}\right) & = & \beta_{r,Intercept}\\
+& & +\beta_{r,SubAdult}\\
+& & +\beta_{r,Urban}\\
+& & +\beta_{r,2000}\\
+& & +\beta_{r,SubAdult,Urban}\\
+& & +\beta_{r,SubAdult,2000}\\
+& & +\beta_{r,Urban,2000}\\
+& & +\beta_{r,SubAdult,Urban,2000}
+\end{eqnarray*}
+]
+
+.pull-right[
+\begin{eqnarray*}
+\eta_S \left(\boldsymbol{\beta}\right) & = & \beta_{S,Intercept}\\
+& & +\beta_{S,SubAdult}\\
+& & +\beta_{S,Urban}\\
+& & +\beta_{S,2000}\\
+& & +\beta_{S,SubAdult,Urban}\\
+& & +\beta_{S,SubAdult,2000}\\
+& & +\beta_{S,Urban,2000}\\
+& & +\beta_{S,SubAdult,Urban,2000}.
+\end{eqnarray*}
+]
+
+In R:
+
+```{r}
+g_su00_part1 = "(exp(x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8))" 
+g_su00_part2 = "(1 + exp(x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8))"
+g_su00_part3 = "(1 + exp(x9 + x10 + x11 + x12 + x13 + x14 + x15 + x16))"
+g_su00 = paste0("~", g_su00_part1, "/", 
+                  "(", g_su00_part2, "*", g_su00_part3, ")")
+```
+]
+
+---
+
+## Applying the delta method
+
+### Step 3: Obtain correct subset of $\boldsymbol{\beta}$s and variance-covariance matrix
+
+Source helpful function and cleaned up versions of betas and variance-covariance values:
+
+```{r}
+source("code/geese_functions.R")
+geese_betas_clean = read.csv("data/geese_betas_df.csv")
+geese_vc_clean = read.csv("data/geese_vc_df.csv")
+```
+
+.pull-left[
+```{r}
+res_jr99 <-
+  get_betas_and_vc(
+    age = "Juvenile",
+    site = "Rural",
+    time = 1999,
+    betas_full = geese_betas_clean,
+    vc_full = geese_vc_clean
+  )
+```
+]
+
+.pull-right[
+```{r}
+res_su00 <-
+  get_betas_and_vc(
+    age = "Sub Adult",
+    site = "Urban",
+    time = 2000,
+    betas_full = geese_betas_clean,
+    vc_full = geese_vc_clean
+  )
+```
+]
+
+---
+
+```{r}
+str(res_jr99)
+str(res_su00)
+```
+
+---
+
+## Applying the delta method
+
+### Step 4: Input formula, betas, and variance-covariance into the `deltamethod` function
+
+```{r}
+msm::deltamethod(
+  g = as.formula(g_jr99),
+  mean = res_jr99$betas$beta,
+  cov = res_jr99$vc
+)
+
+msm::deltamethod(
+  g = as.formula(g_su00),
+  mean = res_su00$betas$beta,
+  cov = res_su00$vc
+)
+```
+
+---
+
+## Could go a step further and write a function
+
+```{r}
+compute_dmse(
+  age = "Juvenile",
+  site = "Rural",
+  time = 1999,
+  betas_full = geese_betas_clean,
+  vc_full = geese_vc_clean
+)
+```
+
+```{r}
+compute_dmse(
+  age = "Sub Adult",
+  site = "Urban",
+  time = 2000,
+  betas_full = geese_betas_clean,
+  vc_full = geese_vc_clean
+)
+```
+
+---
+
+## And even apply purrr
+
+```{r}
+# Create a data frame with all combinations of age, site, and year
+var_values = expand.grid(
+  age = c("Juvenile", "Sub Adult", "Adult"),
+  site = c("Rural", "Urban"),
+  year = 1999:2019
+)
+```
+
+```{r}
+# Apply compute_dmse to age, site, and time combinations
+dmses <-
+  purrr::pmap_df( #<<
+    .l = list(
+      age = var_values$age,
+      site = var_values$site,
+      time = var_values$year
+    ),
+    .f = compute_dmse,
+    betas_full = geese_betas_clean,
+    vc_full = geese_vc_clean
+  )
+```
+
+---
+
+```{r}
+# Print the results
+dmses
+```
+
+---
+
+## Summary
+
+- For more complicated problems, be careful figuring out relationship between quantity of interest and the $\boldsymbol{\beta}$s
+
+- Writing functions in R to apply the delta method is a good when many cases
+
