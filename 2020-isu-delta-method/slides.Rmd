@@ -372,7 +372,7 @@ Would need to:
 
 ---
 
-## Mule deer derivatives
+**Mule deer derivatives**
 
 The partial derivatives of $g\left(\boldsymbol{\beta}\right)$ in terms of $\beta_0, \beta_1$, and $\beta_2$ (note that the partial derivatives are functions of age):
 
@@ -486,25 +486,31 @@ Output: data frame with the variables of...
 ```{r}
 # Function for computing annual survival standard error
 compute_annual_se <- function(age, betas, vcov){
+  
   # Separate the betas
   b0 <- betas[1]; b1 <- betas[2]; b2 <- betas[3]
+  
   # Compute logit of quarterly survival for given age
   logit_s <- b0 + (b1 * age) + (b2 * (age^2))
+  
   # Compute quarterly and annual survival
   s <- exp(logit_s) / (1 + exp(logit_s))
   annual <- s^4
   
   # Create empty 1x3 matrix to store the elements of d
   d <- matrix(NA, nrow = 1, ncol = 3)
+  
   # Compute elements of d (partial derivatives of g(beta))
   d[1] <- 4 * (s^4) * (1 - s)
   d[2] <- 4 * age * (s^4) * (1 - s)
   d[3] <- 4 * (age^2) * (s^4) * (1 - s)
+  
   # Compute standard error of annual survival (using delta method)
   se <- sqrt(d %*% vcov %*% t(d)) #<<
   
   # Compute lower and upper bounds of 95% CI for annual survival
   lower <- annual - (1.96 * se); upper <- annual + (1.96 * se) #<<
+  
   # Return age, annual survival estimate, standard error, 95% CI
   return(data.frame(age, annual_survival = annual, se, lower, upper))
 }
@@ -897,14 +903,14 @@ Recall $f = r(1-S)$ and let...
 & = & \beta_{r,Intercept} + \\
 & & \beta_{r,Sub Adult} \times I[\mbox{age = sub adult}]\\
 & & +\beta_{r,Adult} \times I[\mbox{age = adult}]\\
-& & + \beta_{r,Urban} \times I[\mbox{rite = urban}]\\
-& & + \beta_{r,2000} \times I[\mbox{year = 2000}]\\
-& & + \beta_{r,2001} \times I[\mbox{year = 2001}]\\
+& & + \beta_{r,Urban} \times I[\mbox{site = urban}]\\
+& & + \beta_{r,2000} \times I[\mbox{time = 2000}]\\
+& & + \beta_{r,2001} \times I[\mbox{time = 2001}]\\
 & & \vdots\\
 & & + \beta_{r,Adult,Urban,2019}\\
-& & \ \ \ \times I[Age = Adult] \\ 
-& & \ \ \ \times I[Site = Urban]\\
-& & \ \ \ \times I[Time = 2019]
+& & \ \ \ \times I[age = adult] \\ 
+& & \ \ \ \times I[site = urban]\\
+& & \ \ \ \times I[time = 2019]
 \end{eqnarray*}
 </small>
 ]
@@ -916,14 +922,14 @@ Recall $f = r(1-S)$ and let...
 & = & \beta_{S,Intercept} + \\
 & & \beta_{S,Sub Adult} \times I[\mbox{age = sub adult}]\\
 & & +\beta_{S,Adult} \times I[\mbox{age = adult}]\\
-& & + \beta_{S,Urban} \times I[\mbox{Site = urban}]\\
-& & + \beta_{S,2000} \times I[\mbox{year = 2000}]\\
-& & + \beta_{S,2001} \times I[\mbox{year = 2001}]\\
+& & + \beta_{S,Urban} \times I[\mbox{site = urban}]\\
+& & + \beta_{S,2000} \times I[\mbox{time = 2000}]\\
+& & + \beta_{S,2001} \times I[\mbox{time = 2001}]\\
 & & \vdots\\
 & & + \beta_{S,Adult,Urban,2019}\\
-& & \ \ \ \times I[Age = Adult] \\ 
-& & \ \ \ \times I[Site = Urban]\\
-& & \ \ \ \times I[Time = 2019]
+& & \ \ \ \times I[age = adult] \\ 
+& & \ \ \ \times I[site = urban]\\
+& & \ \ \ \times I[time = 2019]
 \end{eqnarray*}
 </small>
 ]
@@ -1126,7 +1132,7 @@ compute_dmse(
 var_values = expand.grid(
   age = c("Juvenile", "Sub Adult", "Adult"),
   site = c("Rural", "Urban"),
-  year = 1999:2019
+  time = 1999:2019
 )
 ```
 
@@ -1137,7 +1143,7 @@ dmses <-
     .l = list(
       age = var_values$age,
       site = var_values$site,
-      time = var_values$year
+      time = var_values$time
     ),
     .f = compute_dmse,
     betas_full = geese_betas_clean,
