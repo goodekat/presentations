@@ -900,9 +900,9 @@ Recall $f = r(1-S)$ and let...
 <small>
 \begin{eqnarray*}
 \eta_r\left(\boldsymbol{\beta}\right) & = & \log\left(\frac{r}{1-r}\right)\\
-& = & \beta_{r,Intercept} + \\
-& & \beta_{r,Sub Adult} \times I[\mbox{age = sub adult}]\\
-& & +\beta_{r,Adult} \times I[\mbox{age = adult}]\\
+& = & \beta_{r,Intercept}\\
+& & + \beta_{r,Sub Adult} \times I[\mbox{age = sub adult}]\\
+& & + \beta_{r,Adult} \times I[\mbox{age = adult}]\\
 & & + \beta_{r,Urban} \times I[\mbox{site = urban}]\\
 & & + \beta_{r,2000} \times I[\mbox{time = 2000}]\\
 & & + \beta_{r,2001} \times I[\mbox{time = 2001}]\\
@@ -919,8 +919,8 @@ Recall $f = r(1-S)$ and let...
 <small>
 \begin{eqnarray*}
 \eta_S\left(\boldsymbol{\beta}\right) & = & \log\left(\frac{S}{1-S}\right)\\
-& = & \beta_{S,Intercept} + \\
-& & \beta_{S,Sub Adult} \times I[\mbox{age = sub adult}]\\
+& = & \beta_{S,Intercept}\\
+& & + \beta_{S,Sub Adult} \times I[\mbox{age = sub adult}]\\
 & & +\beta_{S,Adult} \times I[\mbox{age = adult}]\\
 & & + \beta_{S,Urban} \times I[\mbox{site = urban}]\\
 & & + \beta_{S,2000} \times I[\mbox{time = 2000}]\\
