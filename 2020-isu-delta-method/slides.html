@@ -145,6 +145,7 @@ Others do not...
 When computing "tricky" standard errors, it may be helpful to use the...
 
 &gt; **Delta method**: approach to approximate standard errors of transformed parameters
+
 If
 
 - want a SE for a parameter estimate
@@ -320,7 +321,7 @@ What is the notation in this context?
 
 
 .content-box[
-- .Standard error of `\(g\left(\hat{\boldsymbol{\theta}}\right)\)` can be computed as
+- Standard error of `\(g\left(\hat{\boldsymbol{\theta}}\right)\)` can be computed as
 `$$SE\left(g\left(\hat{\boldsymbol{\theta}}\right)\right)=\sqrt{Cov\left(g\left(\hat{\boldsymbol{\theta}}\right)\right)}=\sqrt{\textbf{d}Cov\left(\hat{\boldsymbol{\theta}}\right)\textbf{d}'}.$$` &lt;small&gt; (Note that `\(Cov\left(\hat{\boldsymbol{\theta}}\right)\)` is estimated by the negative inverse Hessian matrix) &lt;/small&gt;
 ]
 
@@ -709,7 +710,7 @@ msm::deltamethod(g = ~ 1 / (x1 + x2), mean = bhat1, cov = vc1)
 .pull-left[
 Simple linear regression:
 
-`$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\hat{\beta}x_2$$`
+`$$\hat{y}=\hat{\beta}_0+\hat{\beta}_1x_1+\hat{\beta}_2x_2$$`
 ]
 
 .pull-right[
