@@ -1,5 +1,9 @@
 # My Academic Presentations
 
+### 2021
+
+- [**isugg-shiny-fish**](https://goodekat.github.io/presentations/isugg-shiny-fish/slides.html): presentation for ISU graphics group on my the current state of my Shiny app for applying a random forest model to predict fish egg taxonomies based on egg characteristics (research project with Dr. Mike Weber and Dr. Philip Dixon)
+
 ### 2020
 
 - [**aaai-fpca-pfi**](https://goodekat.github.io/presentations/2020-aaai-fpca-pfi/slides.pdf): presentation for the AAAI fall symposium on Artificial Intelligence in Government and Public Sector on my research with Sandia National Labs relating to explaining neural network predictions with functional data as inputs
