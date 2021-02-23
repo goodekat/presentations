@@ -1,9 +1,10 @@
 ---
-title: "WhoseEgg: A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics"  
+title: ".teal[WhoseEgg:] A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics"  
 author: 
   - "<br>"
   - "Katherine Goode"
-  - "Presented at ISU Graphics Group"
+  - "Joint work with [Dr. Mike Weber](https://michaeljohnweber.wixsite.com/fisherieslab) and [Dr. Philip Dixon](https://pdixon.stat.iastate.edu/)"
+  - ".teal[Presented at ISU Graphics Group]"
 date: 'February 25, 2021'
 output:
   xaringan::moon_reader:
@@ -44,14 +45,15 @@ style_mono_accent(
 <br>
 
 - Background on invasive carp
-
+  
 <br>
 
-- Random forest approach to egg classification
+- Random forests approach to egg classification
 
 <br>
 
 - Shiny app
+
 ]
 
 .pull-right[
@@ -74,37 +76,80 @@ Information from [National Park Service](https://www.nps.gov/miss/learn/nature/a
 
 - Brought to US in 1970's "to control algae, weed, and parasite growth in aquatic farms, weeds in canal systems, and as one form of sewage treatment"
 
-- Now a problem in Mississippi River basin:
+- Escaped into wild and reproduced
+
+- Become a problem in Mississippi River basin:
 
   - Threaten native fish populations
   - May lower water quality
-  - Can endanger boaters by jumping out of water
+  - Possible danger to boaters
   
 ]
 
 .pull-right[
-![](figures/carp.jpg)
+<center> ![](https://www.nps.gov/miss/learn/nature/images/bhcarp-250.jpg?maxwidth=650&autorotate=false) <center/>
+
+.small[Image source: [NPS](https://www.nps.gov/miss/learn/nature/ascarpover.htm)]
 ]
 
 ---
 
 # Jumping Carp
 
-<video width="320" height="240">
-<source src="figures/jumping-carp.mp4" type="video/mp4">
-</video>
+<iframe width="900" height="510" src="https://www.youtube.com/embed/pJ6WH28RvQU" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ---
 
-# Invasive Carp Species
+# More Jumping Carp
 
-<iframe width="560" height="315" src="goodekat.github.io" frameborder="0" </iframe>
+<iframe width="900" height="510" src="https://www.youtube.com/embed/yC-PSvlbogg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+---
+
+# Current Management
+
+- Federal and state agencies monitor and try to manage invasive carp populations to: 
+
+  - Control population
+  - Keep out of new aquatic ecosystems (include Great Lakes)
+
+- Management practices from [USGS](https://www.usgs.gov/ecosystems/invasive-species-program/science/asian-carp?qt-science_center_objects=0#qt-science_center_objects)
+
+![](figures/management-practices.png)
+
+---
+
+# Egg Collection
+
+<br>
+
+- One method for monitoring carp is to collect eggs
+
+- Common practice is to have eggs identified using genetic analysis
+
+- Both expensive and timely 
+
+- Led Camacho et al (2019) 
+
+<br>
+
+.center[
+```{r out.width = "30%"}
+include_graphics("figures/egg1.png")
+include_graphics("figures/egg2.png")
+include_graphics("figures/egg5.png")
+```
+]
 
 ---
 
 class: inverse, middle, center
 
-# Random Forest Approach to egg classification
+# Random Forest Approach to Egg Classification
+
+---
+
+# Original Study
 
 ---
 
@@ -117,6 +162,8 @@ class: inverse, middle, center
 ---
 
 # Response variable
+
+![](figures/carp.jpg)
 
 ---
 

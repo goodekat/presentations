@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>WhoseEgg: A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics</title>
+    <title>.teal[WhoseEgg:] A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics</title>
     <meta charset="utf-8" />
     <meta name="author" content="" />
     <meta name="author" content="Katherine Goode" />
-    <meta name="author" content="Presented at ISU Graphics Group" />
+    <meta name="author" content="Joint work with Dr. Mike Weber and Dr. Philip Dixon" />
+    <meta name="author" content=".teal[Presented at ISU Graphics Group]" />
     <meta name="date" content="2021-02-25" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -13,10 +14,11 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# WhoseEgg: A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics
+# .teal[WhoseEgg:] A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics
 ### <br>
 ### Katherine Goode
-### Presented at ISU Graphics Group
+### Joint work with <a href="https://michaeljohnweber.wixsite.com/fisherieslab">Dr. Mike Weber</a> and <a href="https://pdixon.stat.iastate.edu/">Dr. Philip Dixon</a>
+### .teal[Presented at ISU Graphics Group]
 ### February 25, 2021
 
 ---
@@ -32,14 +34,15 @@ class: center, middle, inverse, title-slide
 &lt;br&gt;
 
 - Background on invasive carp
-
+  
 &lt;br&gt;
 
-- Random forest approach to egg classification
+- Random forests approach to egg classification
 
 &lt;br&gt;
 
 - Shiny app
+
 ]
 
 .pull-right[
@@ -62,37 +65,76 @@ Information from [National Park Service](https://www.nps.gov/miss/learn/nature/a
 
 - Brought to US in 1970's "to control algae, weed, and parasite growth in aquatic farms, weeds in canal systems, and as one form of sewage treatment"
 
-- Now a problem in Mississippi River basin:
+- Escaped into wild and reproduced
+
+- Become a problem in Mississippi River basin:
 
   - Threaten native fish populations
   - May lower water quality
-  - Can endanger boaters by jumping out of water
+  - Possible danger to boaters
   
 ]
 
 .pull-right[
-![](figures/carp.jpg)
+&lt;center&gt; ![](https://www.nps.gov/miss/learn/nature/images/bhcarp-250.jpg?maxwidth=650&amp;autorotate=false) &lt;center/&gt;
+
+.small[Image source: [NPS](https://www.nps.gov/miss/learn/nature/ascarpover.htm)]
 ]
 
 ---
 
 # Jumping Carp
 
-&lt;video width="320" height="240"&gt;
-&lt;source src="figures/jumping-carp.mp4" type="video/mp4"&gt;
-&lt;/video&gt;
+&lt;iframe width="900" height="510" src="https://www.youtube.com/embed/pJ6WH28RvQU" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
 
 ---
 
-# Invasive Carp Species
+# More Jumping Carp
 
-&lt;iframe width="560" height="315" src="goodekat.github.io" frameborder="0" &lt;/iframe&gt;
+&lt;iframe width="900" height="510" src="https://www.youtube.com/embed/yC-PSvlbogg" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+
+---
+
+# Current Management
+
+- Federal and state agencies monitor and try to manage invasive carp populations to: 
+
+  - Control population
+  - Keep out of new aquatic ecosystems (include Great Lakes)
+
+- Management practices from [USGS](https://www.usgs.gov/ecosystems/invasive-species-program/science/asian-carp?qt-science_center_objects=0#qt-science_center_objects)
+
+![](figures/management-practices.png)
+
+---
+
+# Egg Collection
+
+&lt;br&gt;
+
+- One method for monitoring carp is to collect eggs
+
+- Common practice is to have eggs identified using genetic analysis
+
+- Both expensive and timely 
+
+- Led Camacho et al (2019) 
+
+&lt;br&gt;
+
+.center[
+&lt;img src="figures/egg1.png" width="30%" /&gt;&lt;img src="figures/egg2.png" width="30%" /&gt;&lt;img src="figures/egg5.png" width="30%" /&gt;
+]
 
 ---
 
 class: inverse, middle, center
 
-# Random Forest Approach to egg classification
+# Random Forest Approach to Egg Classification
+
+---
+
+# Original Study
 
 ---
 
@@ -105,6 +147,8 @@ class: inverse, middle, center
 ---
 
 # Response variable
+
+![](figures/carp.jpg)
 
 ---
 
