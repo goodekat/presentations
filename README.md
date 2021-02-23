@@ -2,7 +2,7 @@
 
 ### 2021
 
-- [**isugg-shiny-fish**](https://goodekat.github.io/presentations/isugg-shiny-fish/slides.html): presentation for ISU graphics group on my the current state of my Shiny app for applying a random forest model to predict fish egg taxonomies based on egg characteristics (research project with Dr. Mike Weber and Dr. Philip Dixon)
+- [**isugg-shiny-fish**](https://goodekat.github.io/presentations/2021-isugg-shiny-fish/slides.html): presentation for ISU graphics group on my the current state of my Shiny app for applying a random forest model to predict fish egg taxonomies based on egg characteristics (research project with Dr. Mike Weber and Dr. Philip Dixon)
 
 ### 2020
 
