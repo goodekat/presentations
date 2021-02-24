@@ -129,7 +129,7 @@ Information from [National Park Service](https://www.nps.gov/miss/learn/nature/a
 
 - Both expensive and timely 
 
-- Led Camacho et al (2019) 
+- Led Camacho et al (2019) to try using machine learning to classify fish eggs using egg measurements
 
 <br>
 
@@ -149,7 +149,11 @@ class: inverse, middle, center
 
 ---
 
-# Original Study
+# Data Collection
+
+```{r out.width = "75%", fig.align = "center"}
+include_graphics("figures/map.png")
+```
 
 ---
 
