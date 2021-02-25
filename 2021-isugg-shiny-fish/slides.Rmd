@@ -283,7 +283,7 @@ include_graphics("figures/egg-characteristics.png")
 
 ---
 
-# Results: Metrics on training data
+# Results: Metrics on Training Data
 
 Models trained with 2014-2015 and 2014-2016 data
 
@@ -293,7 +293,7 @@ include_graphics("figures/train-res.png")
 
 ---
 
-# Results: Validation of original models
+# Results: Validation of Original Models
 
 Metrics computed using 2014-2015 model on 2016 data
 
@@ -333,7 +333,7 @@ class: inverse, middle, center
 
 ---
 
-# Feedback from audience
+# Feedback from Audience
 
 **Current version:**
 
@@ -359,7 +359,7 @@ class: inverse, middle, center
 
 ---
 
-# Demonstrate app
+# App Demonstration
 
 ```{r}
 include_graphics("figures/app.png")
@@ -367,7 +367,7 @@ include_graphics("figures/app.png")
 
 ---
 
-# Plans for adding to the app
+# Plans for Adding to the App
 
 Version 2: 
 
@@ -403,7 +403,7 @@ class: inverse, center, middle
 
 ---
 
-# Metrics on new/old sites
+# Metrics on New/Old Sites
 
 ```{r out.width = "80%", fig.align = "center"}
 include_graphics("figures/res-diff-sites.png")
@@ -411,7 +411,7 @@ include_graphics("figures/res-diff-sites.png")
 
 ---
 
-# Feature importance
+# Feature Importance
 
 ```{r out.width = "100%", fig.align = "center"}
 include_graphics("figures/feature-imp.png")
@@ -419,7 +419,7 @@ include_graphics("figures/feature-imp.png")
 
 ---
 
-# Partial dependence plots
+# Partial Dependence Plots
 
 ```{r out.width = "100%", fig.align = "center"}
 include_graphics("figures/pdps.png")
@@ -427,7 +427,7 @@ include_graphics("figures/pdps.png")
 
 ---
 
-# Correlation between features
+# Correlation Between Features
 
 ```{r out.width = "80%", fig.align = "center"}
 include_graphics("figures/correlation.png")
