@@ -16,6 +16,23 @@ output:
       countIncrementalSlides: false
 ---
 
+```{css, echo = FALSE}
+.tiny{font-size: 30%}
+.small{font-size: 50%}
+.medium{font-size: 75%}
+.left-code {
+  color: #777;
+  width: 37%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 60%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
 ```{r setup, include = FALSE}
 options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(echo = FALSE)
@@ -48,7 +65,7 @@ style_mono_accent(
   
 <br>
 
-- Random forests approach to egg classification
+- Random forest approach to fish egg identification
 
 <br>
 
@@ -76,7 +93,7 @@ Information from [National Park Service](https://www.nps.gov/miss/learn/nature/a
 
 - Brought to US in 1970's "to control algae, weed, and parasite growth in aquatic farms, weeds in canal systems, and as one form of sewage treatment"
 
-- Escaped into wild and reproduced
+- Escaped into wild
 
 - Become a problem in Mississippi River basin:
 
@@ -87,9 +104,7 @@ Information from [National Park Service](https://www.nps.gov/miss/learn/nature/a
 ]
 
 .pull-right[
-<center> ![](https://www.nps.gov/miss/learn/nature/images/bhcarp-250.jpg?maxwidth=650&autorotate=false) <center/>
-
-.small[Image source: [NPS](https://www.nps.gov/miss/learn/nature/ascarpover.htm)]
+<center> ![](figures/large-carp.JPG) <center/>
 ]
 
 ---
@@ -106,7 +121,7 @@ Information from [National Park Service](https://www.nps.gov/miss/learn/nature/a
 
 ---
 
-# Current Management
+# Management of Carp
 
 - Federal and state agencies monitor and try to manage invasive carp populations to: 
 
@@ -115,7 +130,9 @@ Information from [National Park Service](https://www.nps.gov/miss/learn/nature/a
 
 - Management practices from [USGS](https://www.usgs.gov/ecosystems/invasive-species-program/science/asian-carp?qt-science_center_objects=0#qt-science_center_objects)
 
-![](figures/management-practices.png)
+```{r out.width = "90%", fig.align = "center"}
+include_graphics("figures/management-practices.png")
+```
 
 ---
 
@@ -129,7 +146,7 @@ Information from [National Park Service](https://www.nps.gov/miss/learn/nature/a
 
 - Both expensive and timely 
 
-- Led Camacho et al (2019) to try using machine learning to classify fish eggs using egg measurements
+- Led Camacho et al (2019) to try using machine learning to classify fish eggs
 
 <br>
 
@@ -149,38 +166,138 @@ class: inverse, middle, center
 
 ---
 
-# Data Collection
+# Overview of Random Forests
 
-```{r out.width = "75%", fig.align = "center"}
+.pull-left[
+**[Camacho et al. (2019)](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1002/nafm.10380)**
+
+- Trained random forests 
+
+- Predictor variables: egg characteristics
+
+- Responses: taxonomy levels (family, genus, species)
+
+- Models showed promise for identifying invasive carp 
+
+]
+
+.pull-right[
+
+**[Goode et al. (submitted manuscript)](https://github.com/goodekat/carp-egg-rf-validation)**
+
+- Validated models using a new year of data
+
+- Trained new models with all years of data
+
+<br>
+
+![](figures/large-carp2.JPG)
+]
+
+---
+
+# Sampling Site and Years
+
+Three years of collection
+
+```{r out.width = "70%", fig.align = "center"}
 include_graphics("figures/map.png")
 ```
 
 ---
 
-# Features
+# Egg Collection
+
+Collected eggs were taken to the lab for measurements and genetic identification
+
+```{r out.width = "45%", fig.align = "center"}
+include_graphics("figures/Larval_Tow_Eggs.jpg")
+```
 
 ---
 
-# Data collection
+# Predictor Variables
+
+.left-code[
+**Egg characteristics: ** 
+
+- Month
+- Julian day  
+- Water temperature	 
+- Water conductivity  	
+- Deflated?	 
+- Pigment?  
+- Compact or diffuse?  	
+- Sticky debris?  
+- Egg stage  
+- Membrane average  
+- Membrane standard deviation  
+- Membrane coefficient of variation  
+- Yolk average
+- Yolk standard deviation  
+- Yolk coefficient of variation
+- Membrane to yolk ratio
+- Larval length  
+]
+
+.right-plot[
+
+```{r out.width = "100%", fig.align = "center"}
+include_graphics("figures/egg-characteristics.png")
+```
+]
 
 ---
 
-# Response variable
+# Response Variables
 
-![](figures/carp.jpg)
+.pull-left[
+
+**Taxonomy**: 
+
+- Genus (17 levels)
+
+- Species (29 levels)
+
+<br> 
+
+**Taxonomy with invasive carp categorized as on class**: 
+
+- Family (8 levels)
+
+- Genus (16 levels)
+
+- Species (27 levels)
+
+]
+
+.pull-right[
+![](figures/carp.png)
+
+<br> 
+<small> Image source: https://www.watershedcouncil.org/asian-carp.html </small>
+]
 
 ---
 
-# Results
+# Results: Metrics on training data
+
+Models trained with 2014-2015 and 2014-2016 data
+
+```{r out.width = "95%", fig.align = "center"}
+include_graphics("figures/train-res.png")
+```
 
 ---
 
-# Validation of models
+# Results: Validation of original models
 
----
+Metrics computed using 2014-2015 model on 2016 data
 
-# Augmented models
-  
+```{r}
+include_graphics("figures/val-res.png")
+```
+
 ---
 
 class: inverse, middle, center
@@ -189,24 +306,127 @@ class: inverse, middle, center
 
 ---
 
-# Goals
+# WhoseEgg
 
----
+**Goal**
 
-# Models used
+- Provide a tool for easily predicting the identification of fish eggs using the random forests
 
----
+- Used to help identify areas where invasive carp are reproducing
 
-# Demonstrate app
+<br>
 
----
+**Audience**
 
-# Plans for adding to the app
+- Scientists and natural resource management organization employees
+
+- Many non-R users
+
+<br>
+
+**Models used**
+
+- Random forests for predicting family, genus, and species with invasive carp grouped
 
 ---
 
 # Feedback from audience
 
+**Current version:**
+
+- Version 1 of app (almost complete)
+
+- Have ideas for improvement
+
+- Would be great to hear thoughts!
+
+<br>
+
+**For example:**
+
+- Suggestions to make more user friendly
+
 - Data input process?
-- What else to look at with predictions?
+
+- What else to look at with predictions within the app?
+
 - Advice for instructions?
+
+- Organizing help page?
+
+---
+
+# Demonstrate app
+
+```{r}
+include_graphics("figures/app.png")
+```
+
+---
+
+# Plans for adding to the app
+
+Version 2: 
+
+- Add visualizations of input data compared to training data
+
+- Include prediction intervals
+
+<br>
+
+Version 3: 
+
+- Add visualizations relating to explainability for individual predictions
+
+- Add video showing how to use the app
+
+- Add image during loading of swimming fish
+
+---
+
+class: inverse, center
+
+# Thank you!
+
+```{r out.width = "85%"}
+knitr::include_graphics("figures/Skunk River larval AC.jpg")
+```
+
+---
+
+class: inverse, center, middle
+
+# Additional Figures
+
+---
+
+# Metrics on new/old sites
+
+```{r out.width = "80%", fig.align = "center"}
+include_graphics("figures/res-diff-sites.png")
+```
+
+---
+
+# Feature importance
+
+```{r out.width = "100%", fig.align = "center"}
+include_graphics("figures/feature-imp.png")
+```
+
+---
+
+# Partial dependence plots
+
+```{r out.width = "100%", fig.align = "center"}
+include_graphics("figures/pdps.png")
+```
+
+---
+
+# Correlation between features
+
+```{r out.width = "80%", fig.align = "center"}
+include_graphics("figures/correlation.png")
+```
+
