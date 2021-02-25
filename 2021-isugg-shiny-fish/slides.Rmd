@@ -1,11 +1,12 @@
 ---
-title: ".teal[WhoseEgg:] A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics"  
+title: "WhoseEgg"
+subtitle: ".white[A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics]"
 author: 
   - "<br>"
-  - "Katherine Goode"
-  - "Joint work with [Dr. Mike Weber](https://michaeljohnweber.wixsite.com/fisherieslab) and [Dr. Philip Dixon](https://pdixon.stat.iastate.edu/)"
-  - ".teal[Presented at ISU Graphics Group]"
-date: 'February 25, 2021'
+  - ".white[Katherine Goode]"
+  - ".white[Joint work with] [Dr. Mike Weber](https://michaeljohnweber.wixsite.com/fisherieslab) .white[and] [Dr. Philip Dixon](https://pdixon.stat.iastate.edu/)"
+  - ".white[Presented at ISU Graphics Group]"
+date: '.white[February 25, 2021]'
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -14,6 +15,7 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+favicon: "hi"
 ---
 
 ```{css, echo = FALSE}
@@ -42,7 +44,8 @@ library(knitr)
 ```{r xaringan-themer, include = FALSE, warning = FALSE}
 library(xaringanthemer)
 style_mono_accent(
-  base_color = "#273E52",
+  base_color = "#273E52", 
+  title_slide_text_color = "#43d1b5",
   header_font_google = google_font("Josefin Sans"),
   text_font_google = google_font("Montserrat", "300", "300i"),
   code_font_google = google_font("Fira Mono"),
@@ -50,7 +53,7 @@ style_mono_accent(
   header_h1_font_size = "2rem",
   header_h2_font_size = "1.75rem",
   header_h3_font_size = "1.25rem",
-  colors = c(teal = "#43d1b5"), 
+  colors = c(teal = "#43d1b5", white = "#ffffff"), 
   link_color = "#43d1b5", 
   code_highlight_color = "#43d1b5"
 )

@@ -52,13 +52,14 @@
   --inverse-background-color: #273E52;
   --inverse-header-color: #FFFFFF;
   --title-slide-background-color: #273E52;
-  --title-slide-text-color: #FFFFFF;
+  --title-slide-text-color: #43d1b5;
   --header-background-color: #273E52;
   --header-background-text-color: #FFFFFF;
   --base: #273E52;
   --white: #FFFFFF;
   --black: #272822;
   --teal: #43d1b5;
+  --white: #ffffff;
 }
 
 html {
@@ -257,5 +258,11 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
 }
 .bg-teal {
   background-color: var(--teal);
+}
+.white {
+  color: var(--white);
+}
+.bg-white {
+  background-color: var(--white);
 }
 
