@@ -325,6 +325,8 @@ class: inverse, middle, center
 
 - Many non-R users
 
+- Users in upper Mississippi River basin (possibly other regions)
+
 <br>
 
 **Models used**
