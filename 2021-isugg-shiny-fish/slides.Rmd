@@ -239,7 +239,7 @@ include_graphics("figures/Larval_Tow_Eggs.jpg")
 - Yolk average
 - Yolk standard deviation  
 - Yolk coefficient of variation
-- Membrane to yolk ratio
+- Yolk to membrane ratio
 - Larval length  
 ]
 
