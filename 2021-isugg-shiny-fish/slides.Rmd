@@ -6,7 +6,7 @@ author:
   - ".white[Katherine Goode]"
   - ".white[Joint work with] [Dr. Mike Weber](https://michaeljohnweber.wixsite.com/fisherieslab) .white[and] [Dr. Philip Dixon](https://pdixon.stat.iastate.edu/)"
   - ".white[Presented at ISU Graphics Group]"
-date: '.white[February 25, 2021]'
+date: ".white[February 25, 2021] <br> <br> <br> <br> .medium[.white[Code for slide generation found [here](https://github.com/goodekat/presentations/tree/master/2021-isugg-shiny-fish)]]"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -15,7 +15,6 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
-favicon: "hi"
 ---
 
 ```{css, echo = FALSE}
@@ -363,7 +362,7 @@ class: inverse, middle, center
 
 # App Demonstration
 
-```{r}
+```{r out.width = "90%", fig.align = "center"}
 include_graphics("figures/app.png")
 ```
 
