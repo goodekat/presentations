@@ -1,0 +1,122 @@
+---
+title: "Using trace plots to visualize summary trees and variability across trees in random forests"
+author: 
+  - "<br>"
+  - "Katherine Goode"
+  - "Presented at ISU Graphics Group"
+date: "March 18, 2021 <br> <br> <br> <br> .medium[.white[Code for creating slides available [here](https://github.com/goodekat/presentations/tree/master/2021-isugg-trace-plots)]]"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{css, echo = FALSE}
+.tiny{font-size: 30%}
+.small{font-size: 50%}
+.medium{font-size: 75%}
+.left-code {
+  color: #777;
+  width: 37%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 60%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE)
+library(knitr)
+```
+
+```{r xaringan-themer, include = FALSE, warning = FALSE}
+library(xaringanthemer)
+style_mono_accent(
+  white_color = "#f7f7e8",
+  base_color = "#557174",
+  header_font_google = google_font("Josefin Sans"),
+  title_slide_background_color = "#557174",
+  inverse_background_color = "#557174",
+  text_font_google = google_font("Montserrat", "300", "300i"),
+  code_font_google = google_font("Fira Mono"),
+  text_slide_number_color = "black",
+  header_h1_font_size = "2rem",
+  header_h2_font_size = "1.75rem",
+  header_h3_font_size = "1.25rem",
+  colors = c(
+    cream = "#f7f7e8",
+    green_light = "#c7cfb7",
+    green_med = "#9dad7f",
+    green_dark = "#557174"
+  ),
+  link_color = "#9dad7f",
+  code_highlight_color = "#9dad7f"
+)
+```
+
+# Overview
+
+- Intro to random forests 
+
+- Background on trace plots
+
+- Extending Trace Plots
+
+  - Visualizing the canopy
+  
+  - Summary trees with variability
+  
+  - Clusters of trees
+  
+  - Linking to other plots
+
+- Limitations and going forward
+
+---
+
+class: inverse, center, middle
+
+# Intro to random forests
+
+---
+
+class: inverse, center, middle
+
+# Background on trace plots
+
+---
+
+class: inverse, center, middle
+
+# Extending trace plots
+
+---
+
+# Visualizing the canopy
+
+---
+
+# Summary trees with variability
+
+---
+
+# Clusters of trees
+
+---
+
+# Linking to other plots
+
+---
+
+class: inverse, center, middle
+
+# Limitations and going foward
