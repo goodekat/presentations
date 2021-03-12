@@ -59,9 +59,9 @@
   --white: #f7f7e8;
   --black: #272822;
   --cream: #f7f7e8;
-  --green_light: #c7cfb7;
-  --green_med: #9dad7f;
-  --green_dark: #557174;
+  --light_green: #c7cfb7;
+  --medium_green: #9dad7f;
+  --dark_green: #557174;
 }
 
 html {
@@ -261,22 +261,22 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
 .bg-cream {
   background-color: var(--cream);
 }
-.green_light {
-  color: var(--green_light);
+.light_green {
+  color: var(--light_green);
 }
-.bg-green_light {
-  background-color: var(--green_light);
+.bg-light_green {
+  background-color: var(--light_green);
 }
-.green_med {
-  color: var(--green_med);
+.medium_green {
+  color: var(--medium_green);
 }
-.bg-green_med {
-  background-color: var(--green_med);
+.bg-medium_green {
+  background-color: var(--medium_green);
 }
-.green_dark {
-  color: var(--green_dark);
+.dark_green {
+  color: var(--dark_green);
 }
-.bg-green_dark {
-  background-color: var(--green_dark);
+.bg-dark_green {
+  background-color: var(--dark_green);
 }
 

@@ -1,10 +1,11 @@
 ---
-title: "Using trace plots to visualize summary trees and variability across trees in random forests"
+title: "Tracing Trees"
+subtitle: "Visualizing the Architecture of Random Forests with Extensions of Trace Plots"
 author: 
   - "<br>"
-  - "Katherine Goode"
-  - "Presented at ISU Graphics Group"
-date: "March 18, 2021 <br> <br> <br> <br> .medium[.white[Code for creating slides available [here](https://github.com/goodekat/presentations/tree/master/2021-isugg-trace-plots)]]"
+  - ".light_green[Katherine Goode]"
+  - ".light_green[Presented at ISU Graphics Group]"
+date: ".light_green[April 1, 2021] <br> <br> <br> <br> .medium[.white[Code for creating slides available [here](https://github.com/goodekat/presentations/tree/master/2021-isugg-trace-plots)]]"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -54,9 +55,9 @@ style_mono_accent(
   header_h3_font_size = "1.25rem",
   colors = c(
     cream = "#f7f7e8",
-    green_light = "#c7cfb7",
-    green_med = "#9dad7f",
-    green_dark = "#557174"
+    light_green = "#c7cfb7",
+    medium_green = "#9dad7f",
+    dark_green = "#557174"
   ),
   link_color = "#9dad7f",
   code_highlight_color = "#9dad7f"
