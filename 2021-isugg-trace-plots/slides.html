@@ -4,8 +4,8 @@
     <title>Tracing Trees</title>
     <meta charset="utf-8" />
     <meta name="author" content="" />
-    <meta name="author" content=".light_green[Katherine Goode]" />
-    <meta name="author" content=".light_green[Presented at ISU Graphics Group]" />
+    <meta name="author" content="Katherine Goode" />
+    <meta name="author" content="Presented at ISU Graphics Group" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -13,11 +13,11 @@
 class: center, middle, inverse, title-slide
 
 # Tracing Trees
-## Visualizing the Architecture of Random Forests with Extensions of Trace Plots
+## .light_green[Visualizing Variability in the Architecture of Random Forest Trees Using Extensions of Trace Plots]
 ### <br>
-### .light_green[Katherine Goode]
-### .light_green[Presented at ISU Graphics Group]
-### .light_green[April 1, 2021] <br> <br> <br> <br> .medium[.white[Code for creating slides available <a href="https://github.com/goodekat/presentations/tree/master/2021-isugg-trace-plots">here</a>]]
+### Katherine Goode
+### Presented at ISU Graphics Group
+### April 1, 2021 <br> <br> <br> <br> .small[Code used to create slides available <a href="https://github.com/goodekat/presentations/tree/master/2021-isugg-trace-plots">here</a>]
 
 ---
 
@@ -45,9 +45,17 @@ class: center, middle, inverse, title-slide
 
 # Overview
 
-- Intro to random forests 
+- Background
 
-- Background on trace plots
+  - Random forests 
+  
+  - Trace plots
+
+&lt;br&gt;
+
+- TreeTracer
+
+&lt;br&gt;
 
 - Extending Trace Plots
 
@@ -59,19 +67,112 @@ class: center, middle, inverse, title-slide
   
   - Linking to other plots
 
-- Limitations and going forward
+&lt;br&gt;
+
+- Limitations and next steps
 
 ---
 
 class: inverse, center, middle
 
-# Intro to random forests
+# Background
+
+---
+
+# Random Forests
+
+&lt;img src="figures/rf-diagram.png" width="2580" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Common Tree Visualization
+
+From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11):
+
+&lt;img src="figures/tree.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Trace Plots (one tree)
+
+From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11):
+
+&lt;img src="figures/trace.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Trace Plots (forest of trees)
+
+From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11):
+
+&lt;img src="figures/trace-plot.png" width="85%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Example: Predicting Penguin Species
+
+
+```r
+# Load the Palmer penguins data
+penguins &lt;- na.omit(palmerpenguins::penguins)
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-7-1.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+
+```r
+# Fit a random forest
+set.seed(71)
+penguin_rf &lt;-
+  randomForest::randomForest(
+    species ~ 
+      bill_length_mm + 
+      bill_depth_mm + 
+      flipper_length_mm + 
+      body_mass_g,
+    data = penguins, 
+    ntree = 50
+  )
+```
+
+
+```r
+# Print the confusion matrix
+penguin_rf$confusion
+```
+
+```
+##           Adelie Chinstrap Gentoo class.error
+## Adelie       142         3      1 0.027397260
+## Chinstrap      4        64      0 0.058823529
+## Gentoo         0         1    118 0.008403361
+```
+
+---
+
+&lt;br&gt;
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-12-1.png" width="65%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 class: inverse, center, middle
 
-# Background on trace plots
+# TreeTracer
+
+---
+
+# TreeTracer R Package
+
+&lt;iframe src="https://github.com/goodekat/TreeTracer" title="TreeTracer" width="100%" height = "500" &gt;&lt;/iframe&gt;
 
 ---
 
@@ -99,7 +200,14 @@ class: inverse, center, middle
 
 class: inverse, center, middle
 
-# Limitations and going foward
+# Limitations and next steps
+
+---
+
+# New Metrics
+
+- Compare the regions that are used to make a prediction (since the order of splits may not matter)
+- Metric that basically compares two traces for similarities
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

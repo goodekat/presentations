@@ -42,26 +42,30 @@
   --header-h3-font-size: 1.25rem;
 
   /* Colors */
-  --text-color: #272822;
+  --text-color: #000000;
   --header-color: #557174;
-  --background-color: #f7f7e8;
+  --background-color: #FFFFFF;
   --link-color: #9dad7f;
   --text-bold-color: #557174;
   --code-highlight-color: #9dad7f;
-  --inverse-text-color: #f7f7e8;
-  --inverse-background-color: #557174;
+  --inverse-text-color: #000000;
+  --inverse-background-color: #9dad7f;
   --inverse-header-color: #f7f7e8;
   --title-slide-background-color: #557174;
   --title-slide-text-color: #f7f7e8;
   --header-background-color: #557174;
-  --header-background-text-color: #f7f7e8;
-  --base: #557174;
-  --white: #f7f7e8;
-  --black: #272822;
+  --header-background-text-color: #FFFFFF;
+  --primary: #557174;
+  --secondary: #9dad7f;
+  --white: #FFFFFF;
+  --black: #000000;
   --cream: #f7f7e8;
   --light_green: #c7cfb7;
   --medium_green: #9dad7f;
   --dark_green: #557174;
+  --orange: #D67236;
+  --tan: #F1BB7B;
+  --purple: #916a89;
 }
 
 html {
@@ -105,7 +109,7 @@ h1, h2, h3 {
   color: #557174;
 }
 .remark-slide-number {
-  color: black;
+  color: #557174;
   opacity: 1;
   font-size: 0.9em;
 }
@@ -172,7 +176,7 @@ img, video, iframe {
   max-width: 100%;
 }
 blockquote {
-  border-left: solid 5px #55717480;
+  border-left: solid 5px #9dad7f80;
   padding-left: 1em;
 }
 .remark-slide table {
@@ -187,7 +191,7 @@ th, td {
   padding: 5px;
 }
 .remark-slide thead, .remark-slide tfoot, .remark-slide tr:nth-child(even) {
-  background: #DDE2E3;
+  background: #EBEEE5;
 }
 table.dataTable tbody {
   background-color: var(--background-color);
@@ -197,7 +201,7 @@ table.dataTable.display tbody tr.odd {
   background-color: var(--background-color);
 }
 table.dataTable.display tbody tr.even {
-  background-color: #DDE2E3;
+  background-color: #EBEEE5;
 }
 table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.5);
@@ -237,11 +241,17 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   }
 }
 
-.base {
-  color: var(--base);
+.primary {
+  color: var(--primary);
 }
-.bg-base {
-  background-color: var(--base);
+.bg-primary {
+  background-color: var(--primary);
+}
+.secondary {
+  color: var(--secondary);
+}
+.bg-secondary {
+  background-color: var(--secondary);
 }
 .white {
   color: var(--white);
@@ -278,5 +288,23 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
 }
 .bg-dark_green {
   background-color: var(--dark_green);
+}
+.orange {
+  color: var(--orange);
+}
+.bg-orange {
+  background-color: var(--orange);
+}
+.tan {
+  color: var(--tan);
+}
+.bg-tan {
+  background-color: var(--tan);
+}
+.purple {
+  color: var(--purple);
+}
+.bg-purple {
+  background-color: var(--purple);
 }
 

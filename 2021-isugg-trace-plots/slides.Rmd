@@ -1,11 +1,11 @@
 ---
 title: "Tracing Trees"
-subtitle: "Visualizing the Architecture of Random Forests with Extensions of Trace Plots"
+subtitle: ".light_green[Visualizing Variability in the Architecture of Random Forest Trees Using Extensions of Trace Plots]"
 author: 
   - "<br>"
-  - ".light_green[Katherine Goode]"
-  - ".light_green[Presented at ISU Graphics Group]"
-date: ".light_green[April 1, 2021] <br> <br> <br> <br> .medium[.white[Code for creating slides available [here](https://github.com/goodekat/presentations/tree/master/2021-isugg-trace-plots)]]"
+  - "Katherine Goode"
+  - "Presented at ISU Graphics Group"
+date: "April 1, 2021 <br> <br> <br> <br> .small[Code used to create slides available [here](https://github.com/goodekat/presentations/tree/master/2021-isugg-trace-plots)]"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -34,41 +34,63 @@ output:
 ```
 
 ```{r setup, include = FALSE}
+# Knitr options
 options(htmltools.dir.version = FALSE)
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  fig.align = "center", 
+  dpi = 300
+)
+
+# Load packages
+library(dplyr)
+library(GGally)
+library(ggpcp)
+library(ggplot2)
 library(knitr)
+library(xaringanthemer)
 ```
 
 ```{r xaringan-themer, include = FALSE, warning = FALSE}
-library(xaringanthemer)
-style_mono_accent(
-  white_color = "#f7f7e8",
-  base_color = "#557174",
+style_duo_accent(
+  primary_color = "#557174",
+  secondary_color = "#9dad7f",
   header_font_google = google_font("Josefin Sans"),
   title_slide_background_color = "#557174",
-  inverse_background_color = "#557174",
   text_font_google = google_font("Montserrat", "300", "300i"),
   code_font_google = google_font("Fira Mono"),
-  text_slide_number_color = "black",
   header_h1_font_size = "2rem",
   header_h2_font_size = "1.75rem",
   header_h3_font_size = "1.25rem",
+  title_slide_text_color = "#f7f7e8",
+  inverse_header_color = "#f7f7e8",
+  link_color = "#9dad7f",
+  code_highlight_color = "#9dad7f",
   colors = c(
     cream = "#f7f7e8",
     light_green = "#c7cfb7",
     medium_green = "#9dad7f",
-    dark_green = "#557174"
-  ),
-  link_color = "#9dad7f",
-  code_highlight_color = "#9dad7f"
+    dark_green = "#557174",
+    orange = "#D67236",
+    tan = "#F1BB7B",
+    purple = "#916a89"
+  )
 )
 ```
 
 # Overview
 
-- Intro to random forests 
+- Background
 
-- Background on trace plots
+  - Random forests 
+  
+  - Trace plots
+
+<br>
+
+- TreeTracer
+
+<br>
 
 - Extending Trace Plots
 
@@ -80,19 +102,180 @@ style_mono_accent(
   
   - Linking to other plots
 
-- Limitations and going forward
+<br>
+
+- Limitations and next steps
 
 ---
 
 class: inverse, center, middle
 
-# Intro to random forests
+# Background
+
+---
+
+# Random Forests
+
+```{r}
+knitr::include_graphics("figures/rf-diagram.png")
+```
+
+---
+
+# Common Tree Visualization
+
+From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11):
+
+```{r out.width = "100%"}
+knitr::include_graphics("figures/tree.png")
+```
+
+---
+
+# Trace Plots (one tree)
+
+From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11):
+
+```{r out.width = "100%"}
+knitr::include_graphics("figures/trace.png")
+```
+
+---
+
+# Trace Plots (forest of trees)
+
+From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11):
+
+```{r out.width = "85%"}
+knitr::include_graphics("figures/trace-plot.png")
+```
+
+---
+
+# Example: Predicting Penguin Species
+
+```{r echo = TRUE}
+# Load the Palmer penguins data
+penguins <- na.omit(palmerpenguins::penguins)
+```
+
+```{r fig.width = 9, fig.height = 8, out.width = "65%"}
+ggpairs(
+  penguins,
+  columns = 3:6,
+  aes(colour = species, fill = species),
+  progress = FALSE,
+  diag = list(continuous = wrap("densityDiag", alpha=0.5 ))
+) +
+  scale_color_manual(values = c("#557174", "#9dad7f", "#916a89")) +
+  scale_fill_manual(values = c("#557174", "#9dad7f", "#916a89")) +
+  theme_xaringan(text_font_size = 14) +
+  theme(legend.position = "bottom")
+```
+
+```{r fig.width = 12, fig.height = 7, eval = FALSE}
+# penguins %>%
+#   ggplot(aes(color = species)) +
+#   ggpcp::geom_pcp(aes(
+#     vars = vars(
+#       bill_length_mm, 
+#       bill_depth_mm, 
+#       flipper_length_mm, 
+#       body_mass_g
+#     )
+#   ), alpha = 0.5) + 
+#   scale_color_manual(values = c("#557174", "#9dad7f", "#916a89")) +
+#   theme_xaringan(text_font_size = 14) +
+#   theme(legend.position = "bottom")
+```
+
+---
+
+```{r echo = TRUE}
+# Fit a random forest
+set.seed(71)
+penguin_rf <-
+  randomForest::randomForest(
+    species ~ 
+      bill_length_mm + 
+      bill_depth_mm + 
+      flipper_length_mm + 
+      body_mass_g,
+    data = penguins, 
+    ntree = 50
+  )
+```
+
+```{r echo = TRUE}
+# Print the confusion matrix
+penguin_rf$confusion
+```
+
+---
+
+<br>
+
+```{r fig.height = 6, fig.width = 10}
+vi <- 
+  data.frame(penguin_rf$importance) %>%
+  arrange(desc(MeanDecreaseGini)) %>%
+  tibble::rownames_to_column(var = "feature")
+
+vi %>%
+  mutate(feature = factor(feature, levels = rev(vi$feature))) %>%
+  ggplot(aes(x = feature, y = MeanDecreaseGini)) + 
+  geom_col() + 
+  coord_flip() + 
+  labs(
+    x = "Feature", 
+    y = "Random Forest Variable Importance",
+    title = "Variable Importance from Random Forest for Predicting Penguin Species"
+  ) + 
+  theme_xaringan(text_font_size = 14)
+```
+
+---
+
+```{r fig.height = 11, fig.width = 9, out.width = "65%"}
+# Load package
+library(TreeTracer)
+
+# Create a trace plot of all trees in the forest
+penguin_trace <-
+  trace_plot(
+    rf = penguin_rf,
+    train = penguins %>%
+      select(
+        bill_length_mm,
+        bill_depth_mm,
+        flipper_length_mm,
+        body_mass_g
+      ),
+    tree_ids = 1:penguin_rf$ntree,
+    alpha = 0.4
+  ) + 
+  theme_xaringan(text_font_size = 14) +
+  labs(title = 
+         paste(
+           "Trace Plot of All", 
+           penguin_rf$ntree, 
+           "Trees in the Penguin Random Forest"
+           )
+        )
+penguin_trace
+```
 
 ---
 
 class: inverse, center, middle
 
-# Background on trace plots
+# TreeTracer
+
+---
+
+# TreeTracer R Package
+
+<iframe src="https://github.com/goodekat/TreeTracer" title="TreeTracer" width="100%" height = "500" ></iframe>
 
 ---
 
@@ -120,4 +303,11 @@ class: inverse, center, middle
 
 class: inverse, center, middle
 
-# Limitations and going foward
+# Limitations and next steps
+
+---
+
+# New Metrics
+
+- Compare the regions that are used to make a prediction (since the order of splits may not matter)
+- Metric that basically compares two traces for similarities
