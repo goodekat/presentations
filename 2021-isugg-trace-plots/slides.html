@@ -3,9 +3,19 @@
   <head>
     <title>Tracing Trees</title>
     <meta charset="utf-8" />
-    <meta name="author" content="" />
+    <meta name="author" content=" " />
     <meta name="author" content="Katherine Goode" />
     <meta name="author" content="Presented at ISU Graphics Group" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/jquery/jquery.min.js"></script>
+    <link href="libs/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="libs/datatables-binding/datatables.js"></script>
+    <link href="libs/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="libs/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="libs/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="libs/crosstalk/css/crosstalk.css" rel="stylesheet" />
+    <script src="libs/crosstalk/js/crosstalk.min.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -28,14 +38,14 @@ class: center, middle, inverse, title-slide
 .medium{font-size: 75%}
 .left-code {
   color: #777;
-  width: 37%;
+  width: 39%;
   height: 92%;
   float: left;
 }
 .right-plot {
-  width: 60%;
+  width: 59%;
   float: right;
-  padding-left: 1%;
+  padding-left: 2%;
 }
 &lt;/style&gt;
 
@@ -53,23 +63,19 @@ class: center, middle, inverse, title-slide
 
 &lt;br&gt;
 
-- TreeTracer
+- TreeTracer: Trace Plots in R
 
 &lt;br&gt;
 
 - Extending Trace Plots
 
-  - Visualizing the canopy
-  
-  - Summary trees with variability
-  
-  - Clusters of trees
-  
-  - Linking to other plots
+&lt;br&gt;
+
+- Patterns in the Forest
 
 &lt;br&gt;
 
-- Limitations and next steps
+- Limitations and Next Steps
 
 ---
 
@@ -79,13 +85,13 @@ class: inverse, center, middle
 
 ---
 
-# Random Forests
+## Random Forests
 
 &lt;img src="figures/rf-diagram.png" width="2580" style="display: block; margin: auto;" /&gt;
 
 ---
 
-# Common Tree Visualization
+## Common Tree Visualization
 
 From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11):
 
@@ -93,7 +99,7 @@ From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-
 
 ---
 
-# Trace Plots (one tree)
+## Trace Plots (one tree)
 
 From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11):
 
@@ -101,7 +107,7 @@ From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-
 
 ---
 
-# Trace Plots (forest of trees)
+## Trace Plots (forest of trees)
 
 From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11):
 
@@ -109,17 +115,22 @@ From [Urbanek (2008)](https://link.springer.com/chapter/10.1007/978-3-540-33037-
 
 ---
 
-# Example: Predicting Penguin Species
+## Example: Predicting Penguin Species
 
 
 ```r
-# Load the Palmer penguins data
+# Load the Palmer penguins data and prepare training data
 penguins &lt;- na.omit(palmerpenguins::penguins)
+penguins_train &lt;- 
+  penguins %&gt;% 
+  select(bill_depth_mm, bill_length_mm, flipper_length_mm, body_mass_g)
 ```
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-7-1.png" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-7-1.png" style="display: block; margin: auto;" /&gt;
 
+---
 
+&lt;img src="slides_files/figure-html/unnamed-chunk-8-1.png" width="90%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -127,7 +138,7 @@ penguins &lt;- na.omit(palmerpenguins::penguins)
 ```r
 # Fit a random forest
 set.seed(71)
-penguin_rf &lt;-
+penguins_rf &lt;-
   randomForest::randomForest(
     species ~ 
       bill_length_mm + 
@@ -142,7 +153,7 @@ penguin_rf &lt;-
 
 ```r
 # Print the confusion matrix
-penguin_rf$confusion
+penguins_rf$confusion
 ```
 
 ```
@@ -166,48 +177,435 @@ penguin_rf$confusion
 
 class: inverse, center, middle
 
-# TreeTracer
+# TreeTracer: Trace Plots in R
 
 ---
 
-# TreeTracer R Package
+## TreeTracer R Package
 
-&lt;iframe src="https://www.stat.iastate.edu/" width = "100%" height = "500" &gt;&lt;/iframe&gt;
+&lt;br&gt;
+
+Functions for:
+
+- Creating trace plots from random forests (with some extensions)
+
+- Extract tree data in a data frame for trace plots
+
+- Compute distances between trees
+
+&lt;br&gt;
+
+GitHub repo: [https://github.com/goodekat/TreeTracer](https://github.com/goodekat/TreeTracer)
+
+&lt;br&gt;
+
+
+```r
+# To install the package from GitHub
+# Use with caution -- very much still in development
+remotes::install_github("goodekat/TreeTracer")
+```
+
+---
+
+## Individual Tree Data Frame
+
+### randomForest
+
+
+```r
+rf_tree1 &lt;- randomForest::getTree(rfobj = penguins_rf, k = 1) 
+```
+
+
+| left daughter| right daughter| split var| split point| status| prediction|
+|-------------:|--------------:|---------:|-----------:|------:|----------:|
+|             2|              3|         1|       43.25|      1|          0|
+|             4|              5|         3|      206.50|      1|          0|
+|             6|              7|         3|      206.50|      1|          0|
+|             8|              9|         2|       16.75|      1|          0|
+|            10|             11|         2|       16.80|      1|          0|
+|            12|             13|         4|     4575.00|      1|          0|
+
+
+---
+
+## Individual Tree Data Frame
+
+### TreeTracer
+
+
+```r
+*tt_tree1 = TreeTracer::get_tree_data(rf = penguins_rf, k = 1)
+```
+
+
+| tree| tree_level| tree_branch|split_var         | split_point|
+|----:|----------:|-----------:|:-----------------|-----------:|
+|    1|          1|           1|bill_length_mm    |       43.25|
+|    1|          2|           1|flipper_length_mm |      206.50|
+|    1|          2|           2|flipper_length_mm |      206.50|
+|    1|          3|           2|bill_depth_mm     |       16.75|
+|    1|          2|           3|flipper_length_mm |      206.50|
+|    1|          3|           3|body_mass_g       |     4575.00|
+
+
+---
+
+## Trace Plot Data Frame
+
+
+```r
+tree1_trace &lt;-
+* TreeTracer::get_trace_data(
+    tree_data = tt_tree1,
+    rf = penguins_rf,
+    train = penguins_train
+  )
+```
+
+<div id="htmlwidget-97e9b616f1ea9173d0e5" style="width:100%;height:350px;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-97e9b616f1ea9173d0e5">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],[1,1,1,1,1,1],[1,2,2,3,2,3],[1,1,2,2,3,3],["bill_length_mm","flipper_length_mm","flipper_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g"],[43.25,206.5,206.5,16.75,206.5,4575],[1,2,2,3,2,4],[1.4,2.4,2.4,3.4,2.4,4.4],[0.6,1.6,1.6,2.6,1.6,3.6],[59.6,231,231,21.5,231,6300],[32.1,172,172,13.1,172,2700],[4,3,3,5,3,2],[1.07563636363636,1.93220338983051,1.93220338983051,3.05238095238095,1.93220338983051,3.98333333333333]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>tree<\/th>\n      <th>tree_level<\/th>\n      <th>tree_branch<\/th>\n      <th>split_var<\/th>\n      <th>split_point<\/th>\n      <th>seg_xmid<\/th>\n      <th>seg_xmin<\/th>\n      <th>seg_xmax<\/th>\n      <th>split_var_max<\/th>\n      <th>split_var_min<\/th>\n      <th>n_splits<\/th>\n      <th>split_scaled<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":600,"pageLength":6,"dom":"ti","ordering":false,"columnDefs":[{"className":"dt-right","targets":[1,2,3,5,6,7,8,9,10,11,12]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+## Trace Plot Function (one tree)
+
+.left-code[
+
+```r
+penguin_trace_tree1 &lt;-
+* TreeTracer::trace_plot(
+    rf = penguins_rf,
+    train = penguins_train,
+    tree_ids = 1,
+    alpha = 1
+  )
+```
+]
+
+.right-plot[
+&lt;img src="slides_files/figure-html/unnamed-chunk-21-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Trace Plot Function (multiple trees)
+
+.left-code[
+
+```r
+ntrees = penguins_rf$ntree
+
+penguin_trace &lt;-
+* TreeTracer::trace_plot(
+    rf = penguins_rf,
+    train = penguins_train,
+    tree_ids = 1:ntrees,
+    alpha = 0.4
+  )
+```
+]
+
+.right-plot[
+&lt;img src="slides_files/figure-html/unnamed-chunk-23-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
 class: inverse, center, middle
 
-# Extending trace plots
+# Extending Trace Plots
 
 ---
 
-# Visualizing the canopy
+## Coloring Trees
+
+.left-code[
+
+```r
+penguin_trace_col &lt;-
+  TreeTracer::trace_plot( 
+    rf = penguins_rf,
+    train = penguins_train,
+    tree_ids = 1:ntrees,
+    alpha = 0.4,
+*   tree_color = "#9dad7f"
+  )
+```
+]
+
+.right-plot[
+&lt;img src="slides_files/figure-html/unnamed-chunk-25-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
-# Summary trees with variability
+## Display a Representative Tree 
+
+.left-code[
+
+```r
+penguin_trace_rep &lt;-
+  TreeTracer::trace_plot( 
+    rf = penguins_rf,
+    train = penguins_train,
+    tree_ids = 1:ntrees,
+    alpha = 0.4,
+    tree_color = "#9dad7f",
+*   rep_tree =
+*     get_tree_data(
+*       rf = penguins_rf,
+*       k = 12
+*     ),
+*   rep_tree_size = 1.5,
+*   rep_tree_alpha = 0.9,
+*   rep_tree_color = "#557174"
+  ) + 
+  labs(
+    title = "Highlighting Tree 12"
+  )
+```
+]
+
+.right-plot[
+&lt;img src="slides_files/figure-html/unnamed-chunk-27-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
-# Clusters of trees
+## Color by ID
+
+.left-code[
+
+```r
+penguin_trace_by_id &lt;-
+  TreeTracer::trace_plot( 
+    rf = penguins_rf,
+    train = penguins_train,
+    tree_ids = 1:6,
+    alpha = 0.9, 
+*   color_by_id = TRUE
+  ) + 
+  scale_color_manual(
+    values = c(
+      "#c7cfb7",
+      "#9dad7f",
+      "#557174",
+      "#D67236",
+      "#F1BB7B",
+      "#916a89"
+  ))
+```
+]
+
+.right-plot[
+&lt;img src="slides_files/figure-html/unnamed-chunk-29-1.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
-# Linking to other plots
+## Facet by ID
+
+.left-code[
+
+```r
+penguin_trace_facet &lt;-
+  TreeTracer::trace_plot( 
+    rf = penguins_rf,
+    train = penguins_train,
+    tree_ids = 1:6,
+    alpha = 0.9, 
+    color_by_id = TRUE, 
+*   facet_by_id = TRUE
+  ) + 
+  scale_color_manual(
+    values = c(
+      "#c7cfb7",
+      "#9dad7f",
+      "#557174",
+      "#D67236",
+      "#F1BB7B",
+      "#916a89"
+  ))
+```
+]
+
+.right-plot[
+&lt;img src="slides_files/figure-html/unnamed-chunk-31-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Maximum Depth
+
+.left-code[
+
+```r
+penguin_trace_max &lt;-
+  TreeTracer::trace_plot( 
+    rf = penguins_rf,
+    train = penguins_train,
+    tree_ids = 1:ntrees,
+    alpha = 0.4,
+*   max_depth = 3
+  )
+```
+]
+
+.right-plot[
+&lt;img src="slides_files/figure-html/unnamed-chunk-33-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
 class: inverse, center, middle
 
-# Limitations and next steps
+# Patterns in the Forest
 
 ---
 
-# New Metrics
+## Two Approaches to Finding Patterns
 
-- Compare the regions that are used to make a prediction (since the order of splits may not matter)
-- Metric that basically compares two traces for similarities
+### (1) Clusters of Trees
+
+- Are there clusters of trees within a forest? 
+
+- Would tell us if similar or different decision paths are used by the forest
+
+### (2) Representative Tree
+
+- Can we extract a tree that represents the forest?
+
+- Can we extract a tree representative of each cluster?
+
+&lt;br&gt;
+
+### Examples of Previous Work
+
+  - [Sies and Van Mechelen (2020)](https://link.springer.com/article/10.1007/s00357-019-09350-4)
+  - [Weinberg and Last (2019)](https://journalofbigdata.springeropen.com/articles/10.1186/s40537-019-0186-3)
+  - [Weinberg and Last (2017)](https://sciendo.com/article/10.1515/amcs-2017-0051)
+  - [Banerjee, Ding, and Noone (2011)](https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.4492)
+  - [Miglio and Soffritti (2004)](https://www.sciencedirect.com/science/article/abs/pii/S016794730300063X?via%3Dihub)
+  - [Shannon and Banks (1999)](https://onlinelibrary.wiley.com/doi/epdf/10.1002/%28SICI%291097-0258%2819990330%2918%3A6%3C727%3A%3AAID-SIM61%3E3.0.CO%3B2-2)
+  - [Chipman, George, and McCulloch (1998)](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.42.2598)
+
+---
+
+## Visualizing Clusters and Representative Trees
+
+For both approaches, trace plots would be a great visualization tool!
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="figures/chipman.png" alt="(Left) From Chipman (1998). (Right) Early version of a trace plot I made to depict the four Chipman Trees." width="120%" /&gt;
+&lt;p class="caption"&gt;(Left) From Chipman (1998). (Right) Early version of a trace plot I made to depict the four Chipman Trees.&lt;/p&gt;
+&lt;/div&gt;
+
+---
+
+## My Current Process for Clustering Trees
+
+1. Start with a distance metric to compare similarities between trees
+
+  - Several implemented in TreeTracer
+
+2. Obtain a distance matrix  
+
+3. Apply a clustering method:
+  
+  - Hierarchical clustering
+
+  - K-nearest neighbors
+
+  - Multi-dimensional scaling
+
+4. Visualize clusters using trace plots
+
+---
+
+## Step 1: Compute Distances
+
+---
+
+## Step 2: Obtain Distance Matrix
+
+---
+
+## Step 3: Apply Clustering Method
+
+---
+
+## Step 4: Visualize clusters
+
+---
+
+## More Examples
+
+---
+
+class: inverse, center, middle
+
+# Limitations and Next Steps
+
+---
+
+## Limitations
+
+### Cognitive load
+
+- Too much information to extract understanding?
+
+&lt;br&gt;
+
+### Overplotting issues
+
+- Too many trees hide the trends
+
+&lt;br&gt;
+
+### True trends? 
+
+- Are we actually able to identify realistic similarities and differences between trees?
+
+---
+
+## Future Work
+
+.pull-left[
+### New Metrics
+
+- Metric that compares two traces for similarities
+
+- Compare the regions that are used to make a prediction
+
+&lt;br&gt;
+
+### Linking to other plots
+
+- Sectioned scatterplots
+
+- Visualizations of interactions created by splits
+
+- Parallel coordinate plots with split points overlaid
+]
+
+.pull-right[
+### Computing Representative Trees
+
+- Implement developed methods
+
+- Consider new methods
+
+&lt;br&gt;
+
+### Other
+
+- How to choose a maximum depth? (perhaps based on predictive accuracy)
+
+- How to account for categorical variables?
+
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
