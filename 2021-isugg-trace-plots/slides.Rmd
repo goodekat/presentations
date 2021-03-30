@@ -588,11 +588,9 @@ penguin_trace_max +
 
 ---
 
-.scroll-output[
-```{r}
+```{r out.width = "23%"}
 knitr::include_graphics("figures/bullet-rf.png")
 ```
-]
 
 ---
 
@@ -1468,7 +1466,7 @@ plot_mds_gradient <- function(mds, coordinate, ntrees) {
 mds %>%
   filter(metric == "partition metric") %>%
   ggplot(aes(x = `Coordinate 1`, y = `Coordinate 2`, color = `Coordinate 1`)) +
-  geom_text(aes(label = Tree)) +
+  geom_text(aes(label = Tree), size = 10) +
   labs(title = "MDS from Fit Metric") +
   theme_xaringan(text_font_size = 18, title_font_size = 20) +
   scale_colour_gradient2(
@@ -1479,7 +1477,7 @@ mds %>%
   )
 ```
 
-```{r fig.width = 22, fig.height = 8}
+```{r fig.width = 18, fig.height = 7}
 plot_mds_gradient(
   mds = mds %>% filter(metric == "partition metric"),
   coordinate = 1,
@@ -1508,7 +1506,7 @@ plot_mds_gradient(
 mds %>%
   filter(metric == "partition metric") %>%
   ggplot(aes(x = `Coordinate 1`, y = `Coordinate 2`, color = `Coordinate 2`)) +
-  geom_text(aes(label = Tree)) +
+  geom_text(aes(label = Tree), size = 10) +
   labs(title = "MDS from Fit Metric") +
   theme_xaringan(text_font_size = 18, title_font_size = 20) +
   scale_colour_gradient2(
@@ -1519,7 +1517,7 @@ mds %>%
   )
 ```
 
-```{r fig.width = 22, fig.height = 8}
+```{r fig.width = 18, fig.height = 7}
 plot_mds_gradient(
   mds = mds %>% filter(metric == "partition metric"),
   coordinate = 2,
@@ -1544,7 +1542,7 @@ plot_mds_gradient(
 
 ---
 
-```{r fig.width = 24, fig.height = 6}
+```{r fig.width = 23, fig.height = 8}
 plot_mds_gradient(
   mds = mds %>% filter(metric == "partition metric"), 
   coordinate = 1,
@@ -1565,7 +1563,7 @@ plot_mds_gradient(
 
 <br>
 
-```{r fig.width = 24, fig.height = 6}
+```{r fig.width = 23, fig.height = 8}
 plot_mds_gradient(
   mds = mds %>% filter(metric == "partition metric"), 
   coordinate = 2,
