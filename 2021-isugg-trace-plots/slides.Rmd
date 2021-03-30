@@ -1471,7 +1471,6 @@ mds %>%
   geom_text(aes(label = Tree)) +
   labs(title = "MDS from Fit Metric") +
   theme_xaringan(text_font_size = 18, title_font_size = 20) +
-  #theme(aspect.ratio = 1) +
   scale_colour_gradient2(
     low = colors[7],
     mid = colors[8],
@@ -1512,7 +1511,6 @@ mds %>%
   geom_text(aes(label = Tree)) +
   labs(title = "MDS from Fit Metric") +
   theme_xaringan(text_font_size = 18, title_font_size = 20) +
-  #theme(aspect.ratio = 1) +
   scale_colour_gradient2(
     low = colors[7],
     mid = colors[8],
