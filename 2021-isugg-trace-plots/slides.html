@@ -47,19 +47,24 @@ class: center, middle, inverse, title-slide
   float: right;
   padding-left: 2%;
 }
+.scroll-output {
+  height: 90%;
+  overflow-y: scroll;
+}
+.content-box {
+  box-sizing: border-box;
+  border-radius: 15px;
+  margin: 0 0 15px;
+  overflow: hidden;
+  padding: 0px 20px 0px 20px;
+  width: 100%;
+  background-color: #c7cfb7;
+}
 &lt;/style&gt;
 
 
 
 
-
-&lt;!-- # April Fool's Day Fun --&gt;
-
-&lt;!-- - https://www.history.com/topics/holidays/april-fools-day --&gt;
-
-&lt;!-- - https://blogs.sas.com/content/sgf/2018/04/01/sas-discovers-a-new-planet-in-the-solar-system/ --&gt;
-
-&lt;!-- --- --&gt;
 
 # Overview
 
@@ -83,7 +88,7 @@ class: center, middle, inverse, title-slide
 
 &lt;br&gt;
 
-- Limitations and Next Steps
+- Limitations and Ideas for Future Work
 
 ---
 
@@ -191,8 +196,7 @@ class: inverse, center, middle
 
 ## TreeTracer R Package
 
-&lt;br&gt;
-
+.content-box[
 Functions for:
 
 - Creating trace plots from random forests (with some extensions)
@@ -200,6 +204,7 @@ Functions for:
 - Extract tree data in a data frame for trace plots
 
 - Compute distances between trees
+]
 
 &lt;br&gt;
 
@@ -467,6 +472,16 @@ penguin_trace_max &lt;-
 
 ---
 
+.scroll-output[
+&lt;img src="figures/bullet-rf.png" width="672" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+&lt;img src="figures/bullet-rf-small.png" width="960" style="display: block; margin: auto;" /&gt;
+
+---
+
 class: inverse, center, middle
 
 # Patterns in the Forest
@@ -487,32 +502,57 @@ class: inverse, center, middle
 
 - Can we extract a tree representative of each cluster?
 
-&lt;br&gt;
-
+.pull-left[
 ### Examples of Previous Work
 
-  - [Sies and Van Mechelen (2020)](https://link.springer.com/article/10.1007/s00357-019-09350-4)
-  - [Weinberg and Last (2019)](https://journalofbigdata.springeropen.com/articles/10.1186/s40537-019-0186-3)
-  - [Weinberg and Last (2017)](https://sciendo.com/article/10.1515/amcs-2017-0051)
-  - [Banerjee, Ding, and Noone (2011)](https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.4492)
-  - [Miglio and Soffritti (2004)](https://www.sciencedirect.com/science/article/abs/pii/S016794730300063X?via%3Dihub)
-  - [Shannon and Banks (1999)](https://onlinelibrary.wiley.com/doi/epdf/10.1002/%28SICI%291097-0258%2819990330%2918%3A6%3C727%3A%3AAID-SIM61%3E3.0.CO%3B2-2)
-  - [Chipman, George, and McCulloch (1998)](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.42.2598)
+.medium[
+- [Sies and Van Mechelen (2020)](https://link.springer.com/article/10.1007/s00357-019-09350-4)
+- [Weinberg and Last (2019)](https://journalofbigdata.springeropen.com/articles/10.1186/s40537-019-0186-3)
+- [Weinberg and Last (2017)](https://sciendo.com/article/10.1515/amcs-2017-0051)
+- [Banerjee, Ding, and Noone (2011)](https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.4492)
+- [Miglio and Soffritti (2004)](https://www.sciencedirect.com/science/article/abs/pii/S016794730300063X?via%3Dihub)
+- [Shannon and Banks (1999)](https://onlinelibrary.wiley.com/doi/epdf/10.1002/%28SICI%291097-0258%2819990330%2918%3A6%3C727%3A%3AAID-SIM61%3E3.0.CO%3B2-2)
+- [Chipman, George, and McCulloch (1998)](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.42.2598)
+]]
+
+.pull-right[&lt;br&gt;.content-box[.center[
+**Trace plots would be a great visualization tool for both approaches!**
+]]]
 
 ---
 
-## Visualizing Clusters and Representative Trees
+## Visualizing Clusters
 
-For both approaches, trace plots would be a great visualization tool!
-
+.pull-left[
 &lt;div class="figure" style="text-align: center"&gt;
-&lt;img src="figures/chipman.png" alt="(Left) From Chipman (1998). (Right) Early version of a trace plot I made to depict the four Chipman Trees." width="120%" /&gt;
-&lt;p class="caption"&gt;(Left) From Chipman (1998). (Right) Early version of a trace plot I made to depict the four Chipman Trees.&lt;/p&gt;
+&lt;img src="figures/chipman.png" alt="Example of representative trees from clusters within a random forest from Chipman (1998)" width="120%" /&gt;
+&lt;p class="caption"&gt;Example of representative trees from clusters within a random forest from Chipman (1998)&lt;/p&gt;
 &lt;/div&gt;
+]
+
+.pull-right[
+&lt;img src="slides_files/figure-html/unnamed-chunk-37-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
 
 ---
 
-## My Current Process for Clustering Trees
+## Visualizing Representative Trees with Variability
+
+Two scenarios: 
+
+
+
+.pull-left[
+&lt;img src="slides_files/figure-html/unnamed-chunk-39-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;img src="slides_files/figure-html/unnamed-chunk-40-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Process for Clustering Trees
 
 1. Start with a distance metric to compare similarities between trees
 
@@ -534,27 +574,226 @@ For both approaches, trace plots would be a great visualization tool!
 
 ## Step 1: Compute Distances
 
+### Strategies to compare trees
+
+.left-code[
+
+.center[**Comparing Predictions**]
+
+&lt;img src="figures/predictions.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+.right-plot[
+
+.center[**Comparing Topology**]
+
+&lt;img src="figures/topology.png" width="120%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+### Current metrics implemented in TreeTracer
+
+.pull-left[
+
+**[Chipman, George, and McCulloch (1998)](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.42.2598)**
+ 
+
+```r
+# Fit metric: Compare 
+# predictions from two trees
+fit_metric &lt;- 
+  compute_fit_metric(
+    rf = penguins_rf, 
+    data = penguins_train
+  )
+```
+
+
+```r
+# Partition metric: Determine 
+# whether two predictions fall
+# in same leaf in two trees
+tree_preds &lt;- 
+  get_tree_preds(
+    data = penguins_train, 
+    rf = penguins_rf
+  )
+partition_metric &lt;-
+  compute_partition_metric(
+    rf = penguins_rf,
+    tree_preds = tree_preds
+  )
+```
+
+
+
+]
+
+.pull-right[
+**[Banerjee, Ding, and Noone (2011)](https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.4492)**
+
+
+```r
+# Covariate metric: Determine 
+# the agreement in predictors 
+# used by the trees
+cov_metric &lt;- 
+  compute_covariate_metric(
+    rf = penguins_rf
+  )
+
+cov_metric3 &lt;-
+  compute_covariate_metric(
+    rf = penguins_rf, 
+    max_depth = 3
+  )
+```
+]
+
+---
+
+### Metric Details 
+
+.medium[
+
+.pull-left[
+Let: 
+
+- `\(T_1\)` and `\(T_2\)` two trees trained using `\((y_i,\textbf{x}_i)\)` for `\(i=1,...,n\)`
+
+- `\(\textbf{x}_i=(x_{i1},...,x_{ik})\)` a vector of `\(k\)` covariates for observation `\(i\)`
+
+&lt;br&gt;
+**Fit metric:**
+
+`$$d\left(T_1,T_2\right)=\frac{1}{n}\sum_{i=1}^n m\left(\hat{y}_{i1},\hat{y}_{i2}\right)$$`
+
+where:
+
+- `\(\hat{y}_{ij}\)` is a fitted value for tree `\(j\)`
+
+- `\(m\)` is a metric such as
+  - for a regression tree
+    
+    `$$m\left(\hat{y}_1,\hat{y}_2\right)=\left(\hat{y}_1-\hat{y}_2\right)^2$$`
+  - for a classification tree
+  
+  `$$m\left(y_1,y_2\right)=\begin{cases} 1 &amp; \mbox{if} \ \ y_1=y_2 \\ 0 &amp; \mbox{o.w.} \end{cases}$$`
+]
+
+.pull-right[
+**Partition metric:**
+
+`\begin{equation}
+d\left(T_1, T_2\right)=\frac{\sum_{i&gt;k}\left|I_1(i,k)-I_2(i,k)\right|}{n\choose2}
+\end{equation}`
+
+where:
+
+.medium[
+`$$I_1(i,k) =\begin{cases} 1 &amp; \mbox{if } T_1 \mbox{ places observations } i \mbox{ and } k \mbox{ in the same terminal node} \\ 0 &amp; \mbox{o.w.} \end{cases}$$`
+]
+
+Note: The metric is scaled to the range of (0,1).
+
+&lt;br&gt;
+
+**Covariate metric**
+
+.medium[$$d(T_1, T_2)=\frac{\mbox{# of covariate mismatches between } T_1 \mbox{ and } T_2}{k}$$]
+
+]
+
+]
+
 ---
 
 ## Step 2: Obtain Distance Matrix
+
+
+
+
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-49-1.png" width="75%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 ## Step 3: Apply Clustering Method
 
+&lt;img src="slides_files/figure-html/unnamed-chunk-50-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
 ---
 
 ## Step 4: Visualize clusters
 
+### Covariate Metric 
+
+Coordinate 1 explains variability between trees that use 3 or 4 variables for splits
+
+&lt;br&gt;
+
+
+
+
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-53-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
 ---
 
-## More Examples
+### Covariate Metric (max depth 3)
+
+- Coordinate 1 explains variability in trees that use body mass for splitting in the first three levels or not
+
+- Coordinate 2 explains variability in trees that use flipper length for splitting in the first three levels or not
+
+
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-55-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Fit Metric
+
+Not clear why these trees are outliers based on the fit metric using a trace plot
+
+  - perhaps a different visualization would be more helpful in this situation or
+
+  - could focus on trying to understand the variability within the large cluster
+
+
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-57-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+### Partition Metric
+
+
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-59-1.png" width="45%" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-60-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-61-1.png" width="45%" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-62-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-63-1.png" style="display: block; margin: auto;" /&gt;
+
+&lt;br&gt;
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-64-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
 class: inverse, center, middle
 
-# Limitations and Next Steps
+# Limitations and Ideas for Future Work
 
 ---
 
@@ -578,7 +817,7 @@ class: inverse, center, middle
 
 ---
 
-## Future Work
+##  Ideas for Future Work
 
 .pull-left[
 ### New Metrics
@@ -604,6 +843,8 @@ class: inverse, center, middle
 - Implement developed methods
 
 - Consider new methods
+
+- Visualize rep tree in context of variability
 
 &lt;br&gt;
 
