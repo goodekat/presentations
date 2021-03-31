@@ -645,57 +645,55 @@ cov_metric3 &lt;-
 
 ### Metric Details 
 
-.medium[
-
-.pull-left[
-Let: 
-
-- `\(T_1\)` and `\(T_2\)` two trees trained using `\((y_i,\textbf{x}_i)\)` for `\(i=1,...,n\)`
-
-- `\(\textbf{x}_i=(x_{i1},...,x_{ik})\)` a vector of `\(k\)` covariates for observation `\(i\)`
+&lt;img src="figures/metrics.png" width="120%" style="display: block; margin: auto;" /&gt;
 
 &lt;br&gt;
-**Fit metric:**
-
-`$$d\left(T_1,T_2\right)=\frac{1}{n}\sum_{i=1}^n m\left(\hat{y}_{i1},\hat{y}_{i2}\right)$$`
-
-where:
-
-- `\(\hat{y}_{ij}\)` is a fitted value for tree `\(j\)`
-
-- `\(m\)` is a metric such as
-  - for a regression tree
-    
-    `$$m\left(\hat{y}_1,\hat{y}_2\right)=\left(\hat{y}_1-\hat{y}_2\right)^2$$`
-  - for a classification tree
-  
-  `$$m\left(y_1,y_2\right)=\begin{cases} 1 &amp; \mbox{if} \ \ y_1=y_2 \\ 0 &amp; \mbox{o.w.} \end{cases}$$`
-]
-
-.pull-right[
-**Partition metric:**
-
-`\begin{equation}
-d\left(T_1, T_2\right)=\frac{\sum_{i&gt;k}\left|I_1(i,k)-I_2(i,k)\right|}{n\choose2}
-\end{equation}`
-
-where:
-
-.medium[
-`$$I_1(i,k) =\begin{cases} 1 &amp; \mbox{if } T_1 \mbox{ places observations } i \mbox{ and } k \mbox{ in the same terminal node} \\ 0 &amp; \mbox{o.w.} \end{cases}$$`
-]
-
-Note: The metric is scaled to the range of (0,1).
-
+&lt;br&gt;
+&lt;br&gt;
 &lt;br&gt;
 
-**Covariate metric**
+&lt;!-- Let:  --&gt;
 
-.medium[$$d(T_1, T_2)=\frac{\mbox{# of covariate mismatches between } T_1 \mbox{ and } T_2}{k}$$]
+&lt;!-- - `\(T_1\)` and `\(T_2\)` two trees trained using `\((y_i,\textbf{x}_i)\)` for `\(i=1,...,n\)` --&gt;
 
-]
+&lt;!-- - `\(\textbf{x}_i=(x_{i1},...,x_{ik})\)` a vector of `\(k\)` covariates for observation `\(i\)` --&gt;
 
-]
+&lt;!-- &lt;br&gt; --&gt;
+&lt;!-- **Fit metric:** --&gt;
+
+&lt;!-- `$$d\left(T_1,T_2\right)=\frac{1}{n}\sum_{i=1}^n m\left(\hat{y}_{i1},\hat{y}_{i2}\right)$$` --&gt;
+
+&lt;!-- where: --&gt;
+
+&lt;!-- - `\(\hat{y}_{ij}\)` is a fitted value for tree `\(j\)` --&gt;
+
+&lt;!-- - `\(m\)` is a metric such as --&gt;
+&lt;!--   - for a regression tree --&gt;
+
+&lt;!--     `$$m\left(\hat{y}_1,\hat{y}_2\right)=\left(\hat{y}_1-\hat{y}_2\right)^2$$` --&gt;
+&lt;!--   - for a classification tree --&gt;
+
+&lt;!--   `$$m\left(y_1,y_2\right)=\begin{cases} 1 &amp; \mbox{if} \ \ y_1=y_2 \\ 0 &amp; \mbox{o.w.} \end{cases}$$` --&gt;
+
+&lt;!-- **Partition metric:** --&gt;
+
+&lt;!-- \begin{equation} --&gt;
+&lt;!-- d\left(T_1, T_2\right)=\frac{\sum_{i&gt;k}\left|I_1(i,k)-I_2(i,k)\right|}{n\choose2} --&gt;
+&lt;!-- \end{equation} --&gt;
+
+&lt;!-- where: --&gt;
+
+&lt;!-- .medium[ --&gt;
+&lt;!-- `$$I_1(i,k) =\begin{cases} 1 &amp; \mbox{if } T_1 \mbox{ places observations } i \mbox{ and } k \mbox{ in the same terminal node} \\ 0 &amp; \mbox{o.w.} \end{cases}$$` --&gt;
+&lt;!-- ] --&gt;
+
+&lt;!-- Note: The metric is scaled to the range of (0,1). --&gt;
+
+&lt;!-- &lt;br&gt; --&gt;
+
+&lt;!-- **Covariate metric** --&gt;
+
+&lt;!-- `$$d(T_1, T_2)=\frac{\mbox{# of covariate mismatches between } T_1 \mbox{ and } T_2}{k}$$` --&gt;
 
 ---
 
@@ -705,13 +703,13 @@ Note: The metric is scaled to the range of (0,1).
 
 
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-49-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-50-1.png" width="75%" style="display: block; margin: auto;" /&gt;
 
 ---
 
 ## Step 3: Apply Clustering Method
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-50-1.png" width="75%" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-51-1.png" width="75%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -727,7 +725,7 @@ Note: The metric is scaled to the range of (0,1).
 
 
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-53-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-54-1.png" width="100%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -739,7 +737,7 @@ Note: The metric is scaled to the range of (0,1).
 
 
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-55-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-56-1.png" width="100%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -753,7 +751,7 @@ Not clear why these trees are outliers based on the fit metric using a trace plo
 
 
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-57-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-58-1.png" width="100%" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -761,28 +759,28 @@ Not clear why these trees are outliers based on the fit metric using a trace plo
 
 
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-59-1.png" width="45%" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-60-1.png" width="45%" style="display: block; margin: auto;" /&gt;
 
-&lt;img src="slides_files/figure-html/unnamed-chunk-60-1.png" style="display: block; margin: auto;" /&gt;
-
----
-
-&lt;br&gt;
-
-&lt;img src="slides_files/figure-html/unnamed-chunk-61-1.png" width="45%" style="display: block; margin: auto;" /&gt;
-
-&lt;img src="slides_files/figure-html/unnamed-chunk-62-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="slides_files/figure-html/unnamed-chunk-61-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
 &lt;br&gt;
-&lt;br&gt;
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-62-1.png" width="45%" style="display: block; margin: auto;" /&gt;
 
 &lt;img src="slides_files/figure-html/unnamed-chunk-63-1.png" style="display: block; margin: auto;" /&gt;
 
+---
+
+&lt;br&gt;
 &lt;br&gt;
 
 &lt;img src="slides_files/figure-html/unnamed-chunk-64-1.png" style="display: block; margin: auto;" /&gt;
+
+&lt;br&gt;
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-65-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
