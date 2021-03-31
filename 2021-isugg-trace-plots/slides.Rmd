@@ -167,9 +167,9 @@ knitr::include_graphics("figures/trace-plot.png")
 ## Example: Predicting Penguin Species
 
 ```{r echo = TRUE}
-# Load the Palmer penguins data and prepare training data
+# Load the Palmer penguins data and extract features
 penguins <- na.omit(palmerpenguins::penguins)
-penguins_train <- 
+penguins_feat <- 
   penguins %>% 
   select(bill_depth_mm, bill_length_mm, flipper_length_mm, body_mass_g)
 ```
@@ -261,7 +261,7 @@ library(TreeTracer)
 penguin_trace <-
   trace_plot(
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1:penguins_rf$ntree,
     alpha = 0.4
   ) + 
@@ -319,7 +319,16 @@ rf_tree1 <- randomForest::getTree(rfobj = penguins_rf, k = 1)
 ```
 
 ```{r}
-rf_tree1 %>% head() %>% kable()
+rf_tree1 %>%
+  DT::datatable(
+    options = list(
+      scrollX = 600,
+      scrollY = 300,
+      pageLength = dim(rf_tree1)[1],
+      dom = "ti",
+      ordering = FALSE
+    )
+  )
 ```
 
 
@@ -330,11 +339,20 @@ rf_tree1 %>% head() %>% kable()
 ### TreeTracer
 
 ```{r echo = TRUE}
-tt_tree1 = TreeTracer::get_tree_data(rf = penguins_rf, k = 1) #<<
+tt_tree1 = TreeTracer::get_tree_data(rf = penguins_rf, k = 1)
 ```
 
 ```{r}
-tt_tree1 %>% head() %>% kable()
+tt_tree1 %>% 
+  DT::datatable(
+    options = list(
+      scrollX = 600,
+      scrollY = 300,
+      pageLength = dim(tt_tree1)[1],
+      dom = "ti",
+      ordering = FALSE
+    )
+  )
 ```
 
 
@@ -347,7 +365,7 @@ tree1_trace <-
   TreeTracer::get_trace_data( #<<
     tree_data = tt_tree1,
     rf = penguins_rf,
-    train = penguins_train
+    train = penguins_feat
   )
 ```
 
@@ -372,7 +390,7 @@ tree1_trace %>%
 penguin_trace_tree1 <-
   TreeTracer::trace_plot( #<<
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1,
     alpha = 1
   )
@@ -398,7 +416,7 @@ ntrees = penguins_rf$ntree
 penguin_trace <-
   TreeTracer::trace_plot( #<<
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1:ntrees,
     alpha = 0.4
   )
@@ -432,9 +450,9 @@ class: inverse, center, middle
 .left-code[
 ```{r echo = TRUE}
 penguin_trace_col <-
-  TreeTracer::trace_plot( 
+  trace_plot( 
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1:ntrees,
     alpha = 0.4,
     tree_color = "#9dad7f" #<<
@@ -457,9 +475,9 @@ penguin_trace_col +
 .left-code[
 ```{r echo = TRUE}
 penguin_trace_rep <-
-  TreeTracer::trace_plot( 
+  trace_plot( 
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1:ntrees,
     alpha = 0.4,
     tree_color = "#9dad7f",
@@ -492,9 +510,9 @@ penguin_trace_rep +
 .left-code[
 ```{r echo = TRUE}
 penguin_trace_by_id <-
-  TreeTracer::trace_plot( 
+  trace_plot( 
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1:6,
     alpha = 0.9, 
     color_by_id = TRUE #<<
@@ -526,9 +544,9 @@ penguin_trace_by_id +
 .left-code[
 ```{r echo = TRUE}
 penguin_trace_facet <-
-  TreeTracer::trace_plot( 
+  trace_plot( 
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1:6,
     alpha = 0.9, 
     color_by_id = TRUE, 
@@ -562,9 +580,9 @@ penguin_trace_facet +
 .left-code[
 ```{r echo = TRUE}
 penguin_trace_max <-
-  TreeTracer::trace_plot( 
+  trace_plot( 
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1:ntrees,
     alpha = 0.4,
     max_depth = 3 #<<
@@ -642,13 +660,20 @@ class: inverse, center, middle
 ## Visualizing Clusters
 
 .pull-left[
-```{r out.width = "120%", fig.cap = "Example of representative trees from clusters within a random forest from Chipman (1998)"}
+
+Example of representative trees from clusters within a random forest from [Chipman, George, and McCulloch (1998)](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.42.2598):
+
+```{r out.width = "120%"}
 knitr::include_graphics("figures/chipman.png")
 ```
+
 ]
 
 .pull-right[
-```{r fig.height = 10, fig.width = 8, out.width = "100%"}
+
+Same trees in a trace plot:
+
+```{r fig.height = 6, fig.width = 4.5, out.width = "100%"}
 tree35 <- data.frame(
   tree = factor(rep(35, 5*2)),
   tree_level = factor(c(1, 2, 2, 3, 2, 3, 3, 4, 3, 4), levels = 5:1),
@@ -759,7 +784,7 @@ reptree <- data.frame(
 ```
 
 .pull-left[
-```{r fig.height = 10, fig.width = 8, out.width = "100%"}
+```{r fig.height = 8, fig.width = 6, out.width = "100%"}
 # Create trees with variability
 var1_tree1 <- reptree %>% 
   mutate(
@@ -862,7 +887,7 @@ var1_forest_tree_plot_data %>%
 ]
 
 .pull-right[
-```{r fig.height = 10, fig.width = 8, out.width = "100%"}
+```{r fig.height = 8, fig.width = 6, out.width = "100%"}
 # Create trees with variability
 var2_tree1 <- reptree %>% 
   mutate(
@@ -991,7 +1016,9 @@ var2_forest_tree_plot_data %>%
 
 ## Step 1: Compute Distances
 
-### Strategies to compare trees
+### Strategies to compare trees 
+
+Figures from [Sies and Van Mechelen (2020)](https://link.springer.com/article/10.1007/s00357-019-09350-4)
 
 .left-code[
 
@@ -1025,7 +1052,7 @@ knitr::include_graphics("figures/topology.png")
 fit_metric <- 
   compute_fit_metric(
     rf = penguins_rf, 
-    data = penguins_train
+    data = penguins_feat
   )
 ```
 
@@ -1035,7 +1062,7 @@ fit_metric <-
 # in same leaf in two trees
 tree_preds <- 
   get_tree_preds(
-    data = penguins_train, 
+    data = penguins_feat, 
     rf = penguins_rf
   )
 partition_metric <-
@@ -1183,7 +1210,12 @@ ggplot(dists, aes(x = rows, y = cols, fill = value)) +
     strip.background = element_rect(fill = "white")
   ) + 
   scale_fill_gradient(low = "#c7cfb7", high = "#557174", limits = c(0,1)) +
-  labs(x = "Tree", y = "Tree", fill = "Distance")
+  labs(
+    x = "Tree",
+    y = "Tree", 
+    fill = "Distance",
+    title = "Distance Matrices for all Four Metrics"
+  )
 ```
 
 ---
@@ -1230,7 +1262,7 @@ mds %>%
 
 ### Covariate Metric 
 
-Coordinate 1 explains variability between trees that use 3 or 4 variables for splits
+- Coordinate 1 explains variability between trees that use 3 or 4 variables for splits
 
 <br>
 
@@ -1247,7 +1279,7 @@ plot_trees_in_cluster <- function(cluster_data, cluster_name, color = "black", a
   # Plot the trees in the cluster
   trace_plot(
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = trees, 
     tree_color = color,
     alpha = alpha
@@ -1353,9 +1385,9 @@ plot_grid(
 
 Not clear why these trees are outliers based on the fit metric using a trace plot
 
-  - perhaps a different visualization would be more helpful in this situation or
-
-  - could focus on trying to understand the variability within the large cluster
+  - Perhaps a different visualization would be more helpful in this situation or
+  
+  - Could focus on trying to understand the variability within the large cluster
 
 ```{r}
 # Label clusters
@@ -1378,7 +1410,7 @@ plot_mds_fit <-
 plot_highlight12 <-
   trace_plot(
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1:ntrees,
     alpha = 0.4,
     tree_color = colors[3],
@@ -1395,7 +1427,7 @@ plot_highlight12 <-
 plot_highlight32 <-
   trace_plot(
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = 1:ntrees,
     alpha = 0.4,
     tree_color = colors[3],
@@ -1445,7 +1477,7 @@ plot_mds_gradient <- function(mds, coordinate, ntrees) {
   # Create plot
   trace_plot(
     rf = penguins_rf,
-    train = penguins_train,
+    train = penguins_feat,
     tree_ids = as.numeric(trees$tree),
     alpha = 1,
     facet_by_id = TRUE,
@@ -1502,6 +1534,8 @@ plot_mds_gradient(
 
 ---
 
+<br>
+
 ```{r out.width = "45%", fig.width = 8, fig.height = 6}
 mds %>%
   filter(metric == "partition metric") %>%
@@ -1542,7 +1576,10 @@ plot_mds_gradient(
 
 ---
 
-```{r fig.width = 23, fig.height = 8}
+<br>
+<br>
+
+```{r fig.width = 24, fig.height = 6}
 plot_mds_gradient(
   mds = mds %>% filter(metric == "partition metric"), 
   coordinate = 1,
@@ -1563,7 +1600,7 @@ plot_mds_gradient(
 
 <br>
 
-```{r fig.width = 23, fig.height = 8}
+```{r fig.width = 24, fig.height = 6}
 plot_mds_gradient(
   mds = mds %>% filter(metric == "partition metric"), 
   coordinate = 2,
@@ -1648,3 +1685,14 @@ class: inverse, center, middle
 - How to account for categorical variables?
 
 ]
+
+---
+
+class: inverse, center, middle
+
+# Thank you!
+
+```{r}
+knitr::include_graphics("figures/penguin.png")
+```
+
