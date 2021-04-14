@@ -97,17 +97,19 @@ class: inverse, middle, center
 
 # What is Shiny?
 
-Lets you create apps using R!
+Shiny lets you create apps using R!
 
 From the [Shiny website](https://shiny.rstudio.com/): 
 
 > Shiny is an R package that **makes it easy to build interactive web apps straight from R**. You can host standalone apps on a webpage or embed them in R Markdown documents or build dashboards. You can also extend your Shiny apps with CSS themes, htmlwidgets, and JavaScript actions.
 
-```{r out.width = "40%", fig.align = "center"}
-include_graphics("figures/shiny.jpeg")
+```{r out.width = "35%", fig.align = "center"}
+include_graphics("figures/shiny.png")
 ```
 
 ---
+
+# Shiny website
 
 <body>
 <style type="text/css">
@@ -117,17 +119,13 @@ margin: 0; padding: 0; height: 100%; overflow: hidden;
 }
 #content
 {
-position:absolute; left: 0; right: 0; bottom: 0; top: 0px; 
+position:absolute; left: 0; right: 0; bottom: 0; top: 15%; 
 }
 </style>
 <div id="content">
-<iframe width="100%" height="100%" frameborder="0" src="https://shiny.rstudio.com/"/>
+<iframe width="100%" height="90%" frameborder="0" src="https://shiny.rstudio.com/"/>
 </div>
 </body>
-
----
-
-<iframe src="https://shiny.rstudio.com/" frameborder="0" width="1100" height="510" ></iframe>
 
 ---
 
