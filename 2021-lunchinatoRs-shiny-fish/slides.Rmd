@@ -331,6 +331,8 @@ class: inverse, middle, center
 
 - Used to help identify areas where invasive carp are reproducing
 
+- Screen eggs to select a subset to send for genetic identification
+
 <br>
 
 **Models used**
@@ -347,9 +349,9 @@ class: inverse, middle, center
 
 App available at: https://whoseegg.stat.iastate.edu/  
 
-Example datasets available at: 
+Example datasets available at: https://github.com/goodekat/presentations/blob/master/2021-lunchinatoRs-shiny-fish/example_data.zip
 
-```{r out.width = "85%", fig.align = "center"}
+```{r out.width = "75%", fig.align = "center"}
 include_graphics("figures/app.png")
 ```
 
