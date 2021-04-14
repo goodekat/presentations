@@ -84,7 +84,9 @@ style_mono_accent(
 ]
 
 .pull-right[
-![](figures/fishy.gif)
+<br>
+<br>
+![](figures/jumping-carp.gif)
 ]      
 
 ---
@@ -343,9 +345,11 @@ class: inverse, middle, center
 
 # App Demonstration
 
-App available at: https://whoseegg.stat.iastate.edu/
+App available at: https://whoseegg.stat.iastate.edu/  
 
-```{r out.width = "95%", fig.align = "center"}
+Example datasets available at: 
+
+```{r out.width = "85%", fig.align = "center"}
 include_graphics("figures/app.png")
 ```
 
@@ -355,13 +359,23 @@ name: mylastslide
 
 # Possible Updates
 
+<br>
+
 - Add visualizations of input data compared to training data
+
+<br>
 
 - Include prediction intervals
 
+<br>
+
 - Add visualizations relating to explainability for individual predictions
 
+<br>
+
 - Add video showing how to use the app
+
+<br>
 
 - Add image during loading of swimming fish
 
