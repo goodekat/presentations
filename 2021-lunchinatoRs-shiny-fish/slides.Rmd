@@ -232,11 +232,11 @@ include_graphics("figures/Larval_Tow_Eggs.jpg")
 - Membrane average  
 - Membrane standard deviation  
 - Membrane coefficient of variation  
-- Yolk average
-- Yolk standard deviation  
-- Yolk coefficient of variation
-- Yolk to membrane ratio
-- Larval length  
+- Embryo average
+- Embryo standard deviation  
+- Embryo coefficient of variation
+- Embryo to membrane ratio
+- Larval length
 ]
 
 .right-plot[
