@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>WhoseEgg</title>
+    <meta charset="utf-8" />
+    <meta name="author" content=" " />
+    <meta name="author" content=".white[Katherine Goode]" />
+    <meta name="author" content=".white[Joint work with] Dr. Michael Weber .white[and] Dr. Philip Dixon" />
+    <meta name="author" content=".white[Presented at ISU LunchinatoRs]" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# WhoseEgg
+## .white[A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics]
+### <br>
+### .white[Katherine Goode]
+### .white[Joint work with] <a href="https://michaeljohnweber.wixsite.com/fisherieslab">Dr. Michael Weber</a> .white[and] <a href="https://pdixon.stat.iastate.edu/">Dr. Philip Dixon</a>
+### .white[Presented at ISU LunchinatoRs]
+### .white[April 16, 2021] <br> <br> <br> <br> .small[.white[Code used to generate slides found <a href="https://github.com/goodekat/presentations/tree/master/2021-lunchinatoRs-shiny-fish">here</a>]]
+
+---
+
+
+&lt;script&gt;
+var slideshow = remark.create({slideNumberFormat : function (current, total) {
+  return current + '/' + (this.getSlideByName("mylastslide").getSlideIndex() + 1); },
+  highlightStyle: "github",
+  highlightLines: true,
+  countIncrementalSlides: false});
+&lt;/script&gt;
+
+&lt;style type="text/css"&gt;
+.tiny{font-size: 30%}
+.small{font-size: 60%}
+.medium{font-size: 75%}
+.left-code {
+  color: #777;
+  width: 37%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 60%;
+  float: right;
+  padding-left: 1%;
+}
+&lt;/style&gt;
+
+
+
+
+
+# Overview
+
+.pull-left[
+&lt;br&gt;
+
+- Background on R Shiny
+  
+&lt;br&gt;
+
+- Project Background
+
+&lt;br&gt;
+
+- WhoseEgg App
+
+]
+
+.pull-right[
+![](figures/fishy.gif)
+]      
+
+---
+
+class: inverse, middle, center
+
+# Background on R Shiny
+
+---
+
+# What is Shiny?
+
+Lets you create apps using R!
+
+From the [Shiny website](https://shiny.rstudio.com/): 
+
+&gt; Shiny is an R package that **makes it easy to build interactive web apps straight from R**. You can host standalone apps on a webpage or embed them in R Markdown documents or build dashboards. You can also extend your Shiny apps with CSS themes, htmlwidgets, and JavaScript actions.
+
+&lt;img src="figures/shiny.jpeg" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+
+&lt;body&gt;
+&lt;style type="text/css"&gt;
+body, html
+{
+margin: 0; padding: 0; height: 100%; overflow: hidden;
+}
+#content
+{
+position:absolute; left: 0; right: 0; bottom: 0; top: 0px; 
+}
+&lt;/style&gt;
+&lt;div id="content"&gt;
+&lt;iframe width="100%" height="100%" frameborder="0" src="https://shiny.rstudio.com/"/&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+
+---
+
+&lt;iframe src="https://shiny.rstudio.com/" frameborder="0" width="1100" height="510" &gt;&lt;/iframe&gt;
+
+---
+
+class: inverse, middle, center
+
+# Project Background
+
+---
+
+# Invasive Carp
+
+.pull-left[
+
+- Brought to US in 1960s
+
+- Escaped into wild
+
+- Threat to native fish populations in Mississippi River basin
+
+- Interest in monitoring populations to prevent further spread
+
+]
+
+.pull-right[
+&lt;center&gt; ![](figures/large-carp.JPG) &lt;center/&gt;
+]
+
+---
+
+# Egg Collection
+
+&lt;br&gt;
+
+- One method for monitoring carp is to collect eggs
+
+- Common practice is to have eggs identified using genetic analysis
+
+- Expensive
+
+- Led Camacho et al (2019) to try using machine learning to classify fish eggs
+
+&lt;br&gt;
+
+.center[
+&lt;img src="figures/egg1.png" width="30%" /&gt;&lt;img src="figures/egg2.png" width="30%" /&gt;&lt;img src="figures/egg5.png" width="30%" /&gt;
+]
+
+---
+
+# Machine Learning Appraoch
+
+.pull-left[
+**[Camacho et al. (2019)](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1002/nafm.10380)**
+
+- Trained random forests 
+
+- Predictor variables: 
+  - egg characteristics
+
+- Responses: 
+  - family, genus, and species
+
+- Models showed promise for identifying invasive carp 
+
+]
+
+.pull-right[
+
+**[Goode et al. (2021)](https://afspubs.onlinelibrary.wiley.com/doi/10.1002/nafm.10616)**
+
+- Validated models using a new year of data
+
+- Trained new models with all years of data
+
+&lt;br&gt;
+
+![](figures/large-carp2.JPG)
+]
+
+---
+
+# Sampling Site and Years
+
+Three years of collection
+
+&lt;img src="figures/map.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Egg Collection
+
+Collected eggs were taken to the lab for measurements and genetic identification
+
+&lt;img src="figures/Larval_Tow_Eggs.jpg" width="45%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Predictor Variables
+
+.left-code[
+**Egg characteristics: ** 
+
+- Month
+- Julian day  
+- Water temperature	 
+- Water conductivity  	
+- Deflated?	 
+- Pigment?  
+- Compact or diffuse?  	
+- Sticky debris?  
+- Egg stage  
+- Membrane average  
+- Membrane standard deviation  
+- Membrane coefficient of variation  
+- Yolk average
+- Yolk standard deviation  
+- Yolk coefficient of variation
+- Yolk to membrane ratio
+- Larval length  
+]
+
+.right-plot[
+
+&lt;img src="figures/egg-characteristics.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Response Variables
+
+.pull-left[
+
+**Taxonomy**: 
+
+- Genus (17 levels)
+
+- Species (29 levels)
+
+&lt;br&gt; 
+
+**Taxonomy with invasive carp categorized as on class**: 
+
+- Family (8 levels)
+
+- Genus (16 levels)
+
+- Species (27 levels)
+
+]
+
+.pull-right[
+![](figures/carp.png)
+
+&lt;br&gt; 
+&lt;small&gt; Image source: https://www.watershedcouncil.org/asian-carp.html &lt;/small&gt;
+]
+
+---
+
+# Metrics on Training Data
+
+Models trained with 2014-2015 and 2014-2016 data
+
+&lt;img src="figures/train-res.png" width="95%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Validation of Original Models
+
+Metrics computed using 2014-2015 model on 2016 data
+
+&lt;img src="figures/val-res.png" width="2700" /&gt;
+
+---
+
+class: inverse, middle, center
+
+# WhoseEgg App
+
+---
+
+# WhoseEgg
+
+**Goal**
+
+- Provide a tool for easily predicting the identification of fish eggs using the random forests
+
+- Used to help identify areas where invasive carp are reproducing
+
+&lt;br&gt;
+
+**Models used**
+
+- Random forests:
+
+  - trained all three years of data
+  
+  - responses of family, genus, and species with invasive carp grouped
+
+---
+
+# App Demonstration
+
+App available at: https://whoseegg.stat.iastate.edu/
+
+&lt;img src="figures/app.png" width="95%" style="display: block; margin: auto;" /&gt;
+
+---
+
+name: mylastslide
+
+# Possible Updates
+
+- Add visualizations of input data compared to training data
+
+- Include prediction intervals
+
+- Add visualizations relating to explainability for individual predictions
+
+- Add video showing how to use the app
+
+- Add image during loading of swimming fish
+
+---
+
+class: inverse, center
+
+&lt;br&gt;
+&lt;br&gt;
+
+# Thank you!
+
+&lt;img src="figures/Skunk River larval AC.jpg" width="85%" /&gt;
+
+---
+
+class: inverse, center, middle
+
+# Additional Figures
+
+---
+
+# Metrics on New/Old Sites
+
+&lt;img src="figures/res-diff-sites.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Feature Importance
+
+&lt;img src="figures/feature-imp.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Partial Dependence Plots
+
+&lt;img src="figures/pdps.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Correlation Between Features
+
+&lt;img src="figures/correlation.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
