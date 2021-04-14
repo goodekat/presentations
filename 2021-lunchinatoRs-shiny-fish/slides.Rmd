@@ -68,26 +68,15 @@ style_mono_accent(
 
 # Overview
 
-.pull-left[
-<br>
-
 - Background on R Shiny
   
-<br>
-
 - Project Background
-
-<br>
 
 - WhoseEgg App
 
-]
+<br>
 
-.pull-right[
-<br>
-<br>
-![](figures/jumping-carp.gif)
-]      
+<center> ![](figures/jumping-carp.gif) <center>
 
 ---
 
@@ -121,11 +110,11 @@ margin: 0; padding: 0; height: 100%; overflow: hidden;
 }
 #content
 {
-position:absolute; left: 0; right: 0; bottom: 0; top: 15%; 
+position:absolute; left: 0; right: 0; bottom: 0; top: 0%; 
 }
 </style>
 <div id="content">
-<iframe width="100%" height="90%" frameborder="0" src="https://shiny.rstudio.com/"/>
+<iframe width="100%" height="100%" frameborder="0" src="https://shiny.rstudio.com/"/>
 </div>
 </body>
 
@@ -139,8 +128,6 @@ class: inverse, middle, center
 
 # Invasive Carp
 
-.pull-left[
-
 - Brought to US in 1960s
 
 - Escaped into wild
@@ -149,11 +136,9 @@ class: inverse, middle, center
 
 - Interest in monitoring populations to prevent further spread
 
-]
-
-.pull-right[
-<center> ![](figures/large-carp.JPG) <center/>
-]
+```{r out.width = "60%", fig.align = "center"}
+include_graphics("figures/large-carp.JPG")
+```
 
 ---
 
@@ -206,9 +191,6 @@ include_graphics("figures/egg5.png")
 
 - Trained new models with all years of data
 
-<br>
-
-![](figures/large-carp2.JPG)
 ]
 
 ---
