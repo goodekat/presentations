@@ -130,11 +130,11 @@ class: inverse, middle, center
 
 - Brought to US in 1960s
 
-- Escaped into wild
+- Become a threat to native fish populations in Mississippi River basin
 
-- Threat to native fish populations in Mississippi River basin
+- Interest in monitoring population to prevent further spread
 
-- Interest in monitoring populations to prevent further spread
+<br>
 
 ```{r out.width = "60%", fig.align = "center"}
 include_graphics("figures/large-carp.JPG")
@@ -144,15 +144,13 @@ include_graphics("figures/large-carp.JPG")
 
 # Egg Collection
 
-<br>
-
 - One method for monitoring carp is to collect eggs
 
 - Common practice is to have eggs identified using genetic analysis
 
 - Expensive
 
-- Led Camacho et al (2019) to try using machine learning to classify fish eggs
+- Led [Camacho et al. (2019)](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1002/nafm.10380) to try using machine learning to classify fish eggs
 
 <br>
 
@@ -174,10 +172,10 @@ include_graphics("figures/egg5.png")
 - Trained random forests 
 
 - Predictor variables: 
-  - egg characteristics
+  - Egg characteristics
 
 - Responses: 
-  - family, genus, and species
+  - Family, genus, and species
 
 - Models showed promise for identifying invasive carp 
 
@@ -207,9 +205,9 @@ include_graphics("figures/map.png")
 
 # Egg Collection
 
-Collected eggs were taken to the lab for measurements and genetic identification
+Collected eggs measured and genetically identified
 
-```{r out.width = "45%", fig.align = "center"}
+```{r out.width = "47%", fig.align = "center"}
 include_graphics("figures/Larval_Tow_Eggs.jpg")
 ```
 
@@ -252,15 +250,7 @@ include_graphics("figures/egg-characteristics.png")
 
 .pull-left[
 
-**Taxonomy**: 
-
-- Genus (17 levels)
-
-- Species (29 levels)
-
-<br> 
-
-**Taxonomy with invasive carp categorized as on class**: 
+**Taxonomy with invasive carp categorized as one class**: 
 
 - Family (8 levels)
 
@@ -276,16 +266,6 @@ include_graphics("figures/egg-characteristics.png")
 <br> 
 <small> Image source: https://www.watershedcouncil.org/asian-carp.html </small>
 ]
-
----
-
-# Metrics on Training Data
-
-Models trained with 2014-2015 and 2014-2016 data
-
-```{r out.width = "95%", fig.align = "center"}
-include_graphics("figures/train-res.png")
-```
 
 ---
 
@@ -307,9 +287,9 @@ class: inverse, middle, center
 
 # WhoseEgg
 
-**Goal**
+**Goals**
 
-- Provide a tool for easily predicting the identification of fish eggs using the random forests
+- Provide a tool that is accessible to non-R users for using the random forest to predicting the identification of fish eggs
 
 - Used to help identify areas where invasive carp are reproducing
 
@@ -321,9 +301,9 @@ class: inverse, middle, center
 
 - Random forests:
 
-  - trained all three years of data
+  - Trained with all three years of data
   
-  - responses of family, genus, and species with invasive carp grouped
+  - Responses of family, genus, and species with invasive carp grouped
 
 ---
 
@@ -381,6 +361,16 @@ knitr::include_graphics("figures/Skunk River larval AC.jpg")
 class: inverse, center, middle
 
 # Additional Figures
+
+---
+
+# Metrics on Training Data
+
+Models trained with 2014-2015 and 2014-2016 data
+
+```{r out.width = "95%", fig.align = "center"}
+include_graphics("figures/train-res.png")
+```
 
 ---
 
