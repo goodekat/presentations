@@ -1,0 +1,60 @@
+---
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, 
+                      cache = TRUE, 
+                      warning = FALSE,
+                      message = FALSE)
+
+# Load packages
+library(dplyr)
+library(forcats)
+library(gganimate)
+library(ggplot2)
+```
+
+```{r data}
+# Load in data
+ds_cgm_complete <- readRDS("../2019-samsi-rho-glucose/data/ds_cgm_complete.RDS")
+
+# Create a complete grid of patients and times
+full_times <- data.frame(
+  pt_id = factor(rep(c(2, 3, 5, 7, 8, 9, 10, 11, 14, 15), 
+                     each = 288)),
+  device_tm_bin = 1:288)
+
+# Get data for 10 patients on one day and order appropriately
+pt2_data <- ds_cgm_complete %>%
+  select(pt_id, 
+         visit,
+         visitnum, 
+         device_visit_period_day, 
+         device_tm,
+         device_tm_bin, 
+         glucose_value) %>%
+  filter(pt_id %in% c(2, 3, 5, 7, 8, 9, 10, 11, 14, 15),
+         visitnum == 1,
+         device_visit_period_day == 1) %>%
+  right_join(full_times) %>%
+  arrange(pt_id, device_tm_bin) %>%
+  group_by(pt_id) %>%
+  mutate(time_order = 1:n())
+```
+
+## Glucose Measurements from Ten Individuals for One Day
+
+```{r figure, fig.height = 5}
+pt2_data %>%
+  filter(visitnum == 1) %>%
+  ggplot(aes(x = device_tm, 
+             y = glucose_value, 
+             color = as.factor(pt_id),
+             group = as.factor(device_visit_period_day))) + 
+  geom_point(aes(group = seq_along(device_tm)), size = 0.5) +
+  scale_color_brewer(palette = "Paired") +
+  labs(x = "Time of Day", y = "Glucose Value (mg/dL)") +
+  theme_bw() +
+  theme(legend.position = "none") +
+  transition_reveal(time_order) 
+```
