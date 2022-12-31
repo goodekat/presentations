@@ -246,13 +246,13 @@ Personal github: [github.com/goodekat](https://github.com/goodekat)
 
 .pull-right-v3[
 ```{r out.width = "90%"}
-include_graphics("figures/kat-mina.JPEG")
+include_graphics("fig-static/kat-mina.JPEG")
 ```
 
 <br>
 
 ```{r out.width = "90%"}
-include_graphics("figures/kat-kayak.JPG")
+include_graphics("fig-static/kat-kayak.JPG")
 ```
 ]
 
@@ -297,7 +297,7 @@ class: inverse, center, middle
 <br> 
 
 ```{r out.width = "100%"}
-knitr::include_graphics("figures/demo-tree.png")
+knitr::include_graphics("fig-static/demo-tree.png")
 ```
 
 .right[.small[Image source: `r Citet(bib, "urbanek:2008")`]]
@@ -318,7 +318,7 @@ knitr::include_graphics("figures/demo-tree.png")
 <br>
 
 ```{r out.width = "100%"}
-include_graphics("figures/demo-traditional-trees.png")
+include_graphics("fig-static/demo-traditional-trees.png")
 ```
 
 ]
@@ -326,7 +326,7 @@ include_graphics("figures/demo-traditional-trees.png")
 .pull-right[
 
 ```{r out.width = "90%"}
-include_graphics("figures/demo-icicles.png")
+include_graphics("fig-static/demo-icicles.png")
 ```
 
 .right[.small[Image source: `r Citet(bib, "kuznetsova:2014")`]]
@@ -338,7 +338,7 @@ include_graphics("figures/demo-icicles.png")
 ## Trace Plots (one tree) [.small[`r Citet(bib, "urbanek:2008")`]](https://link.springer.com/chapter/10.1007/978-3-540-33037-0_11)
 
 ```{r out.width = "100%"}
-knitr::include_graphics("figures/demo-one-trace.png")
+knitr::include_graphics("fig-static/demo-one-trace.png")
 ```
 
 .right[.small[Image source: `r Citet(bib, "urbanek:2008")`]]
@@ -350,7 +350,7 @@ knitr::include_graphics("figures/demo-one-trace.png")
 Designed to compare (1) variables used for splitting, (2) location of split points, and (3) hierarchical structure
 
 ```{r out.width = "75%"}
-knitr::include_graphics("figures/demo-trace-plot.png")
+knitr::include_graphics("fig-static/demo-trace-plot.png")
 ```
 
 .right[.small[Image source: `r Citet(bib, "urbanek:2008")`]]
@@ -371,13 +371,13 @@ Example:
 
 .pull-left[  
 ```{r out.width = "70%"}
-include_graphics("figures/bullet-bullets.png")
+include_graphics("fig-static/bullet-bullets.png")
 ```
 ]
 
 .pull-right[  
 ```{r out.width = "100%"}
-include_graphics("figures/bullet-signatures.png")
+include_graphics("fig-static/bullet-signatures.png")
 ```
 ]
 
@@ -387,7 +387,7 @@ include_graphics("figures/bullet-signatures.png")
 
 .pull-left[
 ```{r out.width = "40%"}
-include_graphics("figures/bullet-trace-plot-full.png")
+include_graphics("fig-static/bullet-trace-plot-full.png")
 ```
 ]
 
@@ -445,7 +445,7 @@ class: inverse, center, middle
 - Lessen cognitive load
 
 ```{r out.width = "70%"}
-include_graphics("figures/demo-structure.png")
+include_graphics("fig-static/demo-structure.png")
 ```
 
 ]
@@ -458,7 +458,7 @@ include_graphics("figures/demo-structure.png")
 - Re-purpose trace plots for highlighting summary trees
 
 ```{r out.width = "55%"}
-include_graphics("figures/demo-summary.png")
+include_graphics("fig-static/demo-summary.png")
 ```
 
 ]
@@ -564,7 +564,7 @@ vi %>%
 
 .pull-right[
 ```{r out.width = "90%"}
-include_graphics("figures/penguin-trace.png")
+include_graphics("fig-static/penguin-trace.png")
 ```
 ]
 
@@ -608,7 +608,7 @@ plot_grid(tp1, tp2)
 **Subsets of trees**: Lessen cognitive load
 
 ```{r out.width = "100%"}
-include_graphics("figures/penguin-trace-subsets.png")
+include_graphics("fig-static/penguin-trace-subsets.png")
 ```
 
 ---
@@ -662,7 +662,7 @@ trace_plot(
 **Maximum node depth**: Focus on upper node depths where global structures may exist (e.g., considering the "canopy")
 
 ```{r out.width = "80%"}
-include_graphics("figures/bullet-trace-plot-canopy.png")
+include_graphics("fig-static/bullet-trace-plot-canopy.png")
 ```
 
 ---
@@ -680,7 +680,7 @@ include_graphics("figures/bullet-trace-plot-canopy.png")
 - One approach: Find tree that has smallest average distance to all other trees
 
 ```{r out.width = "90%"}
-include_graphics("figures/penguin-ave-dists.png")
+include_graphics("fig-static/penguin-ave-dists.png")
 ```
 
 ]
@@ -696,7 +696,7 @@ include_graphics("figures/penguin-ave-dists.png")
 <br> 
 
 ```{r out.width = "100%"}
-include_graphics("figures/penguin-rep-tree.png")
+include_graphics("fig-static/penguin-rep-tree.png")
 ```
 
 ]
@@ -709,13 +709,13 @@ include_graphics("figures/penguin-rep-tree.png")
 
 .pull-left[
 ```{r out.width = "100%"}
-include_graphics("figures/demo-chipman.png")
+include_graphics("fig-static/demo-chipman.png")
 ```
 ]
 
 .pull-right[
 ```{r out.width = "100%"}
-include_graphics("figures/demo-rep-trees.png")
+include_graphics("fig-static/demo-rep-trees.png")
 ```
 ]
 
@@ -727,13 +727,13 @@ include_graphics("figures/demo-rep-trees.png")
 
 .pull-left[
 ```{r out.width = "100%"}
-include_graphics("figures/demo-var-small.png")
+include_graphics("fig-static/demo-var-small.png")
 ```
 ]
 
 .pull-right[
 ```{r out.width = "100%"}
-include_graphics("figures/demo-var-large.png")
+include_graphics("fig-static/demo-var-large.png")
 ```
 ]
 
@@ -748,7 +748,7 @@ include_graphics("figures/demo-var-large.png")
 .center[.red[Comparing Predictions]]
 
 ```{r out.width = "100%"}
-knitr::include_graphics("figures/demo-predictions.png")
+knitr::include_graphics("fig-static/demo-predictions.png")
 ```
 ]
 
@@ -757,7 +757,7 @@ knitr::include_graphics("figures/demo-predictions.png")
 .center[.red[Comparing Topology]]
 
 ```{r out.width = "100%"}
-knitr::include_graphics("figures/demo-topology.png")
+knitr::include_graphics("fig-static/demo-topology.png")
 ```
 
 ]
@@ -825,11 +825,11 @@ Details:
 .pull-left[
 
 ```{r out.width = "75%"}
-include_graphics("figures/penguin-mds.png")
+include_graphics("fig-static/penguin-mds.png")
 ```
 
 ```{r out.width = "75%"}
-include_graphics("figures/penguin-clusters.png")
+include_graphics("fig-static/penguin-clusters.png")
 ```
 
 ]
@@ -837,7 +837,7 @@ include_graphics("figures/penguin-clusters.png")
 .pull-right[
 
 ```{r out.width = "65%"}
-include_graphics("figures/penguin-rep-cluster-trees.png")
+include_graphics("fig-static/penguin-rep-cluster-trees.png")
 ```
 
 ]
@@ -850,13 +850,13 @@ include_graphics("figures/penguin-rep-cluster-trees.png")
 
 .pull-left[
 ```{r out.width = "70%"}
-include_graphics("figures/penguin-rep-cluster-trees.png")
+include_graphics("fig-static/penguin-rep-cluster-trees.png")
 ```
 ]
 
 .pull-right[
 ```{r out.width = "100%"}
-include_graphics("figures/penguin-rep-trees-trace-plot.png")
+include_graphics("fig-static/penguin-rep-trees-trace-plot.png")
 ```
 ]
 
@@ -867,7 +867,7 @@ include_graphics("figures/penguin-rep-trees-trace-plot.png")
 **Example 2**: Incorporating variability within a cluster
 
 ```{r out.width = "100%"}
-include_graphics("figures/penguin-rep-trees-with-var.png")
+include_graphics("fig-static/penguin-rep-trees-with-var.png")
 ```
 
 ---
@@ -1286,10 +1286,10 @@ trace_plot(
 
 ```{r}
 music_trace_plot_int <- plotly::ggplotly(music_trace_plot + theme_bw(base_size = 8) + theme(axis.text.x = element_text(angle = 45, hjust = 1)))
-htmlwidgets::saveWidget(music_trace_plot_int, paste0("figures/music-trace-plot-int.html"))
+htmlwidgets::saveWidget(music_trace_plot_int, paste0("fig-static/music-trace-plot-int.html"))
 ```
 
-<iframe src="figures/music-trace-plot-int.html" width="1400" height="550" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
+<iframe src="fig-static/music-trace-plot-int.html" width="1400" height="550" id="igraph" scrolling="no" seamless="seamless" frameBorder="0"> </iframe>
 
 ---
 
@@ -1386,14 +1386,14 @@ class: inverse, middle, center
 
 .pull-right-v2[
 ```{r out.width = "100%"}
-include_graphics("figures/music-trace-plot-int-static.png")
+include_graphics("fig-static/music-trace-plot-int-static.png")
 ```
 
 <br>
 <br>
 
 ```{r out.width = "100%"}
-include_graphics("figures/demo-section-scatter.png")
+include_graphics("fig-static/demo-section-scatter.png")
 ```
 
 .right[.small[Sectioned scatter plot image source: `r Citet(bib, "urbanek:2008")`]]
@@ -1417,5 +1417,5 @@ name: mylastslide
 # Thank you!
 
 ```{r out.width = "30%"}
-include_graphics("figures/penguin-penguin.png")
+include_graphics("fig-static/penguin-penguin.png")
 ```
