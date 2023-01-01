@@ -1,0 +1,406 @@
+---
+title: "WhoseEgg"
+subtitle: ".white[A Shiny App for Identifying Invasive Carp Using Random Forests and Fish Egg Characteristics]"
+author: 
+  - "<br>"
+  - ".white[Katherine Goode]"
+  - ".white[Joint work with] [Dr. Michael Weber](https://michaeljohnweber.wixsite.com/fisherieslab) .white[and] [Dr. Philip Dixon](https://pdixon.stat.iastate.edu/)"
+  - ".white[Presented at ISU LunchinatoRs]"
+date: ".white[April 16, 2021] <br> <br> <br> <br> .small[.white[Code used to generate slides found [here](https://github.com/goodekat/presentations/tree/master/2021-lunchinatoRs-shiny-fish)]]"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+<script>
+var slideshow = remark.create({slideNumberFormat : function (current, total) {
+  return current + '/' + (this.getSlideByName("mylastslide").getSlideIndex() + 1); },
+  highlightStyle: "github",
+  highlightLines: true,
+  countIncrementalSlides: false});
+</script>
+
+```{css, echo = FALSE}
+.tiny{font-size: 30%}
+.small{font-size: 60%}
+.medium{font-size: 75%}
+.left-code {
+  color: #777;
+  width: 37%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 60%;
+  float: right;
+  padding-left: 1%;
+}
+```
+
+```{r setup, include = FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(echo = FALSE)
+library(knitr)
+```
+
+```{r xaringan-themer, include = FALSE, warning = FALSE}
+library(xaringanthemer)
+style_mono_accent(
+  base_color = "#273E52", 
+  title_slide_text_color = "#43d1b5",
+  header_font_google = google_font("Josefin Sans"),
+  text_font_google = google_font("Montserrat", "300", "300i"),
+  code_font_google = google_font("Fira Mono"),
+  text_slide_number_color = "black",
+  header_h1_font_size = "2rem",
+  header_h2_font_size = "1.75rem",
+  header_h3_font_size = "1.25rem",
+  colors = c(teal = "#43d1b5", white = "#ffffff"), 
+  link_color = "#43d1b5", 
+  code_highlight_color = "#43d1b5"
+)
+```
+
+# Overview
+
+- Background on R Shiny
+  
+- Project Background
+
+- WhoseEgg App
+
+<br>
+
+<center> ![](figures/jumping-carp.gif) <center>
+
+---
+
+class: inverse, middle, center
+
+# Background on R Shiny
+
+---
+
+# What is Shiny?
+
+Shiny lets you create apps using R!
+
+From the [Shiny website](https://shiny.rstudio.com/): 
+
+> Shiny is an R package that **makes it easy to build interactive web apps straight from R**. You can host standalone apps on a webpage or embed them in R Markdown documents or build dashboards. You can also extend your Shiny apps with CSS themes, htmlwidgets, and JavaScript actions.
+
+```{r out.width = "35%", fig.align = "center"}
+include_graphics("figures/shiny.png")
+```
+
+---
+
+# Shiny website
+
+<body>
+<style type="text/css">
+body, html
+{
+margin: 0; padding: 0; height: 100%; overflow: hidden;
+}
+#content
+{
+position:absolute; left: 0; right: 0; bottom: 0; top: 0%; 
+}
+</style>
+<div id="content">
+<iframe width="100%" height="100%" frameborder="0" src="https://shiny.rstudio.com/"/>
+</div>
+</body>
+
+---
+
+class: inverse, middle, center
+
+# Project Background
+
+---
+
+# Invasive Carp
+
+- Brought to US in 1960s
+
+- Become a threat to native fish populations in Mississippi River basin
+
+- Interest in monitoring population to prevent further spread
+
+<br>
+
+```{r out.width = "60%", fig.align = "center"}
+include_graphics("figures/large-carp.JPG")
+```
+
+---
+
+# Egg Collection
+
+- One method for monitoring carp is to collect eggs
+
+- Common practice is to have eggs identified using genetic analysis
+
+- Expensive
+
+- Led [Camacho et al. (2019)](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1002/nafm.10380) to try using machine learning to classify fish eggs
+
+<br>
+
+.center[
+```{r out.width = "30%"}
+include_graphics("figures/egg1.png")
+include_graphics("figures/egg2.png")
+include_graphics("figures/egg5.png")
+```
+]
+
+---
+
+# Machine Learning Appraoch
+
+.pull-left[
+**[Camacho et al. (2019)](https://afspubs.onlinelibrary.wiley.com/doi/abs/10.1002/nafm.10380)**
+
+- Trained random forests 
+
+- Predictor variables: 
+  - Egg characteristics
+
+- Responses: 
+  - Family, genus, and species
+
+- Models showed promise for identifying invasive carp 
+
+]
+
+.pull-right[
+
+**[Goode et al. (2021)](https://afspubs.onlinelibrary.wiley.com/doi/10.1002/nafm.10616)**
+
+- Validated models using a new year of data
+
+- Trained new models with all years of data
+
+]
+
+---
+
+# Sampling Site and Years
+
+Three years of collection
+
+```{r out.width = "70%", fig.align = "center"}
+include_graphics("figures/map.png")
+```
+
+---
+
+# Egg Collection
+
+Collected eggs measured and genetically identified
+
+```{r out.width = "47%", fig.align = "center"}
+include_graphics("figures/Larval_Tow_Eggs.jpg")
+```
+
+---
+
+# Predictor Variables
+
+.left-code[
+**Egg characteristics: ** 
+
+- Month
+- Julian day  
+- Water temperature	 
+- Water conductivity  	
+- Deflated?	 
+- Pigment?  
+- Compact or diffuse?  	
+- Sticky debris?  
+- Egg stage  
+- Membrane average  
+- Membrane standard deviation  
+- Membrane coefficient of variation  
+- Embryo average
+- Embryo standard deviation  
+- Embryo coefficient of variation
+- Embryo to membrane ratio
+- Larval length
+]
+
+.right-plot[
+
+```{r out.width = "100%", fig.align = "center"}
+include_graphics("figures/egg-characteristics.png")
+```
+]
+
+---
+
+# Response Variables
+
+.pull-left[
+
+**Taxonomy with invasive carp categorized as one class**: 
+
+- Family (8 levels)
+
+- Genus (16 levels)
+
+- Species (27 levels)
+
+]
+
+.pull-right[
+![](figures/carp.png)
+
+<br> 
+<small> Image source: https://www.watershedcouncil.org/asian-carp.html </small>
+]
+
+---
+
+# Validation of Original Models
+
+Metrics computed using 2014-2015 model on 2016 data
+
+```{r}
+include_graphics("figures/val-res.png")
+```
+
+---
+
+class: inverse, middle, center
+
+# WhoseEgg App
+
+---
+
+# WhoseEgg
+
+**Goals**
+
+- Provide a tool that is accessible to non-R users for using the random forest to predicting the identification of fish eggs
+
+- Used to help identify areas where invasive carp are reproducing
+
+- Screen eggs to select a subset to send for genetic identification
+
+<br>
+
+**Models used**
+
+- Random forests:
+
+  - Trained with all three years of data
+  
+  - Responses of family, genus, and species with invasive carp grouped
+
+---
+
+# App Demonstration
+
+App available at: https://whoseegg.stat.iastate.edu/  
+
+Example datasets available at: https://github.com/goodekat/presentations/blob/master/2021-lunchinatoRs-shiny-fish/example_data.zip
+
+```{r out.width = "75%", fig.align = "center"}
+include_graphics("figures/app.png")
+```
+
+---
+
+name: mylastslide
+
+# Possible Updates
+
+<br>
+
+- Add visualizations of input data compared to training data
+
+<br>
+
+- Include prediction intervals
+
+<br>
+
+- Add visualizations relating to explainability for individual predictions
+
+<br>
+
+- Add video showing how to use the app
+
+<br>
+
+- Add image during loading of swimming fish
+
+---
+
+class: inverse, center
+
+<br>
+<br>
+
+# Thank you!
+
+```{r out.width = "85%"}
+knitr::include_graphics("figures/Skunk River larval AC.jpg")
+```
+
+---
+
+class: inverse, center, middle
+
+# Additional Figures
+
+---
+
+# Metrics on Training Data
+
+Models trained with 2014-2015 and 2014-2016 data
+
+```{r out.width = "95%", fig.align = "center"}
+include_graphics("figures/train-res.png")
+```
+
+---
+
+# Metrics on New/Old Sites
+
+```{r out.width = "80%", fig.align = "center"}
+include_graphics("figures/res-diff-sites.png")
+```
+
+---
+
+# Feature Importance
+
+```{r out.width = "100%", fig.align = "center"}
+include_graphics("figures/feature-imp.png")
+```
+
+---
+
+# Partial Dependence Plots
+
+```{r out.width = "100%", fig.align = "center"}
+include_graphics("figures/pdps.png")
+```
+
+---
+
+# Correlation Between Features
+
+```{r out.width = "80%", fig.align = "center"}
+include_graphics("figures/correlation.png")
+```
+
