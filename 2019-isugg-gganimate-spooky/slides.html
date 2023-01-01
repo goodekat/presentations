@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title> gganimate (with a spooky twist)</title>
+    <meta charset="utf-8" />
+    <meta name="author" content=" Katherine Goode " />
+    <script src="libs/header-attrs-2.19/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# <img src="figures/bat-cartoon.png" /> gganimate (with a spooky twist)
+]
+.author[
+### <font size="5"> Katherine Goode </font>
+]
+.date[
+### <font size="5"> ISU Graphics Group - October 31, 2019 </font>
+]
+
+---
+
+
+&lt;style&gt;
+
+.remark-slide-content {
+  background-color: #FFFFFF;
+  border-top: 80px solid #F9C389;
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1.5;
+  padding: 1em 2em 1em 2em
+}
+
+.inverse {
+  background-color: #696767;
+  border-top: 80px solid #696767;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 50% 75%;
+  background-size: 150px;
+}
+
+.your-turn{
+  background-color: #8C7E95;
+  border-top: 80px solid #F9C389;
+  text-shadow: none;
+  background-image: url(https://github.com/goodekat/presentations/blob/master/2019-isugg-gganimate-spooky/figures/spider.png?raw=true);
+	background-position: 95% 90%;
+  background-size: 75px;
+}
+
+.title-slide {
+  background-color: #F9C389;
+  border-top: 80px solid #F9C389;
+  background-image: none;
+}
+
+.title-slide &gt; h1  {
+  color: #111111;
+  font-size: 40px;
+  text-shadow: none;
+  font-weight: 400;
+  text-align: left;
+  margin-left: 15px;
+  padding-top: 80px;
+}
+.title-slide &gt; h2  {
+  margin-top: -25px;
+  padding-bottom: -20px;
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 35px;
+  text-align: left;
+  margin-left: 15px;
+}
+.title-slide &gt; h3  {
+  color: #111111;
+  text-shadow: none;
+  font-weight: 300;
+  font-size: 25px;
+  text-align: left;
+  margin-left: 15px;
+  margin-bottom: -30px;
+}
+
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.left-code {
+  color: #777;
+  width: 40%;
+  height: 92%;
+  float: left;
+}
+.right-plot {
+  width: 59%;
+  float: right;
+  padding-left: 1%;
+}
+&lt;/style&gt;
+
+
+
+# Overview
+
+.pull-left[
+1. Introduction
+
+2. Transition functions 
+
+3. View functions
+
+4. Shadow functions
+
+5. Other
+]
+
+.pull-right[
+&lt;img src="figures/cat.jpg" width="807" height="500px" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: inverse, middle, center
+
+# Introduction
+
+---
+
+# What is gganimate?
+
+- An extension to ggplot2 for creating animated graphics in R
+
+- Originally written by David Robinson
+
+- Updated by Thomas Lin Pedersen in 2018/2019 
+
+- Code from a year(ish) ago will probably not work anymore
+
+- Uses the R package [tweenr](https://github.com/thomasp85/tweenr) (also by Lin Pedersen)
+
+- Pedersen describes it as... 
+
+&gt; "a theoretical backbone of how to describe animation, and it's also an implementation of set theoretical backbones."
+
+&lt;img src="figures/logo.png" width="150px" style="display: block; margin: auto 0 auto auto;" /&gt;
+
+---
+
+# gapminder Example
+
+&lt;img src="slides_files/figure-html/gapminder-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+# How does it work?
+
+From the documentation...
+
+&gt; gganimate provides "a range of new grammar classes that can be added to the plot object in order to customize how it should change with time."  
+
+&lt;br&gt;
+
+| New Grammar Classes | |
+| :----- | :------------ | 
+| transitions | defines how the data changes in the graphic across time |
+| views | defines changes in the viewpoint of the graphic (i.e. x and y axes) | 
+| shadows | defines how to display "memories" in the animation |
+| enter/exit | defines how the data should appear and disappear during the animation |
+| ease_aes | defines the aesthetics associated with the ease during transitions |
+
+---
+
+# Set up
+
+Packages to load if you are following along
+
+
+```r
+# Installs gganimate
+install.packages("gganimate")
+
+# Loads the library
+library(gganimate)
+
+# Other libraries that will be used
+library(ggplot2)
+library(tidyverse)
+```
+
+---
+
+# Bat Data
+
+Study recorded the flying trajectories of bats (individual and paired)
+
+- **Paper**: Giuggioli L, McKetterick TJ, Holderied M (2015) Delayed response and biosonar perception explain movement coordination in trawling bats. PLOS Computational Biology. [doi:10.1371/journal.pcbi.1004089.t001](https://journals.plos.org/ploscompbiol/article/figure?id=10.1371/journal.pcbi.1004089.t001)
+
+- **Original Data**: Holderied M, Giuggioli L, McKetterick TJ (2015) Data from: Delayed response and biosonar perception explain movement coordination in trawling bats. Movebank Data Repository. [doi:10.5441/001/1.62h1f7k9](https://www.datarepository.movebank.org/handle/10255/move.421)
+
+- **My Subset of the Data**:
+    - extracted the first 5 individual bat trajectories
+    - selected 4 variables
+        - `id`: bat id
+        - `time`: time of observed location (in milliseconds)
+        - `latitude`: latitude at the time of observation
+        - `longitude`: longitude at the time of observation
+
+---
+
+# Bat Data
+
+**How to access my subset of the data:**
+
+
+```r
+# Link where the data are stored
+link &lt;- "https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/bat-data/bats-subset.csv"
+```
+
+
+```r
+# Access the data and convert id to a factor
+bats &lt;- read.csv(link) %&gt;% 
+  mutate(id = factor(id))
+```
+
+
+```r
+# Data structure
+str(bats)
+```
+
+```
+## 'data.frame':	1743 obs. of  4 variables:
+##  $ id       : Factor w/ 5 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ time     : num  0 0.019 0.039 0.059 0.079 0.099 0.119 0.139 0.16 0.18 ...
+##  $ latitude : num  51.4 51.4 51.4 51.4 51.4 ...
+##  $ longitude: num  -2.66 -2.66 -2.66 -2.66 -2.66 ...
+```
+
+---
+
+# Bat Data
+
+Plot of the 5 bat trajectories
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Basics for creating a gganimation
+
+**Step 1**: Start with a ggplot data and mapping
+
+.left-code[
+
+```r
+*ggplot(bats %&gt;% filter(id == 1),
+*      aes(x = longitude,
+*          y = latitude,
+*          color = time))
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/output1-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Basics for creating a gganimation
+
+**Step 2**: Add layers using geoms to create static
+
+.left-code[
+
+```r
+ggplot(bats %&gt;% filter(id == 1), 
+       aes(x = longitude,
+           y = latitude,
+           color = time)) + 
+* geom_point()
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/output2-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Basics for creating a gganimation
+
+**Step 3**: Add formatting options
+
+.left-code[
+
+```r
+ggplot(bats %&gt;% filter(id == 1), 
+       aes(x = longitude,
+           y = latitude,
+           color = time)) + 
+  geom_point() +
+* scale_color_gradient2(
+*   midpoint = 6,
+*   low = "orange",
+*   mid = "purple",
+*   high = "black")
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/output3-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Basics for creating a gganimation
+
+**Step 4**: Add gganimate options
+
+.left-code[
+
+```r
+ggplot(bats %&gt;% filter(id == 1), 
+       aes(x = longitude,
+           y = latitude,
+           color = time)) + 
+  geom_point() +
+  scale_color_gradient2(
+    midpoint = 6,
+    low = "orange",
+    mid = "purple",
+    high = "black") +
+* transition_reveal(time)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/output4-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Rendering process
+
+&lt;video width="800" height="550" controls&gt;
+  &lt;source src="./figures/rendering.mp4" type="video/mp4"&gt;
+&lt;/video&gt;
+
+---
+
+class: inverse, middle, center
+
+# Transitions
+
+---
+
+# Transition: &lt;font color="black"&gt; States &lt;/font&gt;
+
+`transition_states`: Transition between several *distinct stages* of the data
+
+Options:
+
+- `states`: The unquoted name of the column holding the state levels in the data.
+
+- `transition_length`: The relative length of the transition. Will be recycled to match the number of states in the data
+
+- `state_length`:	The relative length of the pause at the states. Will be recycled to match the number of states in the data
+
+- `wrap = TRUE`: Should the animation wrap-around? If TRUE the last state will be transitioned into the first.
+
+---
+
+# Transition: &lt;font color="black"&gt; States &lt;/font&gt;
+
+Static plot of the 5 trajectories colored by time 
+
+.left-code[
+
+```r
+bats %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude, 
+             color = time)) +
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black")
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/statesout1-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="black"&gt; States &lt;/font&gt;
+
+Add `transition_states` with `states = id` 
+
+Something is a bit strange...
+
+.left-code[
+
+```r
+bats %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude, 
+             color = time)) +
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black") + 
+* transition_states(states = id)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/statesout2-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="black"&gt; States &lt;/font&gt;
+
+From the documentation on the importance of specifying the `group`:
+
+&lt;br&gt; 
+
+&gt; The group aesthetic, if not set, will be calculated from the interaction of all discrete aesthetics in the layer (excluding label)
+
+&gt; It is often better to set it explicitly when animating, to make sure your data is interpreted in the right way. 
+
+&gt; Unmatched rows will appear/disappear, potentially using an enter or exit function.
+
+---
+
+# Transition: &lt;font color="black"&gt; States &lt;/font&gt;
+
+Add `group = id`
+
+.left-code[
+
+```r
+bats %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude, 
+             color = time, 
+*            group = id)) +
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black") + 
+  transition_states(states = id)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/statesout3-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="black"&gt; States &lt;/font&gt;
+
+Add a label to describe the state and change the transition length and time
+
+.left-code[
+
+```r
+bats %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude, 
+             color = time,
+             group = id)) +
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black") + 
+* labs(title =
+*        "Bat {previous_state}") +
+  transition_states(
+    states = id, 
+*   transition_length = 3,
+*   state_length = 3)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/statesout4-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
+
+`transition_time`: Transition through distinct states in *time*
+
+Options:
+
+- `time`: An unquoted expression giving the time, and thus state membership, of each observation.
+
+- `range`: The time range to animate. If NULL it will be set to the range of time
+
+---
+
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
+
+Static plot of trajectory for bat 1
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point()
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/timeout1-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
+
+Add `transition_time` with `time = time`
+
+Duplicate points appearing in the same frame
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+* transition_time(time = time)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/timeout2-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
+
+Try adjusting the number of frames using `animate`
+
+.left-code[
+
+```r
+*time_plot &lt;- bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+  transition_time(time = time)
+
+*animate(plot = time_plot,
+*       nframes = 300)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/timeout3-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="#8B16CE"&gt; Time &lt;/font&gt;
+
+Example of adjusting the time range
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+  transition_time(time = time, 
+*                 range = c(1, 3))
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/timeout4-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="black"&gt; Reveal &lt;/font&gt;
+
+`transition_reveal`: Reveal data along a given *dimension*
+
+Options:
+
+- `along`: An unquoted expression giving the dimension to tween along. For a gradually revealing time series this should be set to the same as the x aesthetic.
+
+- `range`: The time range to animate. If NULL it will be set to the range of along
+
+- `keep_last = TRUE`: For non-path/polygon layers should the last row be kept for subsequent frames.
+
+---
+
+# Transition: &lt;font color="black"&gt; Reveal &lt;/font&gt;
+
+Static plot of trajectory for bat 1 (again)
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point()
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/revealout1-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="black"&gt; Reveal &lt;/font&gt;
+
+Add `transition_reveal` with `along = time`
+
+Note: No duplicated observations in a frame
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+* transition_reveal(along = time)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/revealout2-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="black"&gt; Reveal &lt;/font&gt;
+
+`transition_time` vs `transition_reveal` (from the documentation):
+
+&gt; In contrast to e.g. transition_time() transition_reveal() calculates intermediary values at exact positions instead of  coercing raw values into the closest frame. 
+
+&gt; It further keeps old data for path and polygon type layers so that they are gradually build up instead of being a set of disconnected segments...
+
+---
+
+# Transition: &lt;font color="black"&gt; Reveal &lt;/font&gt;
+
+Change to using `geom_path` instead of `geom_point` - allows data to gradually appear with `transition_reveal`
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+* geom_path() +
+  transition_reveal(along = time) 
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/revealout3-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="black"&gt; Reveal &lt;/font&gt;
+
+If using both `geom_path` and `geom_point`, the history of the path will appear for the whole animation, but the point will only appear at the current time.
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+* geom_path() +
+* geom_point() +
+  transition_reveal(time)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/revealout4-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="black"&gt; Reveal &lt;/font&gt;
+
+History of points can be kept by assigning the `along` variable to a group
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_path() +
+* geom_point(aes(group = time)) +
+  transition_reveal(along = time)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/revealout5-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Transition: &lt;font color="black"&gt; Reveal &lt;/font&gt;
+
+Use the ggimage R package to replace the point with an image
+
+.left-code[
+
+```r
+library(ggimage)
+
+bat_image_link &lt;- 
+  "https://raw.githubusercontent.com/goodekat/presentations/master/2019-isugg-gganimate-spooky/figures/bat-cartoon.png"
+
+bats %&gt;%
+  mutate(
+*   image = bat_image_link
+  ) %&gt;% 
+  filter(id == 1) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_path() +
+* geom_image(aes(image = image),
+*            size = 0.3) +
+  transition_reveal(time)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/revealout6-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: your-turn
+
+# Your Turn
+
+Use a transition to create the animation shown below.
+
+If you want to use the same colors, add `scale_color_manual(values = bat_colors)` with `bat_colors &lt;- c("darkorange", "orangered", "violetred", "purple", "black")`.
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-4-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: your-turn
+
+# Your Turn: Static Version
+
+
+```r
+bats %&gt;%
+  mutate(image = bat_image_link) %&gt;%
+  ggplot(aes(x = longitude, y = latitude, group = id, color = id)) +
+  geom_path() +
+  geom_image(aes(image = image), size = 0.1) +
+  scale_color_manual(values = bat_colors)
+```
+
+---
+
+class: your-turn
+
+# Your Turn: Solution
+
+
+```r
+bats %&gt;%
+  mutate(image = bat_image_link) %&gt;%
+  ggplot(aes(x = longitude, y = latitude, group = id, color = id)) +
+  geom_path() +
+  geom_image(aes(image = image), size = 0.1) +
+  scale_color_manual(values = bat_colors) +
+  transition_reveal(along = time)
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-6-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Other Transitions
+
+&lt;br&gt;
+
+| Function | Use | 
+| :-------- | :---------------- |
+| transition_events | Transition individual events in and out |
+| transition_filter | Transition between different filters | 
+| transition_layers | Build up a plot, layer by layer |
+| transition_components | Transition individual components through their own lifecycle |
+| transition_manual | Create an animation by specifying the frame membership directly |
+| transition_null | Keep all data constant across the animation |
+
+---
+
+class: inverse, middle, center
+
+# Views
+
+---
+
+# View: &lt;font color="#8B16CE"&gt; Follow &lt;/font&gt;
+
+Adjusts the axes to follow the data in the frame
+
+.left-code[
+
+```r
+bats %&gt;%
+  mutate(image = bat_image_link) %&gt;% 
+  filter(id == 3) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_image(aes(image = image),
+             size = 0.1) +
+  geom_path() +
+  transition_reveal(time) +
+* view_follow()
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/view_follow_out-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# View: &lt;font color="black"&gt; Step &lt;/font&gt;
+
+Follows the data but switches between being static and changing to the range of the data
+
+.left-code[
+
+```r
+bats %&gt;%
+  mutate(image = bat_image_link) %&gt;% 
+  filter(id == 3) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_image(aes(image = image),
+             size = 0.1) +
+  geom_path() +
+  transition_reveal(time) +
+* view_step(pause_length = 3,
+*           step_length = 1,
+*           nsteps = 5) #&lt;&lt;
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/view_step_out1-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# View: &lt;font color="black"&gt; Step &lt;/font&gt;
+
+Works will with `transistion_states`
+
+.left-code[
+
+```r
+bats %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude, 
+             color = time, 
+             group = id)) +
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black"
+  ) + 
+  transition_states(states = id) +
+* view_step(pause_length = 3,
+*           step_length = 1,
+*           nsteps = 5)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/view_step_out2-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Other Views
+
+| Function | Use |
+| -------- | :----------------- |
+| view_zoom | Pan and zoom smoothly between different states |
+| view_static | Keep a fixed view that include all of the data | 
+
+---
+
+class: your-turn
+
+# Your Turn
+
+Apply a viewing option to the animation from the last 'your turn' to create an animation such as the one below.
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-7-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: your-turn
+
+# Your Turn: Solution 
+
+
+```r
+bats %&gt;%
+  mutate(image = bat_image_link) %&gt;%
+  ggplot(aes(x = longitude, y = latitude, group = id, color = id)) +
+  geom_path() +
+  geom_image(aes(image = image), size = 0.1) +
+  scale_color_manual(values = bat_colors) +
+  transition_reveal(along = time) + 
+  view_follow()
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-8-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: inverse, middle, center
+
+# Shadows
+
+---
+
+# Shadow: &lt;font color="#8B16CE"&gt; Wake &lt;/font&gt;
+
+Leaves a "wake" behind the points as they move through time - options allow for the adjustment of length of wake, size of wake, and so forth
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 3) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+  transition_reveal(time) +
+* shadow_wake(wake_length = 0.1,
+*             alpha = 0.5)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/shadow_wake_out-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Shadow:  &lt;font color="black"&gt; Trail &lt;/font&gt;
+
+Leaves points behind as a memory of the trajectory the points followed (keeps every nth frame) - allows for the adjustments of the distance between points to remember, alpha of memory, and so forth
+
+.left-code[
+
+```r
+bats %&gt;%
+  filter(id == 3) %&gt;%
+  ggplot(aes(x = longitude, 
+             y = latitude)) +
+  geom_point() +
+  transition_reveal(time) +
+* shadow_trail(distance = 0.01,
+*              alpha = 0.5,
+*              shape = 2)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/shadow_trail_out-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Other Shadows
+
+| Function | Use |
+| -------- | :----------------- |
+| shadow_mark | Show original data as background marks |
+| shadow_null | A non-existent shadow | 
+
+---
+
+class: your-turn
+
+# Your Turn
+
+Apply use a shadow option to create an animation such as the one below
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-9-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: your-turn
+
+# Your Turn: Solution 
+
+
+```r
+bats %&gt;%
+  mutate(image = bat_image_link) %&gt;%
+  ggplot(aes(x = longitude, y = latitude, group = id, color = id)) +
+  geom_point() +
+  scale_color_manual(values = bat_colors) +
+  transition_reveal(along = time) + 
+  shadow_wake(wake_length = 0.2, size = 5, alpha = FALSE, colour = 'grey92')
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-10-1.gif" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: inverse, middle, center
+
+# Other
+
+---
+
+# Enter/Exit
+
+Specifies how the objects transition from one time to the next
+
+.pull-left[
+`enter_manual()`  
+`enter_appear()`   
+`enter_fade()`  
+`enter_grow()`  
+`enter_recolour()`  
+`enter_recolor()`  
+`enter_fly()`  
+`enter_drift()`  
+`enter_reset()` 
+]
+
+.pull-right[
+`exit_manual()`  
+`exit_disappear()`  
+`exit_fade()`  
+`exit_shrink()`   
+`exit_recolour()`  
+`exit_recolor()`   
+`exit_fly()`   
+`exit_drift()`  
+`exit_reset()`  
+]
+
+---
+
+# Enter/Exit
+
+.left-code[
+
+```r
+bats %&gt;%
+  ggplot(aes(
+    x = longitude, 
+    y = latitude, 
+    color = time, 
+    group = id)) + 
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black") +
+  transition_states(
+    states = id, 
+    transition_length = 2, 
+    state_length = 1) + 
+* enter_fade() +
+* exit_fade() +
+* exit_fly(x_loc = -2.66300,
+*          y_loc = 51.40692)
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/enter_exit_out-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# ease_aes
+
+"defines how the aesthetics associated with the ease during transitions"
+
+- `quadratic`: Models a power-of-2 function
+- `cubic`: Models a power-of-3 function
+- `quartic`: Models a power-of-4 function
+- `quintic`: Models a power-of-5 function
+- `sine`: Models a sine function
+- `circular`: Models a pi/2 circle arc
+- `exponential`: Models an exponential function
+- `elastic`: Models an elastic release of energy
+- `back`: Models a pullback and release
+- `bounce`: Models the bouncing of a ball
+
+Modifiers: `-in`, `-out`, `-in-out`
+
+Demonstrations of the easings: [https://easings.net/en](https://easings.net/en)
+
+---
+
+# ease_aes
+
+Use `sine-in-out` to smooth the fade transitions
+
+.left-code[
+
+```r
+bats %&gt;%
+  ggplot(aes(
+    x = longitude, 
+    y = latitude, 
+    color = time, 
+    group = id)) + 
+  geom_point() + 
+  scale_color_gradient2(
+    midpoint = 6, 
+    low = "orange", 
+    mid = "purple",
+    high = "black") +
+  transition_states(
+    states = id, 
+    transition_length = 2, 
+    state_length = 1) + 
+  enter_fade() +
+  exit_fade() +
+* ease_aes('sine-in-out')
+```
+]
+.right-plot[
+&lt;img src="slides_files/figure-html/ease_aes_out-1.gif" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Rendering and Output
+
+.pull-left[
+Render a gganim object
+
+- `animate()`
+- `print()` 
+- `knit_print.gganim()`
+
+&lt;br&gt;
+
+Renderers provided by gganimate
+
+- `gifski_renderer()` 
+- `file_renderer()` 
+- `av_renderer()` 
+- `ffmpeg_renderer()` 
+- `magick_renderer()` 
+- `sprite_renderer()`
+]
+
+.pull-right[
+Output
+
+- `anim_save()`: Save an animation to a file
+- `last_animation()`: Retrieve the last rendered animation
+- `frame_vars()`: Access metadata about the frames in an animation
+- `split_animation()`: Split an animation into chunks
+]
+
+---
+
+# Resources
+
+Official Website: https://gganimate.com/index.html
+
+GitHub: https://github.com/thomasp85/gganimate
+
+Talks on gganimate: https://gganimate.com/articles/extra/talks.html
+
+Workshop by Mitchell O'Hara-Wild: https://github.com/numbats/gganimate-workshop
+
+&lt;img src="figures/halloween-dogs.png" width="625px" style="display: block; margin: auto;" /&gt;
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
