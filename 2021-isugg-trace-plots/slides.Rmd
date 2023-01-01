@@ -52,7 +52,8 @@ options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(
   echo = FALSE, 
   fig.align = "center", 
-  dpi = 300
+  dpi = 300,
+  warning = FALSE
 )
 
 # Load packages
