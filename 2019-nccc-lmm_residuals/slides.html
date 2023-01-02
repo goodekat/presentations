@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>A Review and Discussion of Residuals for Mixed Models</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Katherine Goode" />
+    <script src="libs/header-attrs-2.19/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# A Review and Discussion of Residuals for Mixed Models
+]
+.author[
+### Katherine Goode
+]
+.institute[
+### Iowa State University, Department of Statistics
+]
+.date[
+### NCCC-170 Meeting - June 20, 2019
+]
+
+---
+
+
+&lt;style&gt;
+.remark-slide-number {
+  position: inherit;
+}
+
+.remark-slide-number .progress-bar-container {
+  position: absolute;
+  bottom: 0;
+  height: 4px;
+  display: block;
+  left: 0;
+  right: 0;
+}
+
+.remark-slide-number .progress-bar {
+  height: 100%;
+  background-color: #EB811B;
+}
+
+.tiny { font-size: 40% }
+.small { font-size: 75% }
+
+&lt;/style&gt;
+
+
+
+
+
+# Goals for this Talk
+
+1. Motivate my interest in this topic
+
+2. Provide an overview of residuals available for mixed models
+
+3. Describe residual computations in R and SAS
+
+4. Discussion questions
+
+---
+
+class: inverse, center, middle
+
+# Motivation
+
+&lt;html&gt;
+  &lt;div style='float:left'&gt;&lt;/div&gt;
+  &lt;hr color='#009999' size=1px width=800px&gt;
+&lt;/html&gt;
+
+---
+
+# Consulting
+
+### Experiences
+
+- Work with graduate students from many departments at Iowa State
+- Frequently help with mixed models
+- Clients often forget to check residual plots
+
+### Produce Drop Study Example (based on a consulting project)
+
+- 10 reps
+- drop one head of lettuce and one apple per rep
+- bacteria measured at 3 times points on each produce item (30 sec, 10 min, 1 hr)
+
+
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-3-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: clear
+
+### Model for Drop Study
+
+&lt;br&gt;
+
+| Terms |
+| :---: | 
+| Rep  |
+| Produce |
+| Produce * Rep (r.e.) |
+| Time | 
+| Time * Produce |
+| Error |
+
+&lt;br&gt;
+
+
+```r
+# Fits the model in R
+drop_model &lt;- lme4::lmer(bacteria ~ rep + produce*time + (1|produce:rep), 
+                         data = drop_study)
+```
+
+---
+
+# ggResidpanel .tiny[developed with Katie Rey]
+
+
+```r
+# Loads the package
+library(ggResidpanel)
+
+# Creates the default of panel of residual plots
+resid_panel(drop_model)
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: clear
+
+
+```r
+# Refits the model with a log transformation of the reponse
+drop_model_log &lt;- lme4::lmer(log(bacteria) ~ rep + produce*time + (1|produce:rep), 
+                         data = drop_study)
+
+# Creates a panel to compare the models
+resid_compare(models = list(drop_model, drop_model_log), 
+              plots = c("resid", "qq"))
+```
+
+&lt;img src="slides_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# My Questions
+
+- What residual types are available for mixed models?
+
+- How are the residuals types computed? 
+
+- Which types are available in R and SAS?
+
+- How to determine which residual type to use in practice?
+
+---
+
+class: inverse, center, middle
+
+# Residual Types
+
+&lt;html&gt;
+  &lt;div style='float:left'&gt;&lt;/div&gt;
+  &lt;hr color='#009999' size=1px width=800px&gt;
+&lt;/html&gt;
+
+---
+
+# Linear Mixed Model Review
+
+Model formula:
+
+`$$\textbf{Y}=\textbf{X}\boldsymbol{\beta}+\textbf{Z}\boldsymbol{\gamma}+\boldsymbol{\epsilon}$$`
+
+&lt;br&gt;
+
+Assumptions:
+
+`$$\begin{bmatrix} \boldsymbol{\gamma} \\ \textbf{e} \end{bmatrix}
+  \sim N
+    \begin{pmatrix}
+      \begin{bmatrix} \textbf{0} \\ 
+      \textbf{0} 
+      \end{bmatrix},
+      \begin{bmatrix} 
+      \textbf{G} &amp; \textbf{0} \\ 
+      \textbf{0} &amp; \textbf{R} 
+      \end{bmatrix}
+    \end{pmatrix}$$`
+    
+&lt;br&gt;
+
+Marginal and Conditional Distributions:
+
+`$$\textbf{Y} \sim N(\textbf{X}\boldsymbol{\beta}, \ \textbf{ZGZ}'+\textbf{R})$$`
+`$$\textbf{Y}|\boldsymbol{\gamma} \sim N(\textbf{X}\boldsymbol{\beta}+\textbf{Z}\boldsymbol{\gamma}, \ \textbf{R})$$`
+
+
+---
+
+# Raw Residuals
+
+The raw residuals are computed as the observed response values minus the predicted response values. The marginal version does not account for the random effects while the conditional version does.
+
+- **marginal** raw residuals
+  `$$r^m_i = Y_i-\textbf{x}'_i\widehat{\boldsymbol{\beta}}$$`
+  
+- **conditional** raw residuals
+  `$$r^c_i = Y_i-\textbf{x}'_i\boldsymbol{\widehat{\beta}}-\textbf{z}'_i\widehat{\boldsymbol{\gamma}}$$`
+
+### Issues
+
+- residuals may not be from populations with equal variances
+- conditional residuals tend to be correlated
+- conditional residuals are not well suited for detecting outliers
+
+---
+
+# Pearson Residuals
+
+The Pearson residuals are computed as the raw residuals divided by the square root of the estimated variance of the response values.
+
+- **marginal** Pearson residuals
+  `$$r^{m,Pearson}_{i} = \frac{r^m_i}{\sqrt{\widehat{Var}[Y_i]}}$$`
+  
+- **conditional** Pearson residuals
+  `$$r^{c,Pearson}_{i} = \frac{r^c_i}{\sqrt{\widehat{Var}[Y_i|\boldsymbol{\gamma}]}}$$`
+
+### Issues
+
+- still may not be from populations with equal variances
+- only appropriate if the variability of `\(\hat{\boldsymbol{\beta}}\)` can be ignored
+
+---
+
+# Standardized Residuals
+
+The standardized residuals are computed as the raw residuals divided by the square root of the variance of the raw residuals.
+
+- **marginal** studentized residuals
+  `$$r_i^{m,stand}=\frac{r_i^m}{\sqrt{Var[r_i^m]}}$$`
+  
+- **conditional** studentized residuals
+  `$$r_i^{c,stand}=\frac{r_i^c}{\sqrt{Var[r_i^c]}}$$`
+  
+### Reasons for Standardization
+
+- to deal with residuals being from populations with different variances
+- "to normalize the residuals into a signal-to-noise ratio" (Stroup, SAS for Mixed Models)
+
+
+---
+
+# Studentized Residuals
+
+The studentized residuals are computed as the standardized residuals with the variances of the raw residuals replaced by the estimated variances.
+
+- **marginal** studentized residuals
+  `$$r_i^{m,stud}=\frac{r_i^m}{\sqrt{\widehat{Var}[r_i^m]}}$$`
+  
+- **conditional** studentized residuals
+  `$$r_i^{c,stud}=\frac{r_i^c}{\sqrt{\widehat{Var}[r_i^c]}}$$`
+
+### Reasons for Studentization
+
+- same as with standardization
+
+---
+
+# Other Types
+
+Other types exist:
+
+- externally studentized
+- error recovery residuals
+
+---
+
+class: inverse, center, middle
+
+# Residuals in R and SAS
+
+&lt;html&gt;
+  &lt;div style='float:left'&gt;&lt;/div&gt;
+  &lt;hr color='#009999' size=1px width=800px&gt;
+&lt;/html&gt;
+
+---
+
+# SAS
+
+### [proc mixed residuals](https://support.sas.com/documentation/cdl/en/statug/63962/HTML/default/viewer.htm#statug_mixed_sect027.htm)
+
+- offer the key six types discussed so far and "scaled" residuals
+
+&lt;br&gt;
+
+&lt;img src="./figures/sas_table.png" width="971" style="display: block; margin: auto;" /&gt;
+
+---
+
+# R
+
+### lme4
+
+- offers conditional "pearson" and "response" (raw)
+- default is "response"
+- see details from the `residuals.merMod` function below
+
+&lt;br&gt; 
+
+&lt;img src="./figures/lme4_details.png" width="1653" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: clear
+
+### `lme4` Pearson Residuals vs `ggResidpanel` Pearson Residuals
+
+.pull-left[
+
+```r
+plot(drop_model_log,
+     form = resid(., type = "pearson") ~ 
+       fitted(.),
+     abline = 0)
+```
+
+![](slides_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+
+```r
+resid_panel(drop_model_log,
+            plot = "resid", 
+            type = "pearson",
+            title.text.size = 24, axis.text.size = 16)
+```
+
+![](slides_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+]
+
+---
+
+class: clear
+
+### `lme4` Scaled Pearson Residuals vs `ggResidpanel` Pearson Residuals
+
+.pull-left[
+
+```r
+plot(drop_model_log,
+     form = resid(., type = "pearson", 
+                  scaled = TRUE) ~ 
+       fitted(.), abline = 0)
+```
+
+![](slides_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+
+```r
+resid_panel(drop_model_log,
+            plot = "resid", 
+            type = "pearson", 
+            title.text.size = 24, axis.text.size = 16)
+```
+
+![](slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+]
+
+---
+
+class: clear
+
+### `lme4` Pearson Residuals vs `ggResidpanel` Response Residuals
+
+.pull-left[
+
+```r
+plot(drop_model_log,
+     form = resid(., type = "pearson") ~ 
+       fitted(.),
+     abline = 0)
+```
+
+![](slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+
+```r
+resid_panel(drop_model_log,
+            plot = "resid", 
+            type = "response",
+            title.text.size = 24, axis.text.size = 16)
+```
+
+![](slides_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+]
+
+---
+
+class: inverse, center, middle
+
+# Discussion
+
+&lt;html&gt;
+  &lt;div style='float:left'&gt;&lt;/div&gt;
+  &lt;hr color='#009999' size=1px width=800px&gt;
+&lt;/html&gt;
+
+---
+
+# Marginal versus Conditional Residuals?
+
+- Residual plots will look different when conditioning on random effects
+- Should you always look at both? 
+- Is just looking at conditional fine? If so, why?
+
+
+.pull-left[
+&lt;img src="slides_files/figure-html/unnamed-chunk-15-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right[
+&lt;img src="slides_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+# Residuals in Practice?
+
+- Which residual types do you use in practice?
+    - raw
+    - Pearson
+    - studentized
+    - other
+- What motivates you to use this type of residual? 
+- What information do you want to gain from using a specific residual type?
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
