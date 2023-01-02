@@ -1,0 +1,291 @@
+---
+title: "Visual Diagnostics of a Model Explainer: Tools for the Assessment of LIME Explanations from Random Forests"
+author: "Katherine Goode and Dr. Heike Hofmann \\newline Iowa State University Department of Statistics"
+output: 
+  beamer_presentation:
+    keep_tex: no
+    theme: metropolis
+    latex_engine: xelatex
+    slide_level: 2
+    incremental: no
+header-includes:
+  \definecolor{mywhite}{RGB}{255, 255, 255}
+  \definecolor{myblue}{RGB}{112, 144, 177}
+  \definecolor{myorange}{RGB}{237, 193, 154}
+  \setbeamercolor{background canvas}{bg = mywhite}
+  \setbeamercolor{frametitle}{bg = myblue}
+  \setbeamercolor{progress bar}{fg = myorange, bg = myorange}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+
+# Load packages
+library(cowplot)
+library(gower)
+library(gretchenalbrecht)
+library(magick)
+library(tidyverse)
+```
+
+## Background on LIME (Ribeiro et al. 2017)
+
+- Local Interpretable Model-Agnostic Explanations
+
+- Provides “explanations” for black-box model predictions to determine if trustworthy
+
+\vspace{0.25cm}
+
+```{r fig.height = 4.5}
+# Generate data
+set.seed(20190624)
+lime_data <- data.frame(feature1 = sort(runif(250, 0, 1)),
+                      feature2 = sample(x = 1:250, size = 250, replace = FALSE)) %>%
+  mutate(prediction = if_else(feature1 >= 0 & feature1 < 0.1, (0.3 * feature1) + rnorm(n(), 0, 0.01), 
+                      if_else(feature1 >= 0.1 & feature1 < 0.3, rbeta(n(), 1, 0.5), 
+                      if_else(feature1 >= 0.3 & feature1 < 0.5, sin(pi* feature1) + rnorm(n(), 0, 0.5),
+                      if_else(feature1 >= 0.5 & feature1 < 0.8, -(sin(pi* feature1) + rnorm(n(), 0, 0.1)) + 1,
+                      if_else(feature1 >= 0.8 & feature1 < 0.9, 0.5 + runif(n(), -0.5, 0.5), 
+                              0.5 + rnorm(n(), 0, 0.3)))))))
+
+# Specify a prediction of interest
+prediction_of_interest <- data.frame(feature1 = 0.07,
+                                feature2 = 200,
+                                prediction = 0.05, 
+                                color = factor("Prediction of Interest"))
+
+# Compute the distance between the prediction of interest 
+lime_data$distance <- (1 - gower_dist(x = prediction_of_interest, y = lime_data))^10
+
+# Fit the interpretable explainer model
+lime_explainer <- lm(prediction ~ feature1 + feature2, data = lime_data, weights = distance)
+
+# Predictions versus feature 1
+plot_feature1 <- ggplot(lime_data, aes(x = feature1, y = prediction, size = distance)) + 
+  geom_point() + 
+  geom_abline(intercept = coef(lime_explainer)[[1]] + coef(lime_explainer)[[3]]*prediction_of_interest$feature2, 
+              slope = coef(lime_explainer)[[2]], 
+              size = 1) +
+  geom_point(data = prediction_of_interest,
+             mapping = aes(x = feature1, y = prediction),
+             color = "#EFB084",
+             size = 6) +
+  theme_linedraw(base_size = 22) +
+  labs(x = "Feature 1", 
+       y = "Black-Box Prediction") + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = "none")
+
+# Predictions versus feature 2
+plot_feature2 <- ggplot(lime_data, aes(x = feature2, y = prediction, size = distance)) + 
+  geom_point() + 
+  geom_abline(intercept = coef(lime_explainer)[[1]] + coef(lime_explainer)[[2]]*prediction_of_interest$feature1, 
+              slope = coef(lime_explainer)[[3]], 
+              size = 1) +
+  geom_point(data = prediction_of_interest,
+             mapping = aes(x = feature2, y = prediction),
+             color = "#EFB084",
+             size = 6) +
+  theme_linedraw(base_size = 22) +
+  labs(x = "Feature 2", 
+       y = "Black-Box Prediction") + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = "none")
+
+# Join the two feature plots
+lime_plots <- plot_grid(plot_feature1, plot_feature2)
+
+# Create a plot to extract a legend for the prediction of interest
+lime_legend_plot <- ggplot(prediction_of_interest, aes(x = feature1, y = prediction, color = color)) + 
+  geom_point(size = 6) +
+  scale_color_manual(values = c("#EFB084")) +
+  theme_classic(base_size = 22) +
+  labs(color = "") +
+  theme(legend.position = "bottom")
+
+# Extract the legend
+lime_legend <- get_legend(lime_legend_plot)
+
+# Join the title, plots, legend, and caption into one figure
+lime_figure <- plot_grid(lime_plots, lime_legend,
+                         ncol = 1, 
+                         rel_heights = c(0.9, 0.1))
+
+# View the figure
+lime_figure
+```
+
+## Assessment Goals
+
+- How do we know if LIME explanations are trustworthy?
+    - Simple model a good approximation?
+    - Explanation local?
+    - Explanations consistent across implementation methods (form of explainer model, distance metric, etc.)?
+
+```{r fig.height = 4.5}
+# Compute the distance between the prediction of interest 
+lime_data$distance_bad <- (1 - gower_dist(x = prediction_of_interest, y = lime_data))^1
+
+# Fit the interpretable explainer model
+lime_explainer_bad <- lm(prediction ~ feature1 + feature2, data = lime_data, weights = distance_bad)
+
+# Predictions versus feature 1
+plot_feature1_bad <- ggplot(lime_data, aes(x = feature1, y = prediction, size = distance_bad)) + 
+  geom_point() + 
+  geom_abline(intercept = coef(lime_explainer_bad)[[1]] + coef(lime_explainer_bad)[[3]]*prediction_of_interest$feature2, 
+              slope = coef(lime_explainer_bad)[[2]], 
+              size = 1) +
+  geom_point(data = prediction_of_interest,
+             mapping = aes(x = feature1, y = prediction),
+             color = "#EFB084",
+             size = 6) +
+  theme_linedraw(base_size = 22) +
+  labs(x = "Feature 1", 
+       y = "Black-Box Prediction") + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = "none")
+
+# Predictions versus feature 2
+plot_feature2_bad <- ggplot(lime_data, aes(x = feature2, y = prediction, size = distance_bad)) + 
+  geom_point() + 
+  geom_abline(intercept = coef(lime_explainer_bad)[[1]] + coef(lime_explainer_bad)[[2]]*prediction_of_interest$feature1, 
+              slope = coef(lime_explainer_bad)[[3]], 
+              size = 1) +
+  geom_point(data = prediction_of_interest,
+             mapping = aes(x = feature2, y = prediction),
+             color = "#EFB084",
+             size = 6) +
+  theme_linedraw(base_size = 22) +
+  labs(x = "Feature 2", 
+       y = "Black-Box Prediction") + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        legend.position = "none")
+
+# Join the two bad feature plots
+lime_plots_bad <- plot_grid(plot_feature1_bad, plot_feature2_bad)
+
+# Join the title, plots, legend, and caption into one figure
+lime_figure_bad <- plot_grid(lime_plots_bad, lime_legend,
+                         ncol = 1, 
+                         rel_heights = c(0.9, 0.1))
+
+# View the figure
+lime_figure_bad
+```
+
+## Forensics Bullet Matching Example
+
+Random forest model used to predict if two bullets were fired from the same gun based on markings on bullets (Hare, Hofmann, and Carriquiry 2017)
+
+\vspace{0.25cm}
+
+```{r}
+# Load image of the bullet
+bullet <- ggdraw() +
+  draw_image('./figures/bullet.png')
+
+# Load plot of the signatures
+signatures <- ggdraw() +
+  draw_image('./figures/signatures.png')
+
+# Join bullet and signatures
+plot_grid(bullet, signatures,
+          ncol = 2, 
+          rel_widths = c(0.3, 0.7),
+          scale = 0.98)
+```
+
+## LIME Diagnostic Plot
+
+Top features selected by LIME applied to all predictions in bullet testing dataset using several implementation methods
+
+```{r fig.height = 6.5}
+# Read in the test_explain data
+hamby224_test_explain <- readRDS("./data/hamby224_test_explain.rds")
+
+# Create the chosen features dataset
+chosen_features <- hamby224_test_explain %>%
+  filter(!(bin_situation %in% c("kernel density", "normal approximation"))) %>%
+  filter(!is.na(rfscore)) %>%
+  select(set, situation, bin_situation, nbins, case, samesource, feature, feature_weight) %>%
+  mutate(feature_weight_abs = abs(feature_weight)) %>%
+  arrange(situation, case, desc(feature_weight_abs)) %>%
+  mutate(explainer = rep(c("first", "second", "third"), length(situation) / 3)) %>%
+  select(-feature_weight, -feature_weight_abs) %>%
+  spread(explainer, feature)
+
+# Plot of the third feature to get the nine colors from the gretchenalbrecht package
+plot_to_get_nine_colors <- chosen_features %>%
+  group_by(bin_situation, case) %>%
+  mutate(nlevels = length(levels(factor(third)))) %>%
+  ungroup() %>%
+  arrange(bin_situation, set, samesource, desc(nlevels), case) %>%
+  mutate(order = rep(rep(1:length(unique(case)), each = 5, 4))) %>%
+  ggplot(aes(x = situation, y = order, fill = third)) + 
+  geom_tile() + 
+  facet_grid(set + samesource ~ bin_situation, scales = "free", space = "free_y") + 
+  scale_fill_gretchenalbrecht(palette = "last_rays", discrete = TRUE)
+
+# Grab the data from the plot and get the color palette
+plot_data <- ggplot_build(plot_to_get_nine_colors)
+palette <- unique(plot_data$data[[1]]["fill"])
+
+# Order the colors correctly for the plot
+colors <- c("ccf" = palette$fill[9], 
+            "cms" = palette$fill[6], 
+            "D" = palette$fill[3], 
+            "matches" = palette$fill[5],
+            "mismatches" = palette$fill[8], 
+            "non_cms" = palette$fill[1],
+            "rough_cor" = palette$fill[7], 
+            "sd_D" = palette$fill[4],
+            "sum_peaks" = palette$fill[2])
+
+# Create the plot of the first chosen feature
+chosen_features %>%
+  filter(set == "Set 1") %>%
+  group_by(bin_situation, case) %>%
+  mutate(nlevels = length(levels(factor(first)))) %>%
+  ungroup() %>%
+  mutate(bin_situation = fct_recode(bin_situation, "Equal Bins" = "equally spaced", 
+                                    "Quantile Bins" = "quantile", 
+                                    "Kernel Density" = "kernel density",
+                                    "Match Tree" = "samesource tree",
+                                    "RF Prob Tree" = "rfscore tree",
+                                    "Normal Approximation" = "normal approximation"),
+         nbins = fct_recode(factor(nbins), "2 Bins" = "2", "3 Bins" = "3", 
+                            "4 Bins" = "4", "5 Bins" = "5", "6 Bins" = "6")) %>%
+  ggplot(aes(x = nbins, y = case, fill = first)) + 
+  geom_tile() + 
+  facet_grid(samesource ~ bin_situation, scales = "free", space = "free_y") + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom", 
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        text = element_text(size = 16)) + 
+  scale_fill_manual(values = colors, drop = FALSE) +
+  labs(x = "Implementation Method", y = "Prediction", fill = "Feature")
+```
