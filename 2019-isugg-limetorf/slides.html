@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title> An Application of LIME to a Random Forest</title>
+    <meta charset="utf-8" />
+    <meta name="author" content=" Katherine Goode " />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# <a href="https://en.wikipedia.org/wiki/Tilia"><img src="figures/lindens.jpg" /></a> An Application of LIME to a Random Forest
+]
+.author[
+### <font size="5"> Katherine Goode </font>
+]
+.date[
+### <font size="5"> ISU Graphics Group - March 1, 2019 </font>
+]
+
+---
+
+
+
+
+# Overview
+
+.pull-left[
+### The plan
+
+1. Explanation of LIME 
+2. Hamby bullet data
+3. Applying LIME to the random forest
+4. Issues and attempts at a solution
+6. Conclusions and future work
+]
+
+.pull-right[
+&lt;br&gt;
+&lt;br&gt;
+&lt;img src="./figures/lime_drawing.png" width = 400&gt;
+]
+
+---
+
+class: inverse, center, middle
+
+# What is &lt;span style="color:lime"&gt;LIME&lt;/span&gt;?
+
+---
+
+# Motivation for LIME
+
+&lt;br&gt;
+
+![](./figures/blackbox.png)
+
+### Black Box Prediction Models
+
+- Offer great predictive ability 
+- Loss of interpretability
+- Difficult to assess trustworthiness
+
+### Enter LIME...
+
+- **L**ocal **I**nterpretable **M**odel-Agnostic **E**xplanations
+- Developed by computer scientists ([Ribeiro, Singh, and Guestrin](https://arxiv.org/pdf/1602.04938.pdf))
+- Designed to assess if a black box predictive model is trustworthy
+- Produces "explanations" for individual predictions
+
+---
+
+# Meaning of LIME
+
+.pull-left[
+### &lt;span style="color:lime"&gt;L&lt;/span&gt;ocal
+
+- Focuses on behavior of a complex model at a local level
+
+### &lt;span style="color:lime"&gt;I&lt;/span&gt;nterpretable
+
+- Produces easily interpretable "explanations"
+
+### &lt;span style="color:lime"&gt;M&lt;/span&gt;odel-Agnostic
+
+- Works with any predictive model
+
+### &lt;span style="color:lime"&gt;E&lt;/span&gt;xplanations
+
+- Provides insight into individual predictions
+]
+
+.pull-right[
+&lt;br&gt;
+&lt;br&gt;
+.center[&lt;img src="./figures/local.png" width=300&gt;]
+.center[&lt;font size="4"&gt;Figure 3 in Ribeiro, Singh, and Guestrin (2016)&lt;/font&gt;]
+&lt;br&gt;
+&lt;br&gt;
+.center[&lt;img src="./figures/image_explanation.png" width=500&gt;]
+.center[&lt;font size="4"&gt;Figure 4 in Ribeiro, Singh, and Guestrin (2016)&lt;/font&gt;]
+]
+
+---
+
+# An Example &lt;font size="3"&gt;(from Ribeiro, Singh, and Guestrin (2016))&lt;/font&gt;
+
+.pull-left[
+### 1. Black Box Model 
+- Model predicts whether a patient has the flu
+- Apply the model to a new patient
+- Predicts that the patient has the flu
+- Can this prediction be trusted?
+]
+
+.pull-right[
+### 2. LIME
+- Apply LIME to *this* case
+- LIME returns the most important variables in *this* prediction
+- Colors indicate
+    + &lt;span style="color:green"&gt;green&lt;/span&gt;: evidence supporting the flu
+    + &lt;span style="color:red"&gt;red&lt;/span&gt;: evidence against the flu
+- Can this prediction be trusted?
+]
+
+.center[&lt;img src="./figures/example.png" width=700&gt;]
+.center[&lt;font size="4"&gt;Figure 1 in Ribeiro, Singh, and Guestrin (2016)&lt;/font&gt;]
+ 
+---
+
+# General LIME Procedure
+
+**Start with**: (1) training data, (2) complex model, (3) one prediction from the testing data
+1. Create perturbations from training data
+2. Input each perturbation into complex model to get predictions
+3. Compute similarity scores between test observation and each perturbation 
+4. Perform feature selection to choose `\(k\)` features
+5. Fit a simple and interpretable model weighted by the similarity scores to the perturbations
+  `$$\mbox{Example: } \mbox{prediction} \sim \mbox{feature 2} + \mbox{feature 3} \ \ \ \mbox{(with features standardized)}$$`
+6. Interpret the simple model to "explain" the predictions
+
+| | Feature 1 | &lt;span style="color:blue"&gt;Feature 2&lt;/span&gt; | &lt;span style="color:blue"&gt;Feature 3&lt;/span&gt; | Feature 4 | Similarity Score | &lt;span style="color:blue"&gt;Prediction&lt;/span&gt;|
+| --: | :--: | :--: | :--: | :--: | :--: | :--: |
+| test observation | 2 | 4 | 2 | 10 | exact | `\(\hat{y}_{\mbox{obs}}\)` |
+| perturbation 1 | 2 | 3 | 2 | 12 | very close | `\(\hat{y}_1\)` |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | 
+| perturbation 5000  | 10 | 0 | 13 | 22 | not close | `\(\hat{y}_{5000}\)` |
+
+---
+
+# Using LIME
+
+### Implementations of LIME
+
+- Developers created a Python package called [lime](https://github.com/marcotcr/lime)
+- Thomas Pedersen created an R package also called [lime](https://github.com/thomasp85/lime)
+
+![](./figures/lime.png)
+
+### Key Functions in the lime R package
+
+
+```r
+#install.packages("lime")
+library(lime)
+?lime
+?explain
+```
+
+---
+
+class: inverse, center, middle
+
+# Hamby Bullet Matching Data
+
+---
+
+# Hamby Bullet Study [&lt;font size="3"&gt;James E. Hamby et. al. (2009)&lt;/font&gt;](https://cdn2.hubspot.net/hub/71705/file-15668427-pdf/docs/aftespringvol41no2pages99-110.pdf)
+
+- Sets of bullets from both “known” and “unknown” gun barrels were sent to firearm examiners around the world
+- 240 total sets created
+    - 10 barrels used to create a set
+    - 35 bullets in a set 
+        - 20 knowns (2 from the same barrel)
+        - 15 unknowns (at least 1 and no more than 3 from each barrel)
+- Examiners asked to use the known bullets to identify which barrels the unknown bullets were fired from
+
+.center[&lt;img src="./figures/hamby.png" width=350&gt;]
+.center[&lt;font size="4"&gt;Results table from Hamby et. al. (2009)&lt;/font&gt;]
+
+---
+
+# Automated Bullet Matching Algorithm
+
+- CSAFE has access to some of the bullet sets
+- [Hare, Hofmann, and Carriquiry ](https://projecteuclid.org/euclid.aoas/1514430288)(2017) develop an automated algorithm to determine whether two bullets are a match
+- High definition scans of bullets used to obtain signatures associated with each land
+- Developed variables that measure how similar two signatures are
+- Fit a random forest model to predict whether two bullets were a match
+
+.center[&lt;img src="./figures/signatures.png" width=575&gt;]
+.center[&lt;font size="4"&gt;Figure from Hare, Hofmann, and Carriquiry (2017)&lt;/font&gt;]
+
+---
+
+# Training Data
+
+#### Sets 173 and 252
+
+
+```r
+hamby173and252_train &lt;- read.csv("./data/hamby173and252_train.csv") # first 5 rows
+```
+
+#### Variables Identifying the Bullets
+
+
+```r
+hamby173and252_train %&gt;% select(1:8) %&gt;% slice(1:5)
+```
+
+```
+##     study1 barrel1 bullet1 land1   study2 barrel2 bullet2 land2
+## 1 Hamby173      10       1     1 Hamby173      10       1     2
+## 2 Hamby173      10       1     1 Hamby173      10       1     3
+## 3 Hamby173      10       1     1 Hamby173      10       1     4
+## 4 Hamby173      10       1     1 Hamby173      10       1     5
+## 5 Hamby173      10       1     1 Hamby173      10       1     6
+```
+
+---
+
+# Training Data
+
+#### Signature Similarity Features
+
+
+```r
+hamby173and252_train %&gt;% select(9:17) %&gt;% slice(1:5) %&gt;% round(2)
+```
+
+```
+##    ccf rough_cor    D sd_D matches mismatches  cms non_cms sum_peaks
+## 1 0.19     -0.03 2.93 2.64    3.21       7.48 1.60    3.74      4.21
+## 2 0.26      0.18 1.43 1.88    3.37       9.54 1.68    2.80      3.63
+## 3 0.23      0.08 2.49 2.57    2.37      12.43 2.37    9.47      2.30
+## 4 0.35      0.17 2.29 2.68    2.66       9.56 1.59    5.31      3.92
+## 5 0.21      0.04 2.66 2.57    1.13      10.69 1.13    5.63      0.45
+```
+
+#### Response and RF Score
+
+
+```r
+hamby173and252_train %&gt;% select(18:19) %&gt;% slice(1:5)
+```
+
+```
+##   samesource   rfscore
+## 1      FALSE 0.1000000
+## 2      FALSE 0.2300000
+## 3      FALSE 0.3433333
+## 4      FALSE 0.3100000
+## 5      FALSE 0.3100000
+```
+
+---
+
+# Random Forest Model
+
+The random forest model fit to the training data in Hare, Hofmann, and Carriquiry can be found in the bulletxtrctr R package. It is called `rtrees`.
+
+.pull-left[
+
+```r
+# Load the bulletxtrctr library
+library(bulletxtrctr)
+```
+
+```r
+# Importance values from 
+# the random forest
+rtrees$importance
+```
+
+```
+##            MeanDecreaseGini
+## ccf               567.53791
+## rough_cor         666.62447
+## D                 164.76236
+## sd_D              101.73478
+## matches           305.13778
+## mismatches        261.84430
+## cms                94.96370
+## non_cms            96.75017
+## sum_peaks         120.49836
+```
+]
+
+.pull-right[
+
+```r
+# Number of trees
+rtrees$ntree
+```
+
+```
+## [1] 300
+```
+
+```r
+# Number of variables randomly 
+# sampled at each split
+rtrees$mtry
+```
+
+```
+## [1] 3
+```
+
+```r
+# Confusion matrix
+rtrees$confusion
+```
+
+```
+##       FALSE TRUE class.error
+## FALSE 81799   21 0.000256661
+## TRUE    363  845 0.300496689
+```
+]
+
+---
+
+# Testing Data
+
+
+```r
+hamby224_test &lt;- read.csv("./data/hamby224_test.csv") # first 5 rows
+glimpse(hamby224_test)
+```
+
+```
+## Rows: 432
+## Columns: 18
+## $ case       &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, …
+## $ study      &lt;chr&gt; "Hamby 224", "Hamby 224", "Hamby 224", "Hamby 224", "Hamby …
+## $ set        &lt;chr&gt; "Set 11", "Set 11", "Set 11", "Set 11", "Set 1", "Set 1", "…
+## $ bullet1    &lt;chr&gt; "Known 1", "Known 1", "Known 1", "Known 1", "Known 1", "Kno…
+## $ land1      &lt;chr&gt; "Land 4", "Land 3", "Land 1", "Land 4", "Land 6", "Land 3",…
+## $ bullet2    &lt;chr&gt; "Known 1", "Known 1", "Known 2", "Known 2", "Known 2", "Kno…
+## $ land2      &lt;chr&gt; "Land 3", "Land 4", "Land 6", "Land 6", "Land 4", "Land 2",…
+## $ ccf        &lt;dbl&gt; 0.2704221, 0.2704221, 0.2788290, 0.3146965, 0.2251567, 0.34…
+## $ rough_cor  &lt;dbl&gt; 0.2704221, 0.2704221, 0.2788290, 0.3146965, 0.2251567, 0.34…
+## $ D          &lt;dbl&gt; 0.0013963668, 0.0013963668, 0.0015058188, 0.0015339433, 0.0…
+## $ sd_D       &lt;dbl&gt; 0.002090586, 0.002090586, 0.002059285, 0.002235877, 0.00209…
+## $ matches    &lt;dbl&gt; 0.5901742, 0.5901742, 0.5320479, 0.5304097, 0.4600557, 0.51…
+## $ mismatches &lt;dbl&gt; 7.616146, 7.616146, 7.895640, 8.213552, 7.123776, 5.958292,…
+## $ cms        &lt;dbl&gt; 0.5901742, 0.5901742, 0.5320479, 0.5304097, 0.4600557, 0.51…
+## $ non_cms    &lt;dbl&gt; 3.808073, 3.808073, 4.462753, 4.449008, 5.936480, 3.972195,…
+## $ sum_peaks  &lt;dbl&gt; 1.4632093, 1.4632093, 1.2246315, 2.3406954, 0.6428395, 1.36…
+## $ samesource &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FAL…
+## $ rfscore    &lt;dbl&gt; 0.00000000, 0.00000000, 0.00000000, 0.00000000, 0.02000000,…
+```
+
+---
+
+# Testing Data
+
+#### Results from Applying `rtrees` to Hamby 224 (Sets 1 and 11)
+
+&lt;br&gt;
+
+<div id="clcorvbakh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#clcorvbakh .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#clcorvbakh .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#clcorvbakh .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#clcorvbakh .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#clcorvbakh .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#clcorvbakh .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#clcorvbakh .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#clcorvbakh .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#clcorvbakh .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#clcorvbakh .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#clcorvbakh .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#clcorvbakh .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#clcorvbakh .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#clcorvbakh .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#clcorvbakh .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#clcorvbakh .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#clcorvbakh .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#clcorvbakh .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#clcorvbakh .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#clcorvbakh .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#clcorvbakh .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#clcorvbakh .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#clcorvbakh .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#clcorvbakh .gt_left {
+  text-align: left;
+}
+
+#clcorvbakh .gt_center {
+  text-align: center;
+}
+
+#clcorvbakh .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#clcorvbakh .gt_font_normal {
+  font-weight: normal;
+}
+
+#clcorvbakh .gt_font_bold {
+  font-weight: bold;
+}
+
+#clcorvbakh .gt_font_italic {
+  font-style: italic;
+}
+
+#clcorvbakh .gt_super {
+  font-size: 65%;
+}
+
+#clcorvbakh .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#clcorvbakh .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#clcorvbakh .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#clcorvbakh .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#clcorvbakh .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#clcorvbakh .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#clcorvbakh .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Truth">Truth</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="RF_Prediction">RF_Prediction</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Count">Count</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Truth" class="gt_row gt_center">FALSE</td>
+<td headers="RF_Prediction" class="gt_row gt_center">FALSE</td>
+<td headers="Count" class="gt_row gt_right">275</td></tr>
+    <tr><td headers="Truth" class="gt_row gt_center">FALSE</td>
+<td headers="RF_Prediction" class="gt_row gt_center">TRUE</td>
+<td headers="Count" class="gt_row gt_right">45</td></tr>
+    <tr><td headers="Truth" class="gt_row gt_center">TRUE</td>
+<td headers="RF_Prediction" class="gt_row gt_center">FALSE</td>
+<td headers="Count" class="gt_row gt_right">3</td></tr>
+    <tr><td headers="Truth" class="gt_row gt_center">TRUE</td>
+<td headers="RF_Prediction" class="gt_row gt_center">TRUE</td>
+<td headers="Count" class="gt_row gt_right">41</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+
+&lt;br&gt;
+
+- Want to determine the driving variables for individual predictions
+- Especially helpful when the model is wrong
+- Variable importance scores provide global interpretations
+- We want local interpretations
+
+---
+
+class: inverse, center, middle
+
+# Applying &lt;span style="color:lime"&gt;LIME&lt;/span&gt; to the Random Forest
+
+---
+
+# Step 0: Starting Objects
+
+**Training Data**: `hamby173and252_train`
+
+**Complex Model**: `rtrees`
+
+**Case of Interest**: case 1 from `hamby224_test`
+
+&lt;br&gt;
+
+<div id="jqfumugtoq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#jqfumugtoq .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#jqfumugtoq .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#jqfumugtoq .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#jqfumugtoq .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#jqfumugtoq .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#jqfumugtoq .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#jqfumugtoq .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#jqfumugtoq .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#jqfumugtoq .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#jqfumugtoq .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#jqfumugtoq .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#jqfumugtoq .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#jqfumugtoq .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#jqfumugtoq .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jqfumugtoq .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#jqfumugtoq .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#jqfumugtoq .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jqfumugtoq .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#jqfumugtoq .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jqfumugtoq .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#jqfumugtoq .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jqfumugtoq .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jqfumugtoq .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jqfumugtoq .gt_left {
+  text-align: left;
+}
+
+#jqfumugtoq .gt_center {
+  text-align: center;
+}
+
+#jqfumugtoq .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#jqfumugtoq .gt_font_normal {
+  font-weight: normal;
+}
+
+#jqfumugtoq .gt_font_bold {
+  font-weight: bold;
+}
+
+#jqfumugtoq .gt_font_italic {
+  font-style: italic;
+}
+
+#jqfumugtoq .gt_super {
+  font-size: 65%;
+}
+
+#jqfumugtoq .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#jqfumugtoq .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#jqfumugtoq .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#jqfumugtoq .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#jqfumugtoq .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#jqfumugtoq .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#jqfumugtoq .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="case">case</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="study">study</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="set">set</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="bullet1">bullet1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="land1">land1</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="bullet2">bullet2</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="land2">land2</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="case" class="gt_row gt_right">1</td>
+<td headers="study" class="gt_row gt_left">Hamby 224</td>
+<td headers="set" class="gt_row gt_left">Set 11</td>
+<td headers="bullet1" class="gt_row gt_left">Known 1</td>
+<td headers="land1" class="gt_row gt_left">Land 4</td>
+<td headers="bullet2" class="gt_row gt_left">Known 1</td>
+<td headers="land2" class="gt_row gt_left">Land 3</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+
+&lt;br&gt;
+
+<div id="ujhkirlndy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#ujhkirlndy .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#ujhkirlndy .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#ujhkirlndy .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#ujhkirlndy .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#ujhkirlndy .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#ujhkirlndy .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#ujhkirlndy .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#ujhkirlndy .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#ujhkirlndy .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#ujhkirlndy .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#ujhkirlndy .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#ujhkirlndy .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#ujhkirlndy .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#ujhkirlndy .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ujhkirlndy .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#ujhkirlndy .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#ujhkirlndy .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ujhkirlndy .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#ujhkirlndy .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ujhkirlndy .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#ujhkirlndy .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-left: 4px;
+  padding-right: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ujhkirlndy .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#ujhkirlndy .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#ujhkirlndy .gt_left {
+  text-align: left;
+}
+
+#ujhkirlndy .gt_center {
+  text-align: center;
+}
+
+#ujhkirlndy .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#ujhkirlndy .gt_font_normal {
+  font-weight: normal;
+}
+
+#ujhkirlndy .gt_font_bold {
+  font-weight: bold;
+}
+
+#ujhkirlndy .gt_font_italic {
+  font-style: italic;
+}
+
+#ujhkirlndy .gt_super {
+  font-size: 65%;
+}
+
+#ujhkirlndy .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 75%;
+  vertical-align: 0.4em;
+}
+
+#ujhkirlndy .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#ujhkirlndy .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#ujhkirlndy .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#ujhkirlndy .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#ujhkirlndy .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#ujhkirlndy .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="ccf">ccf</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="rough_cor">rough_cor</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="D">D</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="sd_D">sd_D</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="matches">matches</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="mismatches">mismatches</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="cms">cms</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="non_cms">non_cms</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="sum_peaks">sum_peaks</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="samesource">samesource</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="rfscore">rfscore</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="ccf" class="gt_row gt_right">0.27</td>
+<td headers="rough_cor" class="gt_row gt_right">0.27</td>
+<td headers="D" class="gt_row gt_right">0</td>
+<td headers="sd_D" class="gt_row gt_right">0</td>
+<td headers="matches" class="gt_row gt_right">0.59</td>
+<td headers="mismatches" class="gt_row gt_right">7.62</td>
+<td headers="cms" class="gt_row gt_right">0.59</td>
+<td headers="non_cms" class="gt_row gt_right">3.81</td>
+<td headers="sum_peaks" class="gt_row gt_right">1.46</td>
+<td headers="samesource" class="gt_row gt_right">0</td>
+<td headers="rfscore" class="gt_row gt_right">0</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+
+---
+
+# Step 1: Create Perturbations
+
+#### Estimate the feature distributions
+
+.pull-left[
+- quantile bins (default with 4 bins)
+- equally spaced bins
+]
+.pull-right[
+- normal approximation 
+- kernel density estimation
+]
+.center[
+![](slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+]
+.center[&lt;font size="4"&gt;Histogram of CCF from training data with LIME quantile bins (blue line is ccf value of case 1)&lt;/font&gt;]
+
+---
+
+# Step 1: Create Perturbations
+
+#### Draw many samples from the estimated feature distributions
+
+- If a binning estimation method is used, numeric features are converted to indicator variables.
+    - 1 if in same bin as case 1
+    - 0 o.w.
+
+| | ccf same bin? | rough_cor same bin? | `\(\cdots\)` | sum_peaks same bin?|
+| --: | :--: | :--: | :--: | :--: | 
+| case 1 | 1 | 1 | `\(\cdots\)` | 1 |
+| perturbation 1 | 0 | 1 | `\(\cdots\)` | 1 |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+| perturbation 5000  | 0 | 0 | `\(\cdots\)` | 1|
+
+- Otherwise, features are left as is.
+
+---
+
+# Step 2: Obtain Predictions
+
+#### Use the complex model to obtain a prediction for each perturbation
+
+- Use the `rtrees` model to do this
+
+&lt;br&gt;
+
+| | ccf same bin? | rough_cor same bin? | `\(\cdots\)` | sum_peaks same bin?| prediction |
+| --: | :--: | :--: | :--: | :--: | :--: |
+| case 1 | 1 | 1 | `\(\cdots\)` | 1 | not a match |
+| perturbation 1 | 0 | 1 | `\(\cdots\)` | 1 | match |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+| perturbation 5000  | 0 | 0 | `\(\cdots\)` | 1 | not a match |
+
+---
+
+# Step 3: Similarity Score 
+
+#### Compute a similiarity score between the test observation and each perturbation.
+
+- Default method in R package is Gower distance
+    - between 0 and 1 
+    - 0 indicates exactly the same
+- Other distance metrics can be specified
+    
+| | ccf same bin? | rough_cor same bin? | `\(\cdots\)` | sum_peaks same bin?| distance | prediction |
+| --: | :--: | :--: | :--: | :--: | :--: |
+| case 1 | 1 | 1 | `\(\cdots\)` | 1 | 0 | not a match |
+| perturbation 1 | 0 | 1 | `\(\cdots\)` | 1 | 0.1 | match |
+| `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` | `\(\vdots\)` |
+| perturbation 5000  | 0 | 0 | `\(\cdots\)` | 1 | 0.8 | not a match |
+
+---
+
+# Step 4: Feature Selection
+
+#### Perform feature selection to choose `\(k\)` features.
+
+- Can specify the number of features to select
+    - We have been choosing 3 features
+- Options in lime
+     - auto: forward selection if `\(k\le6\)`, highest weight otherwise (default)
+     - forward selection with ridge regression
+     - highest weight with ridge regression
+     - LASSO
+     - tree models
+- We have been using the default method
+
+&lt;br&gt;
+
+`$$\hat{\mbox{rf score}}=\hat{\beta_0} + \hat{\beta_1} I[\mbox{ccf in same bin}] + \hat{\beta_2} I[\mbox{rough_cor in same bin}] +\cdots + \hat{\beta_9} I[\mbox{sum_peaks in same bin}]$$`
+
+---
+
+# Step 5: Simple Model
+
+#### Fit a linear regression (weighted by the similarity scores) to the perturbations with the 3 chosen features.
+
+- Features are standardized
+- Currently, lime uses ridge regression as the "simple" model
+- If the response is categorical, the user can select how many categories they want to explain
+    - We have only been explaining "TRUE"
+- Example model: 
+
+&lt;br&gt;
+
+`$$\hat{\mbox{rf score}}=\hat{\beta_0} + \hat{\beta_1} I[\mbox{ccf in same bin}] + \hat{\beta_2} I[\mbox{cms in same bin}] + \hat{\beta_3} I[\mbox{matches in same bin}]$$`
+
+---
+
+# Step 6: Interpret 
+
+#### Use the coefficients from the regression to "explain" the predictions.
+
+- Since features are standardized, we can compare the coefficients
+- Largest `\(\hat{\beta}_i\)` is considered the most important
+
+---
+
+# R Code
+
+## lime Function
+
+The `lime` function estimates the feature distributions (first part of step 1).
+
+
+```r
+set.seed(20190229)
+out_lime &lt;- lime::lime(x = hamby173and252_train %&gt;% select(ccf:sum_peaks), 
+                      model = lime::as_classifier(rtrees))
+out_lime$bin_cuts$ccf
+```
+
+```
+##         0%        25%        50%        75%       100% 
+## 0.01406705 0.21271265 0.27499511 0.34783793 0.98110386
+```
+
+```r
+out_lime$feature_distribution$ccf
+```
+
+```
+## 
+##    1    2    3    4 
+## 0.25 0.25 0.25 0.25
+```
+
+---
+
+# R Code
+
+## explain Function
+
+The `explain` function performs the rest of the steps.
+
+
+```r
+out_explain &lt;- lime::explain(x = hamby224_test %&gt;% filter(case == 1) %&gt;%
+                               select(ccf:sum_peaks),
+                             explainer = out_lime,
+                             labels = TRUE,
+                             n_features = 3)
+out_explain[,1:6]
+```
+
+```
+## # A tibble: 3 × 6
+##   model_type     case  label label_prob model_r2 model_intercept
+##   &lt;chr&gt;          &lt;chr&gt; &lt;lgl&gt;      &lt;dbl&gt;    &lt;dbl&gt;           &lt;dbl&gt;
+## 1 classification 1     TRUE           0   0.0460           0.700
+## 2 classification 1     TRUE           0   0.0460           0.700
+## 3 classification 1     TRUE           0   0.0460           0.700
+```
+
+```r
+out_explain[,7:10]
+```
+
+```
+## # A tibble: 3 × 4
+##   model_prediction feature   feature_value feature_weight
+##              &lt;dbl&gt; &lt;chr&gt;             &lt;dbl&gt;          &lt;dbl&gt;
+## 1            0.661 rough_cor         0.270        -0.0442
+## 2            0.661 ccf               0.270         0.0393
+## 3            0.661 sum_peaks         1.46         -0.0341
+```
+
+---
+
+# R Code
+
+## R Package Plot of Explanations 
+
+The function `plot_features` let you visualize the explanations.
+
+
+```r
+lime::plot_features(out_explain)
+```
+
+![](slides_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+---
+
+# Shiny App
+
+&lt;br&gt;
+
+.center[&lt;img src="./figures/app.png" width=1100&gt;]
+
+---
+class: inverse, center, middle
+
+# Issues with &lt;span style="color:lime"&gt;LIME&lt;/span&gt; and Attempts at a Solution
+
+---
+
+# Initial Concerns
+
+We first applied lime using all default settings.
+- Explanations did not make sense
+- `\(R^2\)` values were very low
+- Predictions from the simple model were poor
+    
+.center[&lt;img src="./figures/explain1.png" width=450&gt;]
+.center[&lt;font size="4"&gt;Example where the random forest prediction is wrong. The explanations are from 4 quantile bins.&lt;/font&gt;]
+
+---
+
+# More Issues
+
+Then we tried more of the feature distribution estimation methods
+- Explanations still not great
+- `\(R^2\)` values still very low
+- Predictions from the simple model still poor
+- Explanations dependent on the input
+
+.center[&lt;img src="./figures/explain2.png" width=450&gt;]
+.center[&lt;font size="4"&gt;This is the same case with explanations from 3 equally spaced bins.&lt;/font&gt;]
+
+---
+
+# New Binning Method
+
+Next we created our own way to select bins using trees
+
+
+
+.pull-left[
+
+```r
+# Example using treebink
+treebink(
+  y = hamby173and252_train$samesource, 
+  x = hamby173and252_train$ccf, 
+  k = 5
+)
+```
+
+```
+## [1] 0.493562 0.582999 0.688211 0.778397
+```
+]
+.pull-right[
+.center[&lt;img src="./figures/tree.png" height = 500&gt;]
+]
+---
+
+# Comparing Methods
+
+#### Feature distribution estimaton methods:
+
+- 2 to 5 quantile bins
+- 2 to 5 equally spaced bins
+- 2 to 5 tree based bins with `samesoure` as the response
+- 2 to 5 tree based bins with `rfscore` as the response
+- normal approximation
+- kernel density estimation
+
+#### Comparison metrics:
+
+- MSEs (rf prediction vs simple model predictions)
+- `\(R^2\)`
+- Consistency across number of bins
+- Consistency across 10 reps
+
+---
+
+# Comparing MSEs
+
+.center[&lt;img src="./figures/mse.png" width = 900&gt;]
+
+---
+
+# Comparing `\(R^2\)` Values
+
+.center[&lt;img src="./figures/r2.png" width = 900&gt;]
+
+---
+
+# Comparing Consistency Across Bins
+
+.center[&lt;img src="./figures/firstfeature.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Bins
+
+.center[&lt;img src="./figures/secondfeature.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Bins
+
+.center[&lt;img src="./figures/thirdfeature.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Reps
+
+.center[&lt;img src="./figures/reps1.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Reps
+
+.center[&lt;img src="./figures/reps2.png" width = 1100&gt;]
+
+---
+
+# Comparing Consistency Across Reps
+
+.center[&lt;img src="./figures/reps3.png" width = 1100&gt;]
+
+---
+
+class: middle, center, inverse
+
+# Conclusions and Future Work
+
+---
+
+# Conclusions
+
+- Equally spaced bins are dependent on the number of bins
+- Tree based bins usually have the lowest MSEs
+- `rfscore` tree based bins usually have the highest `\(R^2\)` for the binning options
+- All options results in low `\(R^2\)` values
+    - We think that the linear regression is not similar enough to a random forest to produce good explanations
+- Explanations are relatively consistent across reps for first and second features
+- Non-binning methods produce very different results compared to the binning methods
+
+---
+
+# Future Work
+
+- Apply LIME to a logistic regression model
+    - We know how to interpret a logistic regression
+    - Can compare to LIME explanations
+- Run some sort of simulation to assess LIME explanations
+- Adjust and compare weighting methods and the feature selection methods
+- Allow the number of bins to vary across features
+- Use a tree as the simple model
+- Find other ways to interpret random forest models
+
+---
+
+# Image Credits
+
+- slide 1: https://www.flickr.com/photos/lincolnian/300262799
+- slide 2: https://ayoqq.org/explore/lime-drawing/
+- slide 3: https://en.wikipedia.org/wiki/Black_box 
+- slide 8: https://github.com/thomasp85/lime
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
