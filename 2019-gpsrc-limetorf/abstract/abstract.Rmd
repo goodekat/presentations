@@ -1,0 +1,15 @@
+---
+title: "Abstract for 2019 GPSS Poster"
+author: "Katherine Goode"
+date: "3/8/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Title**: Using LIME to Interpret a Random Forest Model with an Application to Bullet Matching Data
+
+**Abstract** (250 words or less): Random forests are known for their accurate predictive abilities, but they are a part of the family of machine learning models that lack interpretability. Recently, a technique called LIME was developed to provide local interpretations for complex predictive models. LIME determines which variables are important in a prediction of interest by fitting a local linear regression to model predictions and perturbations of the data. The coefficients from the linear model are used to interpret the complex model. While applying LIME to random forests, I encountered some unusual results. This led me to develop some diagnostic tools to evaluate LIME. I will demonstrate these by assessing the application of LIME to a random forest fit to a forensics bullet matching dataset.
+
