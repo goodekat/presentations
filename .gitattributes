@@ -2,3 +2,11 @@ slides_with_SAND.pdf filter=lfs diff=lfs merge=lfs -text
 2020-autodesk-eml/slides.pdf filter=lfs diff=lfs merge=lfs -text
 2020-isugg-fpca-pfi/slides_with_SAND.pdf filter=lfs diff=lfs merge=lfs -text
 .pptx filter=lfs diff=lfs merge=lfs -text
+2020-aaai-fpca-pfi/slides.pdf filter=lfs diff=lfs merge=lfs -text
+2019-mmlc-assesslime/poster.pdf filter=lfs diff=lfs merge=lfs -text
+2019-jsm-lime_diagnostics.pdf filter=lfs diff=lfs merge=lfs -text
+2019-jsm-lime_diagnostics/slides.pdf filter=lfs diff=lfs merge=lfs -text
+2019-jsm-lime_diagnostics/script.pdf filter=lfs diff=lfs merge=lfs -text
+2019-jsm-lime_diagnostics/poster.pdf filter=lfs diff=lfs merge=lfs -text
+2019-gpsrc-limetorf/poster.pdf filter=lfs diff=lfs merge=lfs -text
+2018-kstate-ggresidpanel/poster.pdf filter=lfs diff=lfs merge=lfs -text
