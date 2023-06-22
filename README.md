@@ -2,7 +2,7 @@
 
 ### 2023
 
-- [**trace-plots**](https://goodekat.github.io/presentations/2023-siam-gs/slides.html): Presentation on feature importance for echo state networks given at SIAM-GS
+- [**esn-feature-importance**](https://goodekat.github.io/presentations/2023-siam-gs/slides.html): Presentation on feature importance for echo state networks given at SIAM-GS
 
 ### 2022
 
