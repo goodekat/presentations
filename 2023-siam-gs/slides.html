@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Feature Importance with Deep Echo State Models</title>
+    <title>.mediumlarge[Feature Importance with Deep Echo State Models]</title>
     <meta charset="utf-8" />
     <meta name="author" content="Katherine Goode, Daniel Ries, Kellie McClernon, and Lyndsay Shand" />
-    <meta name="author" content="SIAM-GS" />
-    <meta name="author" content="June 22, 2023" />
-    <meta name="author" content=".smaller[SAND2023-05130C]" />
+    <meta name="author" content=".blue-blue[SIAM-GS]" />
+    <meta name="author" content=".blue-blue[June 22, 2023]" />
+    <meta name="author" content=".smaller[.dark-blue[SAND2023-05130C]]" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link rel="stylesheet" href="sandia-theme.css" type="text/css" />
   </head>
@@ -15,19 +15,19 @@
 class: center, middle, inverse, title-slide
 
 .title[
-# Feature Importance with Deep Echo State Models
+# .mediumlarge[Feature Importance with Deep Echo State Models]
 ]
 .author[
 ### Katherine Goode, Daniel Ries, Kellie McClernon, and Lyndsay Shand
 ]
 .author[
-### SIAM-GS
+### .blue-blue[SIAM-GS]
 ]
 .author[
-### June 22, 2023
+### .blue-blue[June 22, 2023]
 ]
 .author[
-### .smaller[SAND2023-05130C]
+### .smaller[.dark-blue[SAND2023-05130C]]
 ]
 
 ---
@@ -620,262 +620,294 @@ class: inverse, center, middle
 
 .sky-blue[goodekat.github.io]
 
----
+&lt;!-- --- --&gt;
 
-class: inverse, center, middle
+&lt;!-- class: inverse, center, middle --&gt;
 
-# Back-Up Slides
+&lt;!-- # Back-Up Slides --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## ESN Details
+&lt;!-- ## ESN Details --&gt;
 
-&lt;img src="figs/esn-details-1.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "100%"} --&gt;
+&lt;!-- include_graphics("figs/esn-details-1.png") --&gt;
+&lt;!-- ``` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## ESN Details
+&lt;!-- ## ESN Details --&gt;
 
-&lt;img src="figs/esn-details-2.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "100%"} --&gt;
+&lt;!-- include_graphics("figs/esn-details-2.png") --&gt;
+&lt;!-- ``` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## ESN Details
+&lt;!-- ## ESN Details --&gt;
 
-&lt;img src="figs/esn-details-3.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "100%"} --&gt;
+&lt;!-- include_graphics("figs/esn-details-3.png") --&gt;
+&lt;!-- ``` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## ESN Details
+&lt;!-- ## ESN Details --&gt;
 
-&lt;img src="figs/esn-details-4.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "100%"} --&gt;
+&lt;!-- include_graphics("figs/esn-details-4.png") --&gt;
+&lt;!-- ``` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## ESN Details
+&lt;!-- ## ESN Details --&gt;
 
-&lt;img src="figs/esn-details-5.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "100%"} --&gt;
+&lt;!-- include_graphics("figs/esn-details-5.png") --&gt;
+&lt;!-- ``` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Issue and Solution
+&lt;!-- ## Issue and Solution --&gt;
 
-**Black-box**:
+&lt;!-- **Black-box**: --&gt;
 
-- ESN parameters NOT interpretable (unlike spatio-temporal statistical models)
-- Objective is to quantify variable relationships...
+&lt;!-- - ESN parameters NOT interpretable (unlike spatio-temporal statistical models) --&gt;
+&lt;!-- - Objective is to quantify variable relationships... --&gt;
 
-&lt;img src="figs/black-box.png" width="45%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "45%"} --&gt;
+&lt;!-- include_graphics("figs/black-box.png") --&gt;
+&lt;!-- ``` --&gt;
 
---
+&lt;!-- -- --&gt;
 
-**Interpretable**: A model is interpretable if it is possible to assign meaning to the model's parameters in the context of the application, which provides insight into how the model inputs relate to the model outputs.
+&lt;!-- **Interpretable**: A model is interpretable if it is possible to assign meaning to the model's parameters in the context of the application, which provides insight into how the model inputs relate to the model outputs. --&gt;
 
-  - Consider a linear model: `\(\hat{y}=\hat{\beta_0}+\hat{\beta_1}x_1.\)` We can interpret the coefficient `\(\hat{\beta}_1\)` as the amount the response variable `\(\hat{y}\)` increases for a one unit increase in the predictor variable `\(x_1\)`.
+&lt;!--   - Consider a linear model: `\(\hat{y}=\hat{\beta_0}+\hat{\beta_1}x_1.\)` We can interpret the coefficient `\(\hat{\beta}_1\)` as the amount the response variable `\(\hat{y}\)` increases for a one unit increase in the predictor variable `\(x_1\)`. --&gt;
 
---
+&lt;!-- -- --&gt;
 
-**Explainable**: A model is explainable if it is possible to implement post hoc investigations on a trained model that infer how the model inputs relate to the model outputs.
+&lt;!-- **Explainable**: A model is explainable if it is possible to implement post hoc investigations on a trained model that infer how the model inputs relate to the model outputs. --&gt;
 
-  - Feature importance: Aims to quantify the effect of an input variable on a model's predictions. Various techniques have been proposed for computing FI
+&lt;!--   - Feature importance: Aims to quantify the effect of an input variable on a model's predictions. Various techniques have been proposed for computing FI --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Feature Importance: Spatio-Temporal Context
+&lt;!-- ## Feature Importance: Spatio-Temporal Context --&gt;
 
---
+&lt;!-- -- --&gt;
 
-**Compute FI on the trained ESN model** for...
+&lt;!-- **Compute FI on the trained ESN model** for... --&gt;
 
-- spatio-temporal input variable `\(k\)`
+&lt;!-- - spatio-temporal input variable `\(k\)` --&gt;
 
-- over the block of times `\(\{t, t-1,..., t-b+1\}\)`
+&lt;!-- - over the block of times `\(\{t, t-1,..., t-b+1\}\)` --&gt;
 
-- on the forecasts of the spatio-temporal response variable at time `\(t+\tau\)`.
+&lt;!-- - on the forecasts of the spatio-temporal response variable at time `\(t+\tau\)`. --&gt;
 
-&lt;br&gt;
+&lt;!-- &lt;br&gt; --&gt;
 
---
+&lt;!-- -- --&gt;
 
-&lt;img src="figs/fi-demo.png" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "90%"} --&gt;
+&lt;!-- include_graphics("figs/fi-demo.png") --&gt;
+&lt;!-- ``` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Feature Importance: Spatio-Temporal Context
+&lt;!-- ## Feature Importance: Spatio-Temporal Context --&gt;
 
-&lt;img src="figs/fi-demo.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "80%"} --&gt;
+&lt;!-- include_graphics("figs/fi-demo.png") --&gt;
+&lt;!-- ``` --&gt;
 
---
+&lt;!-- -- --&gt;
 
-**Two Approaches**: "Adjust" inputs by either
+&lt;!-- **Two Approaches**: "Adjust" inputs by either --&gt;
 
-- Permutation: .blue[spatio-temporal permutation feature importance (stPFI)]
+&lt;!-- - Permutation: .blue[spatio-temporal permutation feature importance (stPFI)] --&gt;
 
-- Set values to zero: .blue[spatio-temporal zeroed feature importance (stZFI)]
+&lt;!-- - Set values to zero: .blue[spatio-temporal zeroed feature importance (stZFI)] --&gt;
 
---
+&lt;!-- -- --&gt;
 
-**Feature Importance**: Difference in RMSEs from observed and "adjusted" spatial predictions
+&lt;!-- **Feature Importance**: Difference in RMSEs from observed and "adjusted" spatial predictions --&gt;
 
-`$$\mathcal{I}^{(k,b)}_{t,t+\tau}=\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b)}_{t+\tau}\right) - \mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}_{t+\tau}\right)$$`
+&lt;!-- `$$\mathcal{I}^{(k,b)}_{t,t+\tau}=\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b)}_{t+\tau}\right) - \mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}_{t+\tau}\right)$$` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Feature Importance: Spatio-Temporal Context
+&lt;!-- ## Feature Importance: Spatio-Temporal Context --&gt;
 
-&lt;img src="figs/fi-demo.png" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "80%"} --&gt;
+&lt;!-- include_graphics("figs/fi-demo.png") --&gt;
+&lt;!-- ``` --&gt;
 
---
+&lt;!-- -- --&gt;
 
-**Visualization**: Feature importance of `\(\textbf{x}_1\)` during times `\(\{t, t-1, t-2\}\)` on forecast of `\(\textbf{y}_t\)` at time `\(t+1\)`:
+&lt;!-- **Visualization**: Feature importance of `\(\textbf{x}_1\)` during times `\(\{t, t-1, t-2\}\)` on forecast of `\(\textbf{y}_t\)` at time `\(t+1\)`: --&gt;
 
-&lt;img src="figs/fi-sketch.png" width="45%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "45%"} --&gt;
+&lt;!-- include_graphics("figs/fi-sketch.png") --&gt;
+&lt;!-- ``` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Feature Importance Details
+&lt;!-- ## Feature Importance Details --&gt;
 
-Let `\(\mathcal{I}^{(k,b)}_{t,t+\tau}\)` denote the FI on the trained ESN model `\(f\)` for
+&lt;!-- Let `\(\mathcal{I}^{(k,b)}_{t,t+\tau}\)` denote the FI on the trained ESN model `\(f\)` for --&gt;
 
-- spatio-temporal input variable `\(k\)`
-- over the block of times `\(\{t, t-1,..., t-b+1\}\)`
-- on the forecasts of the spatio-temporal response variable at time `\(t+\tau\)`.
+&lt;!-- - spatio-temporal input variable `\(k\)` --&gt;
+&lt;!-- - over the block of times `\(\{t, t-1,..., t-b+1\}\)` --&gt;
+&lt;!-- - on the forecasts of the spatio-temporal response variable at time `\(t+\tau\)`. --&gt;
 
-&lt;br&gt;
+&lt;!-- &lt;br&gt; --&gt;
 
---
+&lt;!-- -- --&gt;
 
-We compute the FI `\(\mathcal{I}^{(k,b)}_{t,t+\tau}\)` as follows:
+&lt;!-- We compute the FI `\(\mathcal{I}^{(k,b)}_{t,t+\tau}\)` as follows: --&gt;
 
---
+&lt;!-- -- --&gt;
 
-**Step 1**: Obtain forecasts `\(f(\textbf{x}_t, \textbf{x}_{t-1},..., \textbf{x}_{1})=\hat{\textbf{y}}_{t+\tau}\)` at time `\(t+\tau\)`.
+&lt;!-- **Step 1**: Obtain forecasts `\(f(\textbf{x}_t, \textbf{x}_{t-1},..., \textbf{x}_{1})=\hat{\textbf{y}}_{t+\tau}\)` at time `\(t+\tau\)`. --&gt;
 
---
+&lt;!-- -- --&gt;
 
-**Step 2**: Let `\(\mathcal{M}\)` be a model prediction performance metric comparing observed to predicted values with the constraint that smaller values indicated better model performance (e.g., root mean squared error). Compute the performance metric on the trained model `\(f\)` at time `\(t+\tau\)` as: `$$\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}_{t+\tau}\right).$$`
+&lt;!-- **Step 2**: Let `\(\mathcal{M}\)` be a model prediction performance metric comparing observed to predicted values with the constraint that smaller values indicated better model performance (e.g., root mean squared error). Compute the performance metric on the trained model `\(f\)` at time `\(t+\tau\)` as: `$$\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}_{t+\tau}\right).$$` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Feature Importance Details
+&lt;!-- ## Feature Importance Details --&gt;
 
-**Step 3**: Generate *adjusted* forecasts using one of the following two methods:
+&lt;!-- **Step 3**: Generate *adjusted* forecasts using one of the following two methods: --&gt;
 
---
+&lt;!-- -- --&gt;
 
-  - .blue[Permutation (stPFI)]: For replicate `\(r=1,2,...,R\)`, randomly permute the values within each vector `\(\textbf{x}_{k,t}, \textbf{x}_{k,t-1},..., \textbf{x}_{k,t-b+1}\)`. Replace the corresponding observed values within `\(\textbf{x}_t, \textbf{x}_{t-1},...,\textbf{x}_{t-b+1}\)` with the permuted versions. Let the versions of `\(\textbf{x}_t, \textbf{x}_{t-1},...,\textbf{x}_{t-b+1}\)` containing the permuted values associated with variable `\(k\)` and replicate `\(r\)` be denoted as `$$\textbf{x}^{(k,r)}_t, \textbf{x}^{(k,r)}_{t-1},..., \textbf{x}^{(k,r)}_{t-b+1},$$` respectively. Then obtain forecasts at time `\(t+\tau\)` as `$$f\left(\textbf{x}^{(k,r)}_t, \textbf{x}^{(k,r)}_{t-1},... \textbf{x}^{(k,r)}_{t-b+1}, \textbf{x}_{t-b},..., \textbf{x}_{1}\right)=\hat{\textbf{y}}^{(k,b,r)}_{t+\tau}.$$` The `\(R\)` replications are implemented to account for variability among permutations.
+&lt;!--   - .blue[Permutation (stPFI)]: For replicate `\(r=1,2,...,R\)`, randomly permute the values within each vector `\(\textbf{x}_{k,t}, \textbf{x}_{k,t-1},..., \textbf{x}_{k,t-b+1}\)`. Replace the corresponding observed values within `\(\textbf{x}_t, \textbf{x}_{t-1},...,\textbf{x}_{t-b+1}\)` with the permuted versions. Let the versions of `\(\textbf{x}_t, \textbf{x}_{t-1},...,\textbf{x}_{t-b+1}\)` containing the permuted values associated with variable `\(k\)` and replicate `\(r\)` be denoted as `$$\textbf{x}^{(k,r)}_t, \textbf{x}^{(k,r)}_{t-1},..., \textbf{x}^{(k,r)}_{t-b+1},$$` respectively. Then obtain forecasts at time `\(t+\tau\)` as `$$f\left(\textbf{x}^{(k,r)}_t, \textbf{x}^{(k,r)}_{t-1},... \textbf{x}^{(k,r)}_{t-b+1}, \textbf{x}_{t-b},..., \textbf{x}_{1}\right)=\hat{\textbf{y}}^{(k,b,r)}_{t+\tau}.$$` The `\(R\)` replications are implemented to account for variability among permutations. --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Feature Importance Details
+&lt;!-- ## Feature Importance Details --&gt;
 
-**Step 3**: Generate *adjusted* forecasts using one of the following two methods:
+&lt;!-- **Step 3**: Generate *adjusted* forecasts using one of the following two methods: --&gt;
 
-  - .blue[Zeroing (stZFI)]: Replace the vectors of `\(\textbf{x}_{k,t}, \textbf{x}_{k,t-1},..., \textbf{x}_{k,t-b+1}\)` within `\(\textbf{x}_t, \textbf{x}_{t-1},...,\textbf{x}_{t-b+1}\)` with zeros. Let the versions of `\(\textbf{x}_t, \textbf{x}_{t-1},...,\textbf{x}_{t-b+1}\)` containing the inserted zeros associated with variable `\(k\)` be denoted as `$$\textbf{x}^{(k)}_t, \textbf{x}^{(k)}_{t-1},..., \textbf{x}^{(k)}_{t-b+1},$$` respectively. Then obtain forecasts at time `\(t+\tau\)` as `$$f\left(\textbf{x}^{(k)}_t, \textbf{x}^{(k)}_{t-1},... \textbf{x}^{(k)}_{t-b+1}, \textbf{x}_{t-b},...,\textbf{x}_1\right)=\hat{\textbf{y}}^{(k,b)}_{t+\tau}.$$` Note that no replications are needed to account for variability with zeroing.
+&lt;!--   - .blue[Zeroing (stZFI)]: Replace the vectors of `\(\textbf{x}_{k,t}, \textbf{x}_{k,t-1},..., \textbf{x}_{k,t-b+1}\)` within `\(\textbf{x}_t, \textbf{x}_{t-1},...,\textbf{x}_{t-b+1}\)` with zeros. Let the versions of `\(\textbf{x}_t, \textbf{x}_{t-1},...,\textbf{x}_{t-b+1}\)` containing the inserted zeros associated with variable `\(k\)` be denoted as `$$\textbf{x}^{(k)}_t, \textbf{x}^{(k)}_{t-1},..., \textbf{x}^{(k)}_{t-b+1},$$` respectively. Then obtain forecasts at time `\(t+\tau\)` as `$$f\left(\textbf{x}^{(k)}_t, \textbf{x}^{(k)}_{t-1},... \textbf{x}^{(k)}_{t-b+1}, \textbf{x}_{t-b},...,\textbf{x}_1\right)=\hat{\textbf{y}}^{(k,b)}_{t+\tau}.$$` Note that no replications are needed to account for variability with zeroing. --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Feature Importance Details
+&lt;!-- ## Feature Importance Details --&gt;
 
-**Step 4**: Compute the prediction performance metric on the forecasts obtained by inputting the adjusted predictions into the trained model `\(f\)`. That is, with stPFI compute
+&lt;!-- **Step 4**: Compute the prediction performance metric on the forecasts obtained by inputting the adjusted predictions into the trained model `\(f\)`. That is, with stPFI compute --&gt;
 
-`$$\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b,r)}_{t+\tau}\right),$$`
+&lt;!-- `$$\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b,r)}_{t+\tau}\right),$$` --&gt;
 
-for `\(r=1,...,R\)`, and with stZFI compute
+&lt;!-- for `\(r=1,...,R\)`, and with stZFI compute --&gt;
 
-`$$\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b)}_{t+\tau}\right).$$`
+&lt;!-- `$$\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b)}_{t+\tau}\right).$$` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Feature Importance Details
+&lt;!-- ## Feature Importance Details --&gt;
 
-**Step 5**: Finally, compute:
+&lt;!-- **Step 5**: Finally, compute: --&gt;
 
-&lt;br&gt;
+&lt;!-- &lt;br&gt; --&gt;
 
-.blue[stPFI] at time `\(t+\tau\)` as the average change in model prediction performance when inputs `\(\textbf{x}_{k,t}, \textbf{x}_{k,t-1},..., \textbf{x}_{k,t-b+1}\)` are permuted:
+&lt;!-- .blue[stPFI] at time `\(t+\tau\)` as the average change in model prediction performance when inputs `\(\textbf{x}_{k,t}, \textbf{x}_{k,t-1},..., \textbf{x}_{k,t-b+1}\)` are permuted: --&gt;
 
-`\begin{align}
-    \mathcal{I}^{(k,b)}_{t,t+\tau}=\left[\frac{1}{R}\sum_{r=1}^R\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b,r)}_{t+\tau}\right)\right] - \mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}_{t+\tau}\right),
-\end{align}`
+&lt;!-- \begin{align} --&gt;
+&lt;!--     \mathcal{I}^{(k,b)}_{t,t+\tau}=\left[\frac{1}{R}\sum_{r=1}^R\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b,r)}_{t+\tau}\right)\right] - \mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}_{t+\tau}\right), --&gt;
+&lt;!-- \end{align} --&gt;
 
-&lt;br&gt;
+&lt;!-- &lt;br&gt; --&gt;
 
-or .blue[stZFI] at time `\(t+\tau\)` as the change in model prediction performance when inputs `\(\textbf{x}_{k,t}, \textbf{x}_{k,t-1},..., \textbf{x}_{k,t-b+1}\)` are set to 0:
+&lt;!-- or .blue[stZFI] at time `\(t+\tau\)` as the change in model prediction performance when inputs `\(\textbf{x}_{k,t}, \textbf{x}_{k,t-1},..., \textbf{x}_{k,t-b+1}\)` are set to 0: --&gt;
 
-`\begin{align}
-    \mathcal{I}^{(k,b)}_{t,t+\tau}=\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b)}_{t+\tau}\right) - \mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}_{t+\tau}\right).
-\end{align}`
+&lt;!-- \begin{align} --&gt;
+&lt;!--     \mathcal{I}^{(k,b)}_{t,t+\tau}=\mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}^{(k,b)}_{t+\tau}\right) - \mathcal{M}\left(\textbf{y}_{t+\tau}, \hat{\textbf{y}}_{t+\tau}\right). --&gt;
+&lt;!-- \end{align} --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Simulated Data Demonstration
+&lt;!-- ## Simulated Data Demonstration --&gt;
 
-.pull-left[
+&lt;!-- .pull-left[ --&gt;
 
-**Simulated response**
+&lt;!-- **Simulated response** --&gt;
 
-`$$Z_{Y,t}({\bf s}_i)=Z_{2,t}({\bf s}_i) \beta + \delta_t({\bf s}_i) + \epsilon_t({\bf s}_i)$$`
+&lt;!-- `$$Z_{Y,t}({\bf s}_i)=Z_{2,t}({\bf s}_i) \beta + \delta_t({\bf s}_i) + \epsilon_t({\bf s}_i)$$` --&gt;
 
-where
+&lt;!-- where --&gt;
 
-- `\(Z_{2,t}\)` spatio-temporal covariate
-- `\(\delta_t({\bf s}_i)\)` spatio-temporal random effect
-- `\(\epsilon_t({\bf s}_i) \overset{iid}{\sim}  N(0,\sigma_{\epsilon}^2)\)`
+&lt;!-- - `\(Z_{2,t}\)` spatio-temporal covariate --&gt;
+&lt;!-- - `\(\delta_t({\bf s}_i)\)` spatio-temporal random effect --&gt;
+&lt;!-- - `\(\epsilon_t({\bf s}_i) \overset{iid}{\sim}  N(0,\sigma_{\epsilon}^2)\)` --&gt;
 
-&lt;img src="figs/syn_data.png" width="75%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "75%"} --&gt;
+&lt;!-- include_graphics("figs/syn_data.png") --&gt;
+&lt;!-- ``` --&gt;
 
-]
+&lt;!-- ] --&gt;
 
-.pull-right[
-&lt;img src="figs/syn_data_heat.png" width="95%" style="display: block; margin: auto;" /&gt;
-]
+&lt;!-- .pull-right[ --&gt;
+&lt;!-- ```{r out.width = "95%"} --&gt;
+&lt;!-- include_graphics("figs/syn_data_heat.png") --&gt;
+&lt;!-- ``` --&gt;
+&lt;!-- ] --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Simulated Data Demonstration
+&lt;!-- ## Simulated Data Demonstration --&gt;
 
-.pull-left-smaller[
+&lt;!-- .pull-left-smaller[ --&gt;
 
-**Fit an ESN**
+&lt;!-- **Fit an ESN** --&gt;
 
-- Forecast `\(Z_{Y,t}\)` 
+&lt;!-- - Forecast `\(Z_{Y,t}\)`  --&gt;
 
-- Inputs `\(Z_{1,t-\tau}\)` and `\(Z_{2,t-\tau}\)`
+&lt;!-- - Inputs `\(Z_{1,t-\tau}\)` and `\(Z_{2,t-\tau}\)` --&gt;
 
-**Compute stPFI and stZFI**
+&lt;!-- **Compute stPFI and stZFI** --&gt;
 
-  - Blocks of size 1 to 3
+&lt;!--   - Blocks of size 1 to 3 --&gt;
 
-]
+&lt;!-- ] --&gt;
 
---
+&lt;!-- -- --&gt;
 
-.pull-right-larger[
+&lt;!-- .pull-right-larger[ --&gt;
 
-&lt;img src="figs/syn_data_res.png" width="98%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width="98%"} --&gt;
+&lt;!-- include_graphics("figs/syn_data_res.png") --&gt;
+&lt;!-- ``` --&gt;
 
-Each line represents the importance of the block of lagged times of an input variable on the forecast at time `\(t\)`
+&lt;!-- Each line represents the importance of the block of lagged times of an input variable on the forecast at time `\(t\)` --&gt;
 
-]
+&lt;!-- ] --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Simulated Data: Effect of Variability on FI
+&lt;!-- ## Simulated Data: Effect of Variability on FI --&gt;
 
-&lt;img src="figs/zfi_pfi_comparison.png" width="67%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "67%"} --&gt;
+&lt;!-- include_graphics("figs/zfi_pfi_comparison.png") --&gt;
+&lt;!-- ``` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Simulated Data: Effect of Variability on FI
+&lt;!-- ## Simulated Data: Effect of Variability on FI --&gt;
 
-&lt;img src="figs/zfi_nblock.png" width="92%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "92%"} --&gt;
+&lt;!-- include_graphics("figs/zfi_nblock.png") --&gt;
+&lt;!-- ``` --&gt;
 
----
+&lt;!-- --- --&gt;
 
-## Effect of Correlation on FI
+&lt;!-- ## Effect of Correlation on FI --&gt;
 
-&lt;img src="figs/effect-corr.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;!-- ```{r out.width = "100%"} --&gt;
+&lt;!-- include_graphics("figs/effect-corr.png") --&gt;
+&lt;!-- ``` --&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
