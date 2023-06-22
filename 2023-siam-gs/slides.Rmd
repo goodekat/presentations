@@ -654,7 +654,7 @@ include_graphics("figs/esn-details-5.png")
 - ESN parameters NOT interpretable (unlike spatio-temporal statistical models)
 - Objective is to quantify variable relationships...
 
-```{r out.width = "50%"}
+```{r out.width = "45%"}
 include_graphics("figs/black-box.png")
 ```
 
@@ -669,44 +669,6 @@ include_graphics("figs/black-box.png")
 **Explainable**: A model is explainable if it is possible to implement post hoc investigations on a trained model that infer how the model inputs relate to the model outputs.
 
   - Feature importance: Aims to quantify the effect of an input variable on a model's predictions. Various techniques have been proposed for computing FI
-
---
-
-## Feature Importance
-
-Feature importance aims to quantify effect of input variable on a model's predictions
-
---
-
-.pull-left-smallish[
-**Background**
-
-- Permutation feature importance `r Citep(bib, "fisher2019")`
-- Pixel absence affect with ESNs `r Citep(bib, "arrieta2022")`
-- Temporal permutation feature importance `r Citep(bib, "sood2021")`
-
-**Our Work**
-
-- Adapt for ESNs in context of spatio-temporal data
-
-**Concept**
-
-- "Adjust" inputs at times(s) of interest
-- Quantify effect on model performance
-- Large decrease in performance indicates important time(s)
-
-]
-
---
-
-.pull-right-largeish[
-
-<br>
-
-```{r out.width = "95%"}
-include_graphics("figs/fi.png")
-```
-]
 
 ---
 
