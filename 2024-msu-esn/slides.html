@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>.blue-dark[.mediumlarge[Characterizing climate pathways using echo state networks and feature importance]]</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Katherine Goode" />
+    <meta name="author" content="April 3, 2024" />
+    <meta name="author" content="Montana State University Statistics Department Seminar" />
+    <meta name="author" content=".dark-blue[.smaller[SAND2024-04036PE]]" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="sandia-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# .blue-dark[.mediumlarge[Characterizing climate pathways using echo state networks and feature importance]]
+]
+.author[
+### Katherine Goode
+]
+.author[
+### April 3, 2024
+]
+.author[
+### Montana State University Statistics Department Seminar
+]
+.author[
+### .dark-blue[.smaller[SAND2024-04036PE]]
+]
+
+---
+
+
+&lt;style type="text/css"&gt;
+.smaller{font-size: 45%}
+.small{font-size: 50%}
+.smallmedium{font-size: 55%}
+.medium{font-size: 75%}
+.mediumlarge{font-size: 80%}
+
+.pull-left-small{
+  width: 35%;
+  float: left;
+}
+.pull-right-large{
+  width: 60%;
+  float: right;
+}
+.pull-right-small{
+  width: 35%;
+  float: right;
+}
+.pull-left-large{
+  width: 65%;
+  float: left;
+}
+.pull-left-smallish{
+  width: 46%;
+  float: left;
+}
+.pull-right-largeish{
+  width: 53%;
+  float: right;
+}
+.pull-left-largeish{
+  width: 53%;
+  float: left;
+}
+.pull-right-smallish{
+  width: 46%;
+  float: right;
+}
+.pull-right-smaller{
+  width: 20%;
+  float: right;
+}
+.pull-left-larger{
+  width: 76%;
+  float: left;
+}
+.pull-left-smaller{
+  width: 22%;
+  float: left;
+}
+.pull-right-larger{
+  width: 76%;
+  float: right;
+}
+.pull-left-v3 {
+  width: 60%;
+  height: 92%;
+  float: left;
+}
+.pull-right-v3 {
+  width: 35%;
+  float: right;
+  padding-left: 1%;
+}
+
+&lt;/style&gt;
+
+
+
+
+
+## But first... Working as a statistician at a national lab
+
+--
+
+.pull-left-small[
+
+### .blue[Sandia National Laboratories]
+
+Federally Funded Research and Development Center (FFRDC)
+
+From the [Sandia website](https://www.sandia.gov/): 
+
+&gt; "We strive to become the laboratory that the U.S. turns to first for technology solutions to the most challenging problems that threaten peace and freedom for our nation and the globe."
+
+]
+
+.pull-right-large[
+
+Recent labs news:
+
+&lt;img src="figs/lab-news.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## But first... Working as a statistician at a national lab
+
+.pull-left-small[
+
+### .blue[Sandia National Laboratories]
+
+Federally Funded Research and Development Center (FFRDC)
+
+From the [Sandia website](https://www.sandia.gov/): 
+
+&gt; "We strive to become the laboratory that the U.S. turns to first for technology solutions to the most challenging problems that threaten peace and freedom for our nation and the globe."
+
+]
+
+.pull-right-large[
+
+Examples of programs at Sandia:
+
+&lt;img src="figs/labs-programs.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Previous Projects
+
+--
+
+**Predicting Explosive Device Characteristics**
+
+.pull-left-large[
+
+&lt;img src="figs/edc-sub.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+.center[Simulated optical spectral-temporal signatures from explosions]
+
+]
+
+.pull-right-small[
+
+&lt;img src="figs/edc-pcs.png" width="85%" style="display: block; margin: auto;" /&gt;
+
+.center[Identifying functional principal components important for prediction]
+
+]
+
+---
+
+## Previous Projects
+
+**Determining Processing Conditions of Nuclear Particulates**
+
+&lt;img src="figs/particles-ip.png" width="45%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Current Projects
+
+**Different Perspectives on Trust/Explainability/Interpretability with Machine Learning**
+
+.pull-left-large[
+- Random forest explainability
+  - Identify tree topology patterns in random forest
+  
+- Private yet explainable
+  - Develop differentially private + explainable clustering algorithm
+
+- Maturity levels for SciML
+  - Develop framework for assessing maturity of machine learning models used to complement computational simulation models
+  
+- Trust in AI
+  - Human study to quantify trust in an algorithm when transparency and interactivity of algorithm are adjusted
+]
+
+.pull-right-small[
+
+&lt;img src="figs/forestr-clusters.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="figs/forestr-traces.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+class: inverse, center, middle
+
+# Back to Climate Project
+
+---
+
+## Remainder of Talk...
+
+--
+
+- .blue[Overview]: Project Motivation and Goals
+
+- .blue[Approach]: Echo State Networks and Feature Importance
+
+- .blue[Climate Application]: Mount Pinatubo
+
+- .blue[Ending]: Conclusions and Future/Current Work
+
+&lt;br&gt;
+
+--
+
+Acknowledgements
+
+- **Sub-thrust team**: Daniel Ries, Kellie McClernon
+
+- **Thrust lead**: Lyndsay Shand
+
+- **General advise**: Gabriel Huerta, J. Derek Tucker
+
+---
+
+class: inverse, center, middle
+
+# Overview
+
+### .bright-teal[Project Motivation and Goals]
+
+---
+
+## Climate Interventions
+
+.pull-left-large[
+
+&lt;img src="figs/solar-climate-interventions.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+.center[.smallmedium[Image source: [https://eos.org/science-updates/improving-models-for-solar-climate-intervention-research](https://eos.org/science-updates/improving-models-for-solar-climate-intervention-research)]]
+
+]
+
+.pull-right-small[
+Threat of climate change has led to .blue[proposed interventions]...
+
+  - Stratospheric aerosol injections
+
+  - Marine cloud brightening
+
+  - Cirrus cloud thinning
+
+  - etc.
+]
+
+--
+
+&lt;br&gt;
+
+.center[**What are the downstream effects of such mitigation strategies?**]
+
+---
+
+## CLDERA Grand Challenge
+
+&lt;img src="figs/cldera.png" width="95%" style="display: block; margin: auto;" /&gt;
+
+.center[.smallmedium[Image credit: CLDERA leadership]]
+
+---
+
+## Climate Event Exemplar
+
+- Mount Pinatubo eruption in 1991
+
+- Released 18-19 Tg of sulfur dioxide
+
+- Proxy for anthropogenic stratospheric aerosol injection
+
+.pull-left[
+&lt;img src="figs/pinatubo-ash-cloud.jpg" width="90%" style="display: block; margin: auto;" /&gt;
+.center[.smallmedium[Image source: [https://pubs.usgs.gov/fs/1997/fs113-97/](https://pubs.usgs.gov/fs/1997/fs113-97/)]]
+]
+
+.pull-right[
+&lt;br&gt;
+&lt;img src="figs/pinatubo.jpg" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;br&gt;
+.center[.smallmedium[Image source: [https://volcano.si.edu/volcano.cfm?vn=273083](https://volcano.si.edu/volcano.cfm?vn=273083)]]
+]
+
+---
+
+## Observational Thrust
+
+**Objective**: Develop algorithms to .blue[characterize (i.e., quantify) relationships between climate variables] related to a climate event using observational data
+
+.pull-left-smaller[
+&lt;img src="figs/obs-data-collection.png" width="60%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right-larger[
+&lt;img src="figs/obs-pathway.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;br&gt;
+.center[.smallmedium[Image credit: CLDERA leadership]]
+]
+
+---
+
+## Mount Pintabuo Pathway
+
+.center[
+.blue[Sulfur dioxide]
+
+.medium[Injection of sulfur dioxide (18-19 Tg) into atmosphere [1]] 
+
+&lt;img src="figs/arrow.png" width="5%" style="display: block; margin: auto;" /&gt;
+
+.blue[Aerosol optical depth (AOD)]
+
+.medium[Vertically integrated measure of aerosols in air from surface to stratosphere [2]
+
+AOD increased as a result of injection of sulfur dioxide [1; 2]]
+
+&lt;img src="figs/arrow.png" width="5%" style="display: block; margin: auto;" /&gt;
+
+.blue[Stratospheric temperature]
+
+.medium[Temperatures at pressure levels of 30-50 mb rose 2.5-3.5 degrees centigrade compared to 20-year mean [3]] 
+]
+
+---
+
+## Mount Pintabuo Pathway
+
+&lt;img src="figs/merra2_heatmaps_1991.png" width="77%" style="display: block; margin: auto;" /&gt;
+
+.center[.smaller[Figure generated using Modern-Era Retrospective Analysis for Research and Applications, Version 2 (MERRA- 2) data [4].]]
+
+---
+
+## Our Approach
+
+--
+
+Use machine learning...
+
+--
+
+.pull-left[
+
+**Step 1: Model climate event variables with echo state network**
+
+Allow complex machine learning model to capture complex variable relationships
+
+&lt;br&gt;
+
+&lt;img src="figs/esn-step1.png" width="95%" style="display: block; margin: auto;" /&gt;
+]
+
+--
+
+.pull-right[
+
+**Step 2: Quantify relationships via explainability**
+
+Apply feature importance to understand relationships captured by model
+
+&lt;br&gt;
+
+&lt;img src="figs/esn-step2.png" width="100%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: inverse, center, middle
+
+# Approach
+
+### .bright-teal[Step 1: Echo State Networks]
+
+---
+
+## Echo State Networks
+
+**Overview**
+
+- Nonlinear machine learning model for temporal data
+- Sibling to recurrent neural network (RNN)
+- Computationally efficient due to many parameters being randomly sampled instead of estimated
+
+--
+
+.pull-left[
+**Single Layer Echo State Network**
+
+.blue[Output stage]: ridge regression
+`$$\textbf{y}_{t} = \mathbf{V} \mathbf{h}_t + \boldsymbol{\epsilon}_{t} \ \ \ \ \ \ {\bf \epsilon_t } \sim N(\textbf{0}, \sigma^2_\epsilon \textbf{I})$$`
+.blue[Hidden stage]: nonlinear stochastic transformation
+`$$\mathbf{h}_t = g_h \left(\frac{\nu}{|\lambda_w|} \mathbf{W} \mathbf{h}_{t-1} + \mathbf{U} \mathbf{\tilde{x}}_{t-\tau}\right)$$`
+`$$\tilde{\mathbf{x}}_{t-\tau}=\left[\textbf{x}'_{t-\tau},\textbf{x}'_{t-\tau-\tau^*},...,\mathbf{x}'_{t-\tau-m\tau^*}\right]'$$`
+]
+
+--
+
+.pull-right[
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+Elements of `\(\textbf{W}\)` and `\(\textbf{U}\)` randomly sampled as:
+`\begin{align}
+    \textbf{W}[h,c_w] &amp;=\gamma_{h,c_w}^w\mbox{Unif}(-a_w,a_w)+(1-\gamma_{h,c_w}^w)\delta_0\\
+    \textbf{U}[h,c_u] &amp;=\gamma_{h,c_u}^u\mbox{Unif}(-a_u,a_u)+(1-\gamma_{h,c_u}^u)\delta_0
+\end{align}`
+where `\(\gamma_{h,c_w}^w \sim Bern(\pi_w)\)`, `\(\gamma_{h,c_u}^u \sim Bern(\pi_u)\)`, `\(\delta_0\)` is a Dirac function, and values of `\(a_w\)`, `\(a_u\)`, `\(\pi_w\)`, and `\(\pi_u\)` are pre-specified and set to small values.
+]
+
+---
+
+## Echo State Networks
+
+
+
+&lt;br&gt;
+&lt;br&gt;
+
+&lt;img src="figs/esn-step1.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Echo State Networks: Spatio-Temporal Context
+
+
+
+Recall that we are working with spatio-temporal data...
+
+&lt;img src="figs/esn-spatio-temp.png" width="95%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Echo State Networks: Spatio-Temporal Context
+
+--
+
+Spatio-temporal processes at spatial locations `\(\{\textbf{s}_i\in\mathcal{D}\subset\mathbb{R}^2;i=1,...,N\}\)` over times `\(t=1,...,T\)`...
+
+--
+
+.pull-left[
+.blue[Output variable] (e.g., stratospheric temperature): 
+  
+`$${\bf Z}_{Y,t} = \left(Z_{Y,t}({\bf s}_1),Z_{Y,t}({\bf s}_2),...,Z_{Y,t}({\bf s}_N)\right)'$$`
+
+]
+
+--
+
+.pull-right[
+
+.blue[Input variables] (e.g., lagged aerosol optical depth and stratospheric temperature): For `\(k=1,...,K\)`
+  
+`$${\bf Z}_{k,t} = \left(Z_{k,t}({\bf s}_1),Z_{k,t}({\bf s}_2),...,Z_{k,t}({\bf s}_N)\right)'$$`
+]
+
+--
+
+| Stage | Formula | Description |
+| ----- | ------- | ----------- |
+| Output data stage | `\({\bf Z}_{Y,t}\approx\boldsymbol{\Phi}_Y\textbf{y}_{t}\)` | Basis function decomposition (e.g., PCA) |
+| Output stage | `\(\textbf{y}_{t} = \mathbf{V} \mathbf{h}_t + \boldsymbol{\epsilon}_{t}\)` | Ridge regression |
+| Hidden stage | `\(\mathbf{h}_t = g_h \left(\frac{\nu}{\lvert\lambda_w\rvert} \mathbf{W} \mathbf{h}_{t-1} + \mathbf{U} \mathbf{\tilde{x}}_{t-\tau}\right)\)` `\(\tilde{\mathbf{x}}_{t-\tau}=\left[\textbf{x}'_{t-\tau},\textbf{x}'_{t-\tau-\tau^*},...,\mathbf{x}'_{t-\tau-m\tau^*}\right]'\)` | Nonlinear stochastic transformation |
+| Input data stage | `\({\bf Z}_{k,t}\approx\boldsymbol{\Phi}_k\textbf{x}_{k,t}\)` `\(\ \ \ \ \ \ \textbf{x}_t=[\textbf{x}'_{1,t},...,\textbf{x}'_{K,t}]'\)` | Basis function decomposition (e.g., PCA) |
+
+---
+
+## Echo State Networks: Spatio-Temporal Context
+
+&lt;br&gt;
+
+&lt;img src="figs/esn-with-pcs.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: inverse, center, middle
+
+# Approach
+
+### .bright-teal[Step 2: Feature Importance]
+
+---
+
+## Feature Importance for ESNs
+
+--
+
+**Goal:** Quantify the effect of .blue[input variable] `\(k\)` over .blue[block of times] `\((t-b,...,t-1)\)` on .blue[forecasts] at time `\(t\)`
+
+&lt;img src="figs/esn-spatio-temp.png" width="95%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Feature Importance for ESNs
+
+.pull-left-large[
+&lt;img src="figs/fi.png" width="85%" style="display: block; margin: auto;" /&gt;
+]
+
+.pull-right-small[
+**Concept**: "Adjust" inputs at times(s) of interest and quantify effect on model performance
+
+- .blue[Permute values]: spatio-temporal permutation feature importance (stPFI)
+
+- .blue[Set values to zero]: spatio-temporal zeroed feature importance (stZFI)
+]
+
+--
+
+&lt;br&gt;
+
+**Feature Importance**: Difference in RMSEs from "adjusted" and observed spatial predictions:
+
+`$$RMSE_{adj,t}-RMSE_{obs,t}$$`
+
+--
+
+**Interpretation**: Large feature importance indicates "adjusted" inputs lead to a decrease in model performance indicating the model finds those inputs important for prediction
+
+---
+
+## Feature Importance for ESNs
+
+Computing feature importance of variable 1 at time `\(t=5\)` using a block size of 3:
+
+&lt;br&gt;
+
+`$$RMSE_{adj,5}-RMSE_{obs,5}$$`
+
+&lt;br&gt;
+
+&lt;img src="figs/fi-demo.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: inverse, center, middle
+
+# Climate Application
+
+### .bright-teal[Mount Pinatubo]
+
+---
+
+## Mount Pinatubo Example: Data
+
+**Data** Monthly values from 1980 to 1995 and -86 to 86 degrees latitude 
+
+**Source** Modern-Era Retrospective Analysis for Research and Applications, Version 2 (MERRA- 2)
+
+.pull-left-smaller[
+**Normalized anomalies**
+
+`$$\frac{Z_{k,mth,yr}({\bf s}_i)-\bar{Z}_{k,mth,\cdot}({\bf s}_i)}{sd(Z_{k,mth,\cdot}({\bf s}_i))}$$`
+
+&lt;br&gt;
+
+where `\(\bar{Z}_{k,mth,\cdot}({\bf s}_i)\)` and `\(sd(Z_{k,mth,\cdot}({\bf s}_i))\)` are average and standard deviation at location `\({\bf s}_i\)` during month `\(mth\)` for variable `\(k\)`
+]
+
+.pull-right-larger[
+&lt;img src="figs/merra2_weighted_global_averages.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Mount Pinatubo Example: Model
+
+.pull-left-small[
+**Goal** Forecast stratospheric temperature (50mb) one month ahead given lagged values of stratospheric temperature (50mb) and AOD
+
+**Details**
+
+- All variables: First 5 principal components computed on normalized anomalies
+
+- Hyperparameters selected via grid search when years of 1994 and 1995 were held out 
+
+- Fit 25 ESNs to account for random variability
+]
+
+.pull-right-large[
+
+&lt;img src="figs/merra2_rmse.png" width="97%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Mount Pinatubo Example: Feature Importance
+
+Block sizes of 1-6 months (averaged over 25 ESNs)
+
+&lt;img src="figs/MERRA2_fi_blocks_ens_aves.png" width="72%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Mount Pinatubo Example: Feature Importance
+
+Block size of 6 months (including variability across 25 ESNs)
+
+&lt;img src="figs/MERRA2_fi.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: inverse, center, middle
+
+# Conclusions and Future Work
+
+---
+
+## Summary and Conclusions
+
+- Interested in quantifying relationships between climate variables associated with pathway of climate event
+
+- Motivated by increasing possibility of climate interventions
+
+- Our machine learning approach:
+
+  - Use ESN to model variable relationships
+
+  - Understand variable relationships using proposed spatio-temporal feature importance
+
+- Approach provided evidence of AOD being a variable in Mount Pinatubo climate pathway affecting stratospheric temperature
+
+---
+
+## Future (Current) Work
+
+**Methodology**
+
+- Ensembles of ESNs
+
+- Implement proposed retraining technique [5] to lessen detection of spurious relationships due to correlation
+
+- Feature importance computed on spatial scale
+
+- Comparison to other newly proposed explainability techniques for ESNs (layer-wise relevance propagation)  [6] 
+
+**Mt. Pinatubo Application**
+
+- Inclusion of additional Mt. Pinatubo pathway variables (e.g., SO2, radiative flux, surface temperature)
+
+- Importance of grouped variables
+
+- Application to climate simulation ensembles
+
+- Use of climate simulation ensembles for method assessment
+
+---
+
+## References
+
+.smallmedium[
+[1] S. Guo, G. J. Bluth, W. I. Rose, et al. "Re-evaluation of SO$_2$
+release of the 15 June 1991 Pinatubo eruption using ultraviolet and
+infrared satellite sensors". In: _Geochemistry, Geophysics, Geosystems_
+5 (4 2004), pp. 1-31. DOI:
+[10.1029/2003GC000654](https://doi.org/10.1029%2F2003GC000654).
+
+[2] M. Sato, J. E. Hansen, M. P. McCormick, et al. "Stratospheric
+aerosol optical depths, 1850-1990". In: _Journal of Geophysical
+Research: Atmospheres_ 98.D12 (1993), pp. 22987-22994. DOI:
+[https://doi.org/10.1029/93JD02553](https://doi.org/https%3A%2F%2Fdoi.org%2F10.1029%2F93JD02553).
+eprint:
+https://agupubs.onlinelibrary.wiley.com/doi/pdf/10.1029/93JD02553. URL:
+[https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/93JD02553](https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/93JD02553).
+
+[3] K. Labitzke and M. McCormick. "Stratospheric temperature increases
+due to Pinatubo aerosols". In: _Geophysical Research Letters_ 19 (2
+1992), pp. 207-210. DOI:
+[10.1029/91GL02940](https://doi.org/10.1029%2F91GL02940).
+
+[4] R. Gelaro, W. McCarty, M. J. Suarez, et al. "The ModernEra
+Retrospective Analysis for Research and Applications, Version 2
+(MERRA-2)". In: _Journal of Climate_ 30 (14 2017), pp. 5419-5454. DOI:
+[10.1175/JCLI-D-16-0758.1](https://doi.org/10.1175%2FJCLI-D-16-0758.1).
+
+[5] G. Hooker, L. Mentch, and S. Zhou. "Unrestricted permutation forces
+extrapolation: variable importance requires at least one more model, or
+there is no free variable importance". In: _Statistics and Computing_
+31 (2021), pp. 1-16.
+
+[6] M. Landt-Hayen, P. Kröger, M. Claus, et al. "Layer-Wise Relevance
+Propagation for Echo State Networks Applied to Earth System
+Variability". In: _Signal, Image Processing and Embedded Systems
+Trends_. Ed. by D. C. Wyld. Computer Science &amp; Information Technology
+(CS &amp; IT): Conference Proceedings 20. ARRAY(0x55588c8d8680), 2022, pp.
+115-130. ISBN: 978-1-925953-80-0. DOI:
+[doi:10.5121/csit.2022.122008](https://doi.org/doi%3A10.5121%2Fcsit.2022.122008).
+URL:
+[https://doi.org/10.5121/csit.2022.122008](https://doi.org/10.5121/csit.2022.122008).
+]
+
+---
+
+class: inverse, center, middle
+
+&lt;br&gt;
+
+# Thank you
+
+.white[kjgoode@sandia.gov]
+
+.sky-blue[goodekat.github.io]
+
+.white[Slides: [goodekat.github.io/posts/2024-04-03.html](https://goodekat.github.io/posts/2024-04-03.html)]
+
+---
+
+class: inverse, center, middle
+
+# Back-Up Slides
+
+---
+
+## Weighted RMSE
+
+Weighted RMSE to compute feature importance (weighted by cos latitude): 
+
+`$$\mbox{weighted RMSE}_t =\sqrt{\frac{\sum_{loc}w_{loc}(y_{t,loc}-\hat{y}_{t,loc,adj})^2}{\sum_{loc}w_{loc}}} - \sqrt{\frac{\sum_{loc}w_{loc}(y_{t,loc}-\hat{y}_{t,loc})^2}{\sum_{loc}w_{loc}}}$$`
+
+---
+
+## Feature Importance: Spatio-Temporal Context
+
+Contribution of spatial locations to ZFI: `\(\sqrt{\frac{w_{loc}(y_{t,loc}-\hat{y}_{t,loc,zeroed})^2}{\sum_{loc}w_{loc}}} - \sqrt{\frac{w_{loc}(y_{t,loc}-\hat{y}_{t,loc})^2}{\sum_{loc}w_{loc}}}\)`
+
+&lt;img src="figs/fi-cont-aod.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Feature Importance: Spatio-Temporal Context
+
+Contribution of spatial locations to ZFI: `\(\sqrt{\frac{w_{loc}(y_{t,loc}-\hat{y}_{t,loc,zeroed})^2}{\sum_{loc}w_{loc}}} - \sqrt{\frac{w_{loc}(y_{t,loc}-\hat{y}_{t,loc})^2}{\sum_{loc}w_{loc}}}\)`
+
+&lt;img src="figs/fi-cont-temp.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Simulated Data Demonstration
+
+.pull-left[
+
+**Simulated response**
+
+`$$Z_{Y,t}({\bf s}_i)=Z_{2,t}({\bf s}_i) \beta + \delta_t({\bf s}_i) + \epsilon_t({\bf s}_i)$$`
+
+where
+
+- `\(Z_{2,t}\)` spatio-temporal covariate
+- `\(\delta_t({\bf s}_i)\)` spatio-temporal random effect
+- `\(\epsilon_t({\bf s}_i) \overset{iid}{\sim}  N(0,\sigma_{\epsilon}^2)\)`
+
+
+
+&lt;img src="figs/syn_data.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-right[
+
+
+&lt;img src="figs/syn_data_heat.png" width="90%" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+## Simulated Data: Effect of Variability on FI
+
+&lt;img src="figs/zfi_nblock.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Effect of Correlation on FI
+
+&lt;img src="figs/effect-corr.png" width="100%" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%",
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

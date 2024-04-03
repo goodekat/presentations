@@ -1,0 +1,331 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Exo+2&display=swap);
+@import url(https://fonts.googleapis.com/css?family=Fira+Mono&display=swap);
+
+html {
+  font-size: 20px;
+}
+body {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, Ubuntu, roboto, noto, segoe ui, arial, sans-serif;
+  font-weight: normal;
+  color: #3A3B3A;
+}
+h1, h2, h3 {
+  font-family: 'Open Sans', Georgia, serif;
+  font-weight: 600;
+  color: 324259;
+}
+
+.remark-slide-content {
+  background-image: url(figs/background-remark.png);
+  background-size: cover;
+  background-color: #FFFFFF;
+  font-size: 1rem;
+  color: #3A3B3A;
+  padding: 16px 64px 16px 64px;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+.remark-slide-content h1 {
+  font-size: 2.5rem;
+  color: #324259;
+}
+.remark-slide-content h2 {
+  font-size: 2rem;
+  color: #324259;
+}
+.remark-slide-content h3 {
+  font-size: 1.5rem;
+  color: #324259;
+}
+.remark-code, .remark-inline-code {
+  font-family: 'Fira Mono', Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+}
+.remark-code {
+  font-size: 1rem;
+}
+.remark-inline-code {
+  font-size: 1em;
+  color: #005376;
+}
+.remark-slide-number {
+  color: #324259;
+  opacity: 1;
+  font-size: 0.8rem;
+}
+strong {
+  font-weight: bold;
+  color: #029EBE;
+}
+a, a > code {
+  color: #4CA8D0;
+  text-decoration: none;
+}
+.footnote {
+  position: absolute;
+  bottom: 60px;
+  padding-right: 4em;
+  font-size: 0.9em;
+}
+.remark-code-line-highlighted {
+  background-color: #2B86EB;
+}
+.inverse {
+  background-image: url(figs/background-inverse.png);
+  background-size: cover;
+  font-family: "Open Sans";
+}
+.inverse h1, .inverse h2, .inverse h3 {
+  color: #FAFAFA;
+}
+.inverse a, .inverse a > code {
+  color: #FAFAFA;
+}
+
+.inverse2 {
+  background-image: url(figs/background-inverse2.png);
+  background-size: cover;
+  font-family: "Open Sans";
+}
+.inverse2 h1, .inverse2 h2, .inverse2 h3 {
+  color: #FAFAFA;
+}
+.inverse2 a, .inverse2 a > code {
+  color: #FAFAFA;
+}
+
+.title-slide {
+  background-image: url(figs/background-title.png);
+  background-size: cover;
+  font-family: "Open Sans";
+  text-align: left !important;
+}
+.title-slide h1 {
+  color: #FAFAFA;
+  margin-top: 30px;
+  font-size: 2.5rem;
+}
+.title-slide h2{
+  color: #FAFAFA;
+  margin-top: -30px;
+  margin-bottom: 50px;
+  font-size: 1.5rem;
+}
+.title-slide h3 {
+  color: #FAFAFA;
+  margin-top: -20px;
+  margin-top: -20px;
+  font-size: 1rem;
+}
+.title-slide .remark-slide-number {
+  display: none;
+}
+/* Two-column layout */
+.left-column {
+  width: 20%;
+  height: 92%;
+  float: left;
+}
+.left-column h2, .left-column h3 {
+  color: #00537699;
+}
+.left-column h2:last-of-type, .left-column h3:last-child {
+  color: #005376;
+}
+.right-column {
+  width: 75%;
+  float: right;
+  padding-top: 1em;
+}
+.pull-left {
+  float: left;
+  width: 47%;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+}
+.pull-right + * {
+  clear: both;
+}
+img, video, iframe {
+  max-width: 100%;
+}
+blockquote {
+  border-left: solid 5px #00ADD080;
+  padding-left: 1em;
+}
+.remark-slide table {
+  margin: auto;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
+}
+.remark-slide table thead th {
+  border-bottom: 1px solid #ddd;
+}
+th, td {
+  padding: 5px;
+}
+.remark-slide thead, .remark-slide tfoot{
+  background: var(--background-color);
+}
+table.dataTable tbody {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
+  color: var(--text-color);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: var(--text-color) !important;
+}
+
+/* Horizontal alignment of code blocks */
+.remark-slide-content.left pre,
+.remark-slide-content.center pre,
+.remark-slide-content.right pre {
+  text-align: start;
+  width: max-content;
+  max-width: 100%;
+}
+.remark-slide-content.left pre,
+.remark-slide-content.right pre {
+  min-width: 50%;
+  min-width: min(40ch, 100%);
+}
+.remark-slide-content.center pre {
+  min-width: 66%;
+  min-width: min(50ch, 100%);
+}
+.remark-slide-content.left pre {
+  margin-left: unset;
+  margin-right: auto;
+}
+.remark-slide-content.center pre {
+  margin-left: auto;
+  margin-right: auto;
+}
+.remark-slide-content.right pre {
+  margin-left: auto;
+  margin-right: unset;
+}
+
+/* Slide Header Background for h1 elements */
+.remark-slide-content.header_background > h1 {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #FFFFFF;
+  color: #FFFFFF;
+  padding: 2rem 64px 1.5rem 64px;
+  margin-top: 0;
+  box-sizing: border-box;
+}
+.remark-slide-content.header_background {
+  padding-top: 7rem;
+}
+
+@page { margin: 0; }
+@media print {
+  .remark-slide-scaler {
+    width: 100% !important;
+    height: 100% !important;
+    transform: scale(1) !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+}
+
+.primary {
+  color: #324259;
+}
+.bg-primary {
+  background-color: #324259;
+}
+.secondary {
+  color: #627288;
+}
+.bg-secondary {
+  background-color: #627288;
+}
+
+.white {
+  color: #FAFAFA;
+}
+.bg-white {
+  background-color: #FAFAFA;
+}
+.black {
+  color: #191919;
+}
+.bg-black {
+  background-color: #191919;
+}
+.light-grey {
+  color: #D7D8D7;
+}
+.bg-light-grey {
+  background-color: #D7D8D7;
+}
+.grey {
+  color: #888A88;
+}
+.bg-grey {
+  background-color: #888A88;
+}
+.dark-grey {
+  color: #3A3B3A;
+}
+.bg-dark-grey {
+  background-color: #3A3B3A;
+}
+.light-blue {
+  color: #95C2F5;
+}
+.pale-blue {
+  color: #708AAF;
+}
+.sky-blue {
+  color: #42DDFD;
+}
+.blue {
+  color: #2B86EB;
+}
+.blue-blue {
+  color: #075086;
+}
+.dark-blue {
+  color: #263143;
+}
+.bright-teal {
+  color: #27BECB;
+}
+.teal {
+  color: #029EBE;
+}
+.dark-teal {
+  color: #236482;
+}
+.blue-grey {
+  color: #354257;
+}
+.blue-dark{
+  color:#324259;
+}
+
+.content-box {
+  box-sizing: border-box;
+  border-radius: 15px;
+  margin: 0 0 15px;
+  overflow: hidden;
+  padding: 0px 20px 0px 20px;
+  width: 100%;
+  background-color: #D7D8D7;
+}
